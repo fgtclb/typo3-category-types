@@ -1,0 +1,30 @@
+{
+  "name": "fgtclb/fgtclb-educational",
+  "type": "typo3-cms-extension",
+  "description": "Base package for FGTCLB Educational packages",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+      {
+          "name": "web-vision GmbH",
+          "role": "Mantainer"
+      },
+      {
+          "name": "Mark Houben",
+          "role": "Developer"
+      }
+  ],
+  "require": {
+      "typo3/cms-core": "^11.5",
+      "typo3/cms-extbase": "^11.5"
+  },
+  "autoload": {
+      "psr-4": {
+          "FGTCLB\\FgtclbEducational\\": "Classes"
+      }
+  },
+  "extra": {
+      "typo3/cms": {
+          "extension-key": "fgtclb_educational"
+      }
+  }
+}

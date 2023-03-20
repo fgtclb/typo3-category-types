@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" target-language="" datatype="plaintext"
+		  original="messages" date="2023-03-20T13:05:33Z">
+		<header>
+			<generator>OwnScript</generator>
+		</header>
+		<body>
+			<trans-unit id="sys_category.type">
+				<source>Type</source>
+			</trans-unit>
+			<trans-unit id="sys_category.type.default">
+				<source>Default</source>
+			</trans-unit>
+			<trans-unit id="sys_category.not_set">
+				<source>Not set</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
