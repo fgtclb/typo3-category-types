@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 (static function (): void {
     $llBackend = function (string $label) {
-        return sprintf('LLL:EXT:fgtclb_educational/Resources/Private/Language/locallang.xlf:sys_category.%s', $label);
+        return sprintf('LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.%s', $label);
     };
     $llBackendType = function (string $label) {
-        return sprintf('LLL:EXT:fgtclb_educational/Resources/Private/Language/locallang.xlf:sys_category.type.%s', $label);
+        return sprintf('LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.type.%s', $label);
     };
     $sysCategoryTca = [
         'ctrl' => [
@@ -20,12 +20,13 @@ declare(strict_types=1);
             'type' => [
                 'label' => $llBackend('type'),
                 'config' => [
+                    'default' => 'default',
                     'type' => 'select',
                     'renderType' => 'selectSingle',
                     'items' => [
                         [
                             $llBackendType('default'),
-                            '',
+                            'default',
                             'mimetypes-x-sys_category',
                         ],
                     ],
