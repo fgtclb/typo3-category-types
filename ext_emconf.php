@@ -1,11 +1,11 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => '(FGTCLB) Educational Package Basic',
-    'description' => 'Basic setup for FGTCLB Educational packages',
-    'category' => 'plugin',
-    'author' => '',
-    'author_email' => '',
+    'title' => '(FGTCLB) Basic Typed categories',
+    'description' => 'Basic extension for typed categories',
+    'category' => 'misc',
+    'author' => 'FGTCLB',
+    'author_email' => 'hello@fgtclb.com',
     'state' => 'stable',
     'clearCacheOnLoad' => 0,
     'version' => '1.0.0',
