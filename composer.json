@@ -1,47 +1,53 @@
 {
-  "name": "fgtclb/category-types",
-  "type": "typo3-cms-extension",
-  "description": "Base package for FGTCLB Academic packages",
-  "license": "GPL-2.0-or-later",
-  "authors": [
-      {
-          "name": "web-vision GmbH",
-          "role": "Mantainer"
-      },
-      {
-          "name": "Mark Houben",
-          "role": "Developer"
-      }
-  ],
-  "require": {
-      "typo3/cms-core": "^11.5",
-      "typo3/cms-extbase": "^11.5"
-  },
-  "require-dev": {
-    "typo3/testing-framework": "^7.0",
-    "saschaegerer/phpstan-typo3": "^1.8",
-    "phpstan/phpstan": "^1.10",
-    "friendsofphp/php-cs-fixer": "^v3.14"
-  },
-  "extra": {
-    "typo3/cms": {
-      "cms-package-dir": "{$vendor-dir}/typo3/cms",
-      "extension-key": "category_types",
-      "ignore-as-root": false,
-      "web-dir": ".Build/Web",
-      "app-dir": ".Build"
-    }
-  },
-  "config": {
-    "vendor-dir": ".Build/vendor",
-    "bin-dir": ".Build/bin",
-    "optimize-autoloader": true,
-    "sort-packages": true,
-    "allow-plugins": {
-      "typo3/class-alias-loader": true,
-      "typo3/cms-composer-installers": true,
-      "helhum/typo3-console-plugin": true,
-      "php-http/discovery": true
-    }
-  }
+	"name": "fgtclb/category-types",
+	"type": "typo3-cms-extension",
+	"description": "Base package for FGTCLB Academic packages",
+	"license": "GPL-2.0-or-later",
+	"version": "1.1.0",
+	"authors": [
+		{
+			"name": "web-vision GmbH",
+			"role": "Mantainer"
+		},
+		{
+			"name": "Mark Houben",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"typo3/cms-core": "^11.5 || ^12.4 || ^13.4",
+		"typo3/cms-extbase": "^11.5 || ^12.4 || ^13.4"
+	},
+	"require-dev": {
+		"typo3/testing-framework": "^7.0",
+		"saschaegerer/phpstan-typo3": "^1.8",
+		"phpstan/phpstan": "^1.10",
+		"friendsofphp/php-cs-fixer": "^v3.14"
+	},
+	"autoload": {
+		"psr-4": {
+			"FGTCLB\\CategoryTypes\\": "Classes/"
+		}
+	},
+	"extra": {
+		"typo3/cms": {
+			"cms-package-dir": "{$vendor-dir}/typo3/cms",
+			"extension-key": "category_types",
+			"ignore-as-root": false,
+			"web-dir": ".Build/Web",
+			"app-dir": ".Build"
+		}
+	},
+	"config": {
+		"vendor-dir": ".Build/vendor",
+		"bin-dir": ".Build/bin",
+		"optimize-autoloader": true,
+		"sort-packages": true,
+		"allow-plugins": {
+			"typo3/class-alias-loader": true,
+			"typo3/cms-composer-installers": true,
+			"helhum/typo3-console-plugin": true,
+			"php-http/discovery": true
+		}
+	}
 }
