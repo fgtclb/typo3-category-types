@@ -35,7 +35,10 @@
 			"extension-key": "category_types",
 			"ignore-as-root": false,
 			"web-dir": ".Build/Web",
-			"app-dir": ".Build"
+			"app-dir": ".Build",
+			"Package": {
+				"serviceProvider": "FGTCLB\\CategoryTypes\\ServiceProvider"
+			}
 		}
 	},
 	"config": {

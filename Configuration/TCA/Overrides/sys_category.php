@@ -34,6 +34,7 @@ declare(strict_types=1);
             ],
         ],
     ];
+
     \TYPO3\CMS\Core\Utility\ArrayUtility::mergeRecursiveWithOverrule(
         $GLOBALS['TCA']['sys_category'],
         $sysCategoryTca
