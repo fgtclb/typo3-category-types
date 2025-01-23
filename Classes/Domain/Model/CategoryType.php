@@ -8,7 +8,10 @@ class CategoryType
 {
     public function __construct(
         private string $identifier,
+        private string $extensionKey,
+        private string $title,
         private string $group,
+        private string $icon,
         private int $priority,
     ) {}
 
@@ -16,7 +19,10 @@ class CategoryType
     {
         return new self(
             identifier: (string)($array['identifier'] ?? ''),
+            extensionKey: (string)($array['extensionKey'] ?? ''),
+            title: (string)($array['title'] ?? ''),
             group: (string)($array['group'] ?? ''),
+            icon: (string)($array['icon'] ?? ''),
             priority: (int)($array['priority'] ?? 0),
         );
     }
@@ -25,7 +31,10 @@ class CategoryType
     {
         return [
             'identifier' => $this->identifier,
+            'extensionKey' => $this->extensionKey,
+            'title' => $this->title,
             'group' => $this->group,
+            'icon' => $this->icon,
             'priority' => $this->priority,
         ];
     }
@@ -35,9 +44,24 @@ class CategoryType
         return $this->identifier;
     }
 
+    public function getExtensionKey(): string
+    {
+        return $this->extensionKey;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
     public function getGroup(): string
     {
         return $this->group;
+    }
+
+    public function getIcon(): string
+    {
+        return $this->icon;
     }
 
     public function getPriority(): int
