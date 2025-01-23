@@ -8,11 +8,6 @@ services:
     resource: '../Classes/*'
     exclude: '../Classes/Domain/Model/*.php'
 
-  cache.category_types:
-    class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
-    factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
-    arguments: ['category_types']
-
   FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry:
     factory:
       - '@FGTCLB\CategoryTypes\Loader\CategoryTypeLoader'

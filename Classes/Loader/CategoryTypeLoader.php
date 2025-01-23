@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace FGTCLB\CategoryTypes\Loader;
 
 use FGTCLB\CategoryTypes\Domain\Model\CategoryType;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Yaml;
 use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
-use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Yaml\Yaml;
+use TYPO3\CMS\Core\Cache\Frontend\PhpFrontend;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 class CategoryTypeLoader
@@ -19,8 +16,8 @@ class CategoryTypeLoader
     protected CategoryTypeRegistry $categoryTypeRegistry;
 
     public function __construct(
-        #[Autowire(service: 'cache.category_types')]
-        protected readonly VariableFrontend $cache,
+        #[Autowire(service: 'cache.core')]
+        protected readonly PhpFrontend $cache,
         protected readonly PackageManager $packageManager
     ) {}
 
@@ -48,6 +45,7 @@ class CategoryTypeLoader
         foreach ($this->packageManager->getActivePackages() as $package) {
             $extensionKey = $package->getPackageKey();
             $typeConfigurationFile = $package->getPackagePath() . '/Configuration/CategoryTypes.yaml';
+
             if (file_exists($typeConfigurationFile)) {
                 $configArray = Yaml::parseFile($typeConfigurationFile);
                 if ($configArray === null) {
@@ -55,6 +53,7 @@ class CategoryTypeLoader
                 }
                 if (array_key_exists('types', $configArray) && is_array($configArray['types'])) {
                     foreach ($configArray['types'] as $categoryType) {
+                        $categoryType['extensionKey'] = $extensionKey;
                         $loadedCategoryTypes[] = CategoryType::fromArray($categoryType);
                     }
                 }
@@ -80,8 +79,7 @@ class CategoryTypeLoader
 
     protected function getFromCache(): false|array
     {
-        $test = $this->cache->get('CategoryTypes_Types');
-        return $this->cache->get('CategoryTypes_Types');
+        return $this->cache->require('CategoryTypes_Types');
     }
 
     protected function setCache(): void
