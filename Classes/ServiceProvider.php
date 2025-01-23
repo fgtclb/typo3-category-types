@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\CategoryTypes;
 
 use Closure;
+use FGTCLB\CategoryTypes\Generator\TcaGenerator;
 use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
 use Psr\Container\ContainerInterface;
 use TYPO3\CMS\Core\Configuration\Event\BeforeTcaOverridesEvent;
@@ -49,26 +50,27 @@ class ServiceProvider extends AbstractServiceProvider
             $categoryTypeRegistry = $container->get(CategoryTypeRegistry::class);
             $categoryTypes = $categoryTypeRegistry->getCategoryTypes();
 
-            /*
-            foreach ($iconsFromPackages as $icon => $options) {
-                $provider = $options['provider'] ?? null;
-                unset($options['provider']);
-                $options ??= [];
-                if ($provider === null && ($options['source'] ?? false)) {
-                    $provider = $iconRegistry->detectIconProvider($options['source']);
-                }
-                if ($provider === null) {
-                    continue;
-                }
-                $iconRegistry->registerIcon($icon, $provider, $options);
+            foreach ($categoryTypes as $categoryType) {
+
+                $identifier = 'academic-projects-' . $categoryType->getIdentifier();
+                $iconProviderClassName = $iconRegistry->detectIconProvider($categoryType->getIcon());
+
+                $iconRegistry->registerIcon(
+                    $identifier,
+                    $iconProviderClassName,
+                    [
+                        'source' => $categoryType->getIcon(),
+                    ]
+                );
             }
-            */
         };
     }
 
     public static function addTca(ContainerInterface $container): Closure
     {
         return static function (BeforeTcaOverridesEvent $event) use ($container) {
+            $tcaGenerator = $container->get(TcaGenerator::class);
+            $tcaGenerator($event);
         };
     }
 
