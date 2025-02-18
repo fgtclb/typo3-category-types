@@ -2,13 +2,35 @@
 
 declare(strict_types=1);
 
+use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 (static function (): void {
-    $llBackend = function (string $label) {
-        return sprintf('LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.%s', $label);
-    };
-    $llBackendType = function (string $label) {
-        return sprintf('LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.type.%s', $label);
-    };
+    $ll = static fn (string $key): string => sprintf('LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:%s', $key);
+
+    $items = [
+        [
+            $ll('default'),
+            'default',
+            'mimetypes-x-sys_category',
+        ],
+    ];
+
+    $categoryTypeRegistry = GeneralUtility::makeInstance(CategoryTypeRegistry::class);
+    $categoryTypes = $categoryTypeRegistry->getCategoryTypes();
+    $typeIconClasses = [];
+
+    foreach ($categoryTypes as $categoryType) {
+        $items[] = [
+            $categoryType->getTitle(),
+            $categoryType->getIdentifier(),
+            $categoryType->getIconIdentifier(),
+            $categoryType->getGroup(),
+        ];
+        $typeIconClasses[$categoryType->getIdentifier()] = $categoryType->getIconIdentifier();
+    }
+
     $sysCategoryTca = [
         'ctrl' => [
             'type' => 'type',
@@ -18,18 +40,12 @@ declare(strict_types=1);
         ],
         'columns' => [
             'type' => [
-                'label' => $llBackend('type'),
+                'label' => $ll('type'),
                 'config' => [
                     'default' => 'default',
                     'type' => 'select',
                     'renderType' => 'selectSingle',
-                    'items' => [
-                        [
-                            $llBackendType('default'),
-                            'default',
-                            'mimetypes-x-sys_category',
-                        ],
-                    ],
+                    'items' => $items,
                 ],
             ],
         ],
@@ -45,5 +61,14 @@ declare(strict_types=1);
         'type',
         '',
         'before:title'
+    );
+
+    ArrayUtility::mergeRecursiveWithOverrule(
+        $GLOBALS['TCA']['sys_category'],
+        [
+            'ctrl' => [
+                'typeicon_classes' => $typeIconClasses,
+            ],
+        ]
     );
 })();
