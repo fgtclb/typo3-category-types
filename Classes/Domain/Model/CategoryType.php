@@ -13,7 +13,8 @@ class CategoryType
         private string $group,
         private string $icon,
         private int $priority,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $array): CategoryType
     {
@@ -64,8 +65,22 @@ class CategoryType
         return $this->icon;
     }
 
+    public function getIconIdentifier(): string
+    {
+        return implode('.', [
+            'category_types',
+            $this->group,
+            $this->identifier,
+        ]);
+    }
+
     public function getPriority(): int
     {
         return $this->priority;
+    }
+
+    public function __toString(): string
+    {
+        return $this->identifier;
     }
 }

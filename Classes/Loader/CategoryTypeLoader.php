@@ -19,7 +19,8 @@ class CategoryTypeLoader
         #[Autowire(service: 'cache.core')]
         protected readonly PhpFrontend $cache,
         protected readonly PackageManager $packageManager
-    ) {}
+    ) {
+    }
 
     public function load(): CategoryTypeRegistry
     {
@@ -28,7 +29,7 @@ class CategoryTypeLoader
         }
 
         if (is_array($categoryTypes = $this->getFromCache())) {
-            $categoryTypes = array_map(fn(array $categoryType): CategoryType => CategoryType::fromArray($categoryType), $categoryTypes);
+            $categoryTypes = array_map(fn (array $categoryType): CategoryType => CategoryType::fromArray($categoryType), $categoryTypes);
             $this->categoryTypeRegistry = $this->fillCategoryTypeRegistry($categoryTypes);
             return $this->categoryTypeRegistry;
         }
@@ -72,7 +73,7 @@ class CategoryTypeLoader
     {
         $categoryTypeRegistry = new CategoryTypeRegistry();
         foreach ($categoryTypes as $categoryType) {
-            $categoryTypeRegistry->register($categoryType);
+            $categoryTypeRegistry->attach($categoryType);
         }
         return $categoryTypeRegistry;
     }
@@ -84,7 +85,7 @@ class CategoryTypeLoader
 
     protected function setCache(): void
     {
-        $cache = array_map(fn(CategoryType $categoryType): array => $categoryType->toArray(), $this->categoryTypeRegistry->getCategoryTypes());
+        $cache = array_map(fn (CategoryType $categoryType): array => $categoryType->toArray(), $this->categoryTypeRegistry->getCategoryTypes());
         $this->cache->set('CategoryTypes_Types', 'return ' . var_export($cache, true) . ';');
     }
 }
