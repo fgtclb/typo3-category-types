@@ -175,6 +175,7 @@ class CategoryRepository
             )->executeQuery();
 
         $categoryCollection = new CategoryCollection();
+        $categoryCollection->setTypeIdentifiers($this->categoryTypeRegistry->getCategoryTypeIdentifierByGroup($group));
 
         if ($result->rowCount() === 0) {
             return $categoryCollection;
@@ -201,44 +202,55 @@ class CategoryRepository
     }
 
     /**
+     * @param string $group
+     * @param string $type
      * @param array<int> $idList
      */
-    /*
-    public function findByUidListAndType(
-        array $idList,
-        CategoryTypes $categoryType
+    public function findByTypeAndUidList(
+        string $group,
+        string $type,
+        array $idList
     ): CategoryCollection {
-        $result = $queryBuilder->select('sys_category.*')
+        $queryBuilder = $this->buildQueryBuilder();
+        $result = $queryBuilder
+            ->select('sys_category.*')
             ->from('sys_category')
             ->where(
-                $this->categoryTypeCondition(),
+                $this->categoryTypeCondition($group),
                 $this->siteDefaultLanguageCondition(),
                 $queryBuilder->expr()->in('uid', $idList),
-                $queryBuilder->expr()->eq('type', $queryBuilder->createNamedParameter((string)$categoryType))
+                $queryBuilder->expr()->eq('type', $queryBuilder->createNamedParameter((string)$type))
             )->executeQuery();
 
-        $categories = new CategoryCollection();
+        $categoryCollection = new CategoryCollection();
+        $categoryCollection->setTypeIdentifiers($this->categoryTypeRegistry->getCategoryTypeIdentifierByGroup($group));
 
         if ($result->rowCount() === 0) {
-            return $categories;
+            return $categoryCollection;
         }
 
         foreach ($result->fetchAllAssociative() as $row) {
             $category = $this->buildCategoryObjectFromArray($group, $row);
-            $categories->attach($category);
+            $categoryCollection->attach($category);
         }
 
-        return $categories;
+        return $categoryCollection;
     }
-    */
 
-    /*
+    /**
+     * @param string $group
+     * @param int $uid
+     * @param string $table
+     * @param string $field
+     */
     public function getByDatabaseFields(
+        string $group,
         int $uid,
         string $table = 'tt_content',
         string $field = 'pi_flexform'
     ): CategoryCollection {
-        $result = $this->queryBuilder
+        $queryBuilder = $this->buildQueryBuilder();
+        $result = $queryBuilder
             ->select('sys_category.*')
             ->distinct()
             ->from('sys_category')
@@ -271,30 +283,31 @@ class CategoryRepository
                 )
             )->executeQuery();
 
-        $categories = new CategoryCollection();
+        $categoryCollection = new CategoryCollection();
+        $categoryCollection->setTypeIdentifiers($this->categoryTypeRegistry->getCategoryTypeIdentifierByGroup($group));
 
         if ($result->rowCount() === 0) {
-            return $categories;
+            return $categoryCollection;
         }
 
         foreach ($result->fetchAllAssociative() as $row) {
             $category = $this->buildCategoryObjectFromArray($group, $row);
-            $categories->attach($category);
+            $categoryCollection->attach($category);
         }
 
-        return $categories;
+        return $categoryCollection;
     }
-    */
 
     /**
      * Find the parent category of a given category
      * TODO: Generelize this method to be able to find a category just by UID
+     * @param string $group
      * @param int $parent
      */
-    /*
-    public function findParent(int $parent): ?Category
+    public function findParent(string $group, int $parent): ?Category
     {
-        $result = $this->queryBuilder
+        $queryBuilder = $this->buildQueryBuilder();
+        $result = $queryBuilder
             ->select('sys_category.*')
             ->from('sys_category')
             ->where(
@@ -318,7 +331,6 @@ class CategoryRepository
 
         return $this->buildCategoryObjectFromArray($group, $row);
     }
-    */
 
     /*
     public function findChildren(int $uid): ?CategoryCollection
