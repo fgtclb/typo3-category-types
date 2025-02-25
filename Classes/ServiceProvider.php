@@ -28,7 +28,6 @@ class ServiceProvider extends AbstractServiceProvider
     {
         return [
             'category-types.icons' => static::addIcons(...),
-            'category-types.typoscript' => static::addTypoScript(...),
         ];
     }
 
@@ -61,16 +60,9 @@ class ServiceProvider extends AbstractServiceProvider
         };
     }
 
-    public static function addTypoScript(ContainerInterface $container): Closure
-    {
-        return static function (BootCompletedEvent $event) use ($container) {
-        };
-    }
-
     public static function addEventListeners(ContainerInterface $container, ListenerProvider $listenerProvider): ListenerProvider
     {
         $listenerProvider->addListener(BootCompletedEvent::class, 'category-types.icons');
-        $listenerProvider->addListener(BootCompletedEvent::class, 'category-types.typoscript');
         return $listenerProvider;
     }
 }
