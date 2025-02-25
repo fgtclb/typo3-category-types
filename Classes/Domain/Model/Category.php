@@ -87,7 +87,10 @@ class Category
 
         /** @var CategoryRepository $categoryRepository */
         $categoryRepository = GeneralUtility::makeInstance(CategoryRepository::class);
-        return $categoryRepository->findParent($this->parentId);
+        return $categoryRepository->findParent(
+            $this->type->getGroup(),
+            $this->parentId
+        );
     }
 
     public function isRoot(): bool
