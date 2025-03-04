@@ -3,29 +3,22 @@
 declare(strict_types=1);
 
 (static function (): void {
-    $llBackend = function (string $label) {
-        return sprintf('LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.%s', $label);
-    };
-    $llBackendType = function (string $label) {
-        return sprintf('LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.type.%s', $label);
-    };
     $sysCategoryTca = [
         'ctrl' => [
             'type' => 'type',
-            'typeicon_classes' => [
-            ],
+            'typeicon_classes' => [],
             'typeicon_column' => 'type',
         ],
         'columns' => [
             'type' => [
-                'label' => $llBackend('type'),
+                'label' => 'LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.type',
                 'config' => [
                     'default' => 'default',
                     'type' => 'select',
                     'renderType' => 'selectSingle',
                     'items' => [
                         [
-                            $llBackendType('default'),
+                            'LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.type.default',
                             'default',
                             'mimetypes-x-sys_category',
                         ],
