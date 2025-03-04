@@ -12,3 +12,5 @@
 /composer.json.orig
 /.php-cs-fixer.cache
 /Documentation-GENERATED-temp/
+/tailor-version-artefact/
+/tailor-version-upload/
