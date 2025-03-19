@@ -18,16 +18,15 @@
     "typo3/cms-core": "^11.5 || ^12.4"
   },
   "extra": {
-	"branch-alias": {
-	  "dev-main": "1.x.x-dev",
-	  "dev-compatibility": "2.x.x-dev"
-	},
-    "typo3/cms": {
+	"typo3/cms": {
       "cms-package-dir": "{$vendor-dir}/typo3/cms",
       "extension-key": "category_types",
       "ignore-as-root": false,
       "web-dir": ".Build/Web",
       "app-dir": ".Build"
+    },
+    "branch-alias": {
+      "dev-main": "1.2.x-dev"
     }
   },
   "config": {
