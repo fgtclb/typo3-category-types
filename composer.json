@@ -37,6 +37,11 @@
             "php-http/discovery": true
         }
     },
+    "autoload": {
+        "psr-4": {
+            "FGTCLB\\CategoryTypes\\": "Classes/"
+        }
+    },
     "support": {
         "issues": "https://github.com/fgtclb/academic-extensions/issues",
         "source": "https://github.com/fgtclb/academic-extensions",
