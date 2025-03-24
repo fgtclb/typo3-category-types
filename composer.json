@@ -1,51 +1,59 @@
 {
-    "name": "fgtclb/category-types",
-    "type": "typo3-cms-extension",
-    "description": "Base package for FGTCLB Academic packages",
-    "license": "GPL-2.0-or-later",
-    "authors": [
-        {
-            "name": "FGTCLB GmbH",
-            "email": "hello@fgtclb.com"
-        }
-    ],
-    "require": {
-        "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
-        "typo3/cms-core": "^12.4 || ^13.4"
+  "name": "fgtclb/category-types",
+  "type": "typo3-cms-extension",
+  "description": "Base package for FGTCLB Academic packages",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "FGTCLB GmbH",
+      "email": "hello@fgtclb.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+    "typo3/cms-core": "^12.4 || ^13.4"
+  },
+  "extra": {
+    "typo3/cms": {
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "extension-key": "category_types",
+      "ignore-as-root": false,
+      "web-dir": ".Build/Web",
+      "app-dir": ".Build",
+      "Package": {
+        "serviceProvider": "FGTCLB\\CategoryTypes\\ServiceProvider"
+      }
     },
-    "extra": {
-        "typo3/cms": {
-            "cms-package-dir": "{$vendor-dir}/typo3/cms",
-            "extension-key": "category_types",
-            "ignore-as-root": false,
-            "web-dir": ".Build/Web",
-            "app-dir": ".Build"
-        },
-        "branch-alias": {
-            "dev-main": "2.0.x-dev"
-        }
-    },
-    "config": {
-        "vendor-dir": ".Build/vendor",
-        "bin-dir": ".Build/bin",
-        "optimize-autoloader": true,
-        "sort-packages": true,
-        "allow-plugins": {
-            "typo3/class-alias-loader": true,
-            "typo3/cms-composer-installers": true,
-            "helhum/typo3-console-plugin": true,
-            "php-http/discovery": true
-        }
-    },
-    "autoload": {
-        "psr-4": {
-            "FGTCLB\\CategoryTypes\\": "Classes/"
-        }
-    },
-    "support": {
-        "issues": "https://github.com/fgtclb/academic-extensions/issues",
-        "source": "https://github.com/fgtclb/academic-extensions",
-        "email": "hello@fgtclb.com"
-    },
-    "homepage": "https://www.fgtclb.com/"
+    "branch-alias": {
+      "dev-main": "2.0.x-dev"
+    }
+  },
+  "config": {
+    "vendor-dir": ".Build/vendor",
+    "bin-dir": ".Build/bin",
+    "optimize-autoloader": true,
+    "sort-packages": true,
+    "allow-plugins": {
+      "typo3/class-alias-loader": true,
+      "typo3/cms-composer-installers": true,
+      "helhum/typo3-console-plugin": true,
+      "php-http/discovery": true
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "FGTCLB\\CategoryTypes\\": "Classes/"
+    }
+  },
+  "support": {
+    "issues": "https://github.com/fgtclb/academic-extensions/issues",
+    "source": "https://github.com/fgtclb/academic-extensions",
+    "email": "hello@fgtclb.com"
+  },
+  "homepage": "https://www.fgtclb.com/",
+  "autoload-dev": {
+    "psr-4": {
+      "FGTCLB\\CategoryTypes\\Tests\\": "Tests/"
+    }
+  }
 }

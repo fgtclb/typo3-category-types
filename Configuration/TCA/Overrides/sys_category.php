@@ -2,7 +2,32 @@
 
 declare(strict_types=1);
 
+use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 (static function (): void {
+    $items = [
+        [
+            'label' => 'LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.type.default',
+            'value' => 'default',
+            'icon' => 'mimetypes-x-sys_category',
+        ],
+    ];
+
+    $categoryTypeRegistry = GeneralUtility::makeInstance(CategoryTypeRegistry::class);
+    $categoryTypes = $categoryTypeRegistry->getCategoryTypes();
+    $typeIconClasses = [];
+
+    foreach ($categoryTypes as $categoryType) {
+        $items[] = [
+            'label' => $categoryType->getTitle(),
+            'value' => $categoryType->getIdentifier(),
+            'icon' => $categoryType->getIconIdentifier(),
+            'group' => $categoryType->getGroup(),
+        ];
+        $typeIconClasses[$categoryType->getIdentifier()] = $categoryType->getIconIdentifier();
+    }
+
     $sysCategoryTca = [
         'ctrl' => [
             'type' => 'type',
@@ -16,17 +41,12 @@ declare(strict_types=1);
                     'default' => 'default',
                     'type' => 'select',
                     'renderType' => 'selectSingle',
-                    'items' => [
-                        [
-                            'LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.type.default',
-                            'default',
-                            'mimetypes-x-sys_category',
-                        ],
-                    ],
+                    'items' => $items,
                 ],
             ],
         ],
     ];
+
     \TYPO3\CMS\Core\Utility\ArrayUtility::mergeRecursiveWithOverrule(
         $GLOBALS['TCA']['sys_category'],
         $sysCategoryTca
@@ -38,4 +58,6 @@ declare(strict_types=1);
         '',
         'before:title'
     );
+
+    $GLOBALS['TCA']['sys_category']['ctrl']['typeicon_classes'] = $typeIconClasses;
 })();

@@ -1,0 +1,18 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  FGTCLB\CategoryTypes\:
+    resource: '../Classes/*'
+    exclude: '../Classes/Domain/Model/*.php'
+
+  FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository:
+    public: true
+
+  FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry:
+    public: true
+    factory:
+      - '@FGTCLB\CategoryTypes\Loader\CategoryTypeLoader'
+      - 'load'

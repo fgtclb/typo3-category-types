@@ -2,6 +2,7 @@
 <xliff version="1.0">
 	<file
 		source-language="en"
+		target-language="de"
 		datatype="plaintext"
 		original="messages"
 		date="2023-03-20T13:05:33Z"
@@ -10,12 +11,15 @@
 		<body>
 			<trans-unit id="sys_category.type">
 				<source>Type</source>
+				<target>Typ</target>
 			</trans-unit>
 			<trans-unit id="sys_category.type.default">
 				<source>Default</source>
+				<target>Standard</target>
 			</trans-unit>
 			<trans-unit id="sys_category.not_set">
 				<source>Not set</source>
+				<target>Nicht gesetzt</target>
 			</trans-unit>
 		</body>
 	</file>
