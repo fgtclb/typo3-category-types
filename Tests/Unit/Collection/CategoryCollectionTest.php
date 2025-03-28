@@ -9,9 +9,7 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 final class CategoryCollectionTest extends UnitTestCase
 {
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function canBeCreatedUsingNew(): void
     {
         $subject = new CategoryCollection();
