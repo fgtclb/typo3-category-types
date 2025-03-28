@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -47,12 +49,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
         ],
     ];
 
-    \TYPO3\CMS\Core\Utility\ArrayUtility::mergeRecursiveWithOverrule(
+    ArrayUtility::mergeRecursiveWithOverrule(
         $GLOBALS['TCA']['sys_category'],
         $sysCategoryTca
     );
 
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+    ExtensionManagementUtility::addToAllTCAtypes(
         'sys_category',
         'type',
         '',
