@@ -13,7 +13,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @implements \Iterator<int, Category>
  * @todo Only "offsetGet" implemented, consider to change from array access to ContainerInterface (get/has only).
  */
-class CategoryCollection implements \Countable, \Iterator, \ArrayAccess
+class CategoryCollection implements \Countable, \Iterator, \ArrayAccess, \Stringable
 {
     /**
      * @var Category[]
@@ -184,7 +184,6 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess
 
     /**
      * ArrayAccess method offsetExists
-     * @param mixed $offset
      * @return bool
      */
     public function offsetExists(mixed $offset): bool
@@ -198,7 +197,6 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess
 
     /**
      * ArrayAccess method offsetGet
-     * @param mixed $offset
      * @return Category[]|false
      */
     public function offsetGet(mixed $offset): array|false
@@ -211,8 +209,6 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess
 
     /**
      * ArrayAccess method offsetSet is not implemented
-     * @param mixed $offset
-     * @param mixed $value
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
@@ -224,7 +220,6 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess
 
     /**
      * ArrayAccess method offsetUnset is not implemented
-     * @param mixed $offset
      */
     public function offsetUnset(mixed $offset): void
     {

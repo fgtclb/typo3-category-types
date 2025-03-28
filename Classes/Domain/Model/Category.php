@@ -9,7 +9,7 @@ use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
 use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Category
+class Category implements \Stringable
 {
     protected ?CategoryType $type;
     protected ?CategoryCollection $children = null;

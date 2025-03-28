@@ -39,7 +39,7 @@ class ServiceProvider extends AbstractServiceProvider
 
     public static function addIcons(ContainerInterface $container): \Closure
     {
-        return static function (BootCompletedEvent $event) use ($container) {
+        return static function (BootCompletedEvent $event) use ($container): void {
             $iconRegistry = $container->get(IconRegistry::class);
 
             $categoryTypeRegistry = $container->get(CategoryTypeRegistry::class);

@@ -11,9 +11,9 @@ use FGTCLB\CategoryTypes\Domain\Model\Category;
  * @implements ArrayAccess<string, Category[]>
  * @todo Only "offsetGet" implemented, consider to change from array access to ContainerInterface (get/has only).
  */
-class FilterCollection implements \ArrayAccess
+class FilterCollection implements \ArrayAccess, \Stringable
 {
-    private CategoryCollection $filterCategories;
+    private readonly CategoryCollection $filterCategories;
 
     public function __construct(
         ?CategoryCollection $categoryCollection = null,
@@ -36,7 +36,6 @@ class FilterCollection implements \ArrayAccess
     }
 
     /**
-     * @param mixed $offset
      * @return array<int, Category>|false
      */
     public function offsetGet(mixed $offset): array|false

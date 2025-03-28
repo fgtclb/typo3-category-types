@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\CategoryTypes\Domain\Model;
 
-class CategoryType implements \JsonSerializable
+class CategoryType implements \JsonSerializable, \Stringable
 {
     public function __construct(
         private readonly string $identifier,
