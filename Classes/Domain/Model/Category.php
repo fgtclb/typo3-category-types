@@ -20,6 +20,7 @@ class Category implements \Stringable
         protected string $title,
         string $type = 'default',
         string $typeGroup = 'default',
+        protected bool $hidden = false,
         protected bool $disabled = false
     ) {
         $this->type = null;
@@ -49,6 +50,11 @@ class Category implements \Stringable
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    public function getHidden(): bool
+    {
+        return $this->hidden;
     }
 
     public function getChildren(): ?CategoryCollection

@@ -59,7 +59,7 @@ class CategoryViewHelper extends AbstractViewHelper
 
         /** @var CategoryRepository $repository */
         $repository = GeneralUtility::makeInstance(CategoryRepository::class);
-        $categories = $repository->findByGroupAndPageId($arguments['group'], $arguments['page']);
+        $categories = $repository->findByGroupAndPageId($arguments['group'], $arguments['page'], true);
 
         $templateVariableContainer->add($arguments['as'], $categories);
         $output = $renderChildrenClosure();

@@ -13,6 +13,7 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -28,10 +29,21 @@ class CategoryRepository
      * Find all categories for a given page and group
      * @param string $group
      * @param int $pageId
+     * @param bool $includeHidden @internal Argument is not part of Public API and may change at any given time.
      */
-    public function findByGroupAndPageId(string $group, int $pageId): CategoryCollection
-    {
+    public function findByGroupAndPageId(
+        string $group,
+        int $pageId,
+        bool $includeHidden = false
+    ): CategoryCollection {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_category');
+
+        // Remove the deleted restriction for the pages AND the sys_category table
+        // to show all categories in the backend even if the page or category is hidden.
+        if ($includeHidden === true) {
+            $queryBuilder->getRestrictions()->removeByType(HiddenRestriction::class);
+        }
+
         $result = $queryBuilder
             ->select('sys_category.*')
             ->from('sys_category')
@@ -314,6 +326,7 @@ class CategoryRepository
             title: (string)($row['title'] ?? ''),
             type: (string)($row['type'] ?? 'default'),
             typeGroup: $group,
+            hidden: (bool)($row['hidden'] ?? false),
         );
     }
 }
