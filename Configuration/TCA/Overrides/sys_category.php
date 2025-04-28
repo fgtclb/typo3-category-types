@@ -8,6 +8,8 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 (static function (): void {
+    $categoryTypeRegistry = GeneralUtility::makeInstance(CategoryTypeRegistry::class);
+    $categoryTypes = $categoryTypeRegistry->getCategoryTypes();
     $items = [
         [
             'label' => 'LLL:EXT:category_types/Resources/Private/Language/locallang.xlf:sys_category.type.default',
@@ -15,11 +17,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
             'icon' => 'mimetypes-x-sys_category',
         ],
     ];
-
-    $categoryTypeRegistry = GeneralUtility::makeInstance(CategoryTypeRegistry::class);
-    $categoryTypes = $categoryTypeRegistry->getCategoryTypes();
-    $typeIconClasses = [];
-
+    $typeIconClasses = [
+        'default' => 'mimetypes-x-sys_category',
+    ];
     foreach ($categoryTypes as $categoryType) {
         $items[] = [
             'label' => $categoryType->getTitle(),
