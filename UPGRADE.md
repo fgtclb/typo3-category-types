@@ -1,6 +1,8 @@
 # Upgrade 2.0
 
-## Replace enumeration category-type declaration with yaml file
+## 2.0.0
+
+### Replace enumeration category-type declaration with yaml file
 
 The category type handling has been completely reworked for 2.0, moving the
 definition to the category-type extension, providing a generic way to read
