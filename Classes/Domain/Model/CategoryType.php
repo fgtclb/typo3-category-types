@@ -7,12 +7,12 @@ namespace FGTCLB\CategoryTypes\Domain\Model;
 class CategoryType implements \JsonSerializable, \Stringable
 {
     public function __construct(
-        private readonly string $identifier,
-        private readonly string $extensionKey,
-        private readonly string $title,
-        private readonly string $group,
-        private readonly string $icon,
-        private readonly int $priority,
+        protected readonly string $identifier,
+        protected readonly string $extensionKey,
+        protected readonly string $title,
+        protected readonly string $group,
+        protected readonly string $icon,
+        protected readonly int $priority,
     ) {}
 
     /**
