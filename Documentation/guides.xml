@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guides xmlns="https://www.phpdoc.org/guides" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.phpdoc.org/guides ../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd" links-are-relative="true">
+  <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension" project-repository="https://github.com/fgtclb/typo3-category-types" project-issues="https://github.com/fgtclb/typo3-category-types/issues" edit-on-github-branch="main" edit-on-github="fgtclb/typo3-category-types" edit-on-github-directory="Documentation" typo3-core-preferred="stable"/>
+  <project title="FGTCLB Category Types" release="2.0.2" version="2.0.2" copyright="2023"/>
+  <inventory id="t3tsref" url="http://docs.typo3.org/typo3cms/TyposcriptReference/"/>
+  <inventory id="t3editors" url="http://docs.typo3.org/typo3cms/EditorsTutorial/"/>
+  <inventory id="t3start" url="http://docs.typo3.org/typo3cms/GettingStartedTutorial/"/>
+</guides>
