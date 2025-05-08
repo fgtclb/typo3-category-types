@@ -45,15 +45,15 @@
       "FGTCLB\\CategoryTypes\\": "Classes/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "FGTCLB\\CategoryTypes\\Tests\\": "Tests/"
+    }
+  },
   "support": {
     "issues": "https://github.com/fgtclb/academic-extensions/issues",
     "source": "https://github.com/fgtclb/academic-extensions",
     "email": "hello@fgtclb.com"
   },
-  "homepage": "https://www.fgtclb.com/",
-  "autoload-dev": {
-    "psr-4": {
-      "FGTCLB\\CategoryTypes\\Tests\\": "Tests/"
-    }
-  }
+  "homepage": "https://www.fgtclb.com/"
 }
