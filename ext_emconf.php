@@ -1,14 +1,11 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => '(FGTCLB) Basic Typed categories',
+    'author' => 'FGTCLB',
+    'author_company' => 'FGTCLB GmbH',
+    'author_email' => 'hello@fgtclb.com',
     'description' => 'Basic extension for typed categories',
     'category' => 'misc',
-    'author' => 'FGTCLB',
-    'author_email' => 'hello@fgtclb.com',
-    'state' => 'stable',
-    'clearCacheOnLoad' => 0,
-    'version' => '2.0.2',
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.0-13.4.99',
@@ -16,4 +13,7 @@ $EM_CONF[$_EXTKEY] = [
         'conflicts' => [],
         'suggests' => [],
     ],
+    'state' => 'beta',
+    'title' => 'FGTCLB: Basic Typed categories',
+    'version' => '2.0.2',
 ];
