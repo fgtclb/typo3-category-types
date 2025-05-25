@@ -15,6 +15,7 @@
 ## Description
 
 This extension provides the basic configuration for typed categories.
+
 It is not recommended to use this extension alone, as it only provides a basic
 framework. In order to perform typification, an addition in a separate extension
 is required.
