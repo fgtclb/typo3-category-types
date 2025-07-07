@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace FGTCLB\CategoryTypes\Collection;
 
-use ArrayAccess;
 use FGTCLB\CategoryTypes\Domain\Model\Category;
 
 /**
- * @implements ArrayAccess<string, Category[]>
+ * @implements \ArrayAccess<string, Category[]>
  * @todo Only "offsetGet" implemented, consider to change from array access to ContainerInterface (get/has only).
  */
 class FilterCollection implements \ArrayAccess, \Stringable
