@@ -46,7 +46,7 @@ class ServiceProvider extends AbstractServiceProvider
             $categoryTypes = $categoryTypeRegistry->getCategoryTypes();
 
             foreach ($categoryTypes as $categoryType) {
-                $iconProviderClassName = $iconRegistry->detectIconProvider($categoryType->getIconIdentifier());
+                $iconProviderClassName = $iconRegistry->detectIconProvider($categoryType->getIcon());
 
                 $iconRegistry->registerIcon(
                     $categoryType->getIconIdentifier(),
