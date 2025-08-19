@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<xliff version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
 	<file
 		source-language="en"
 		datatype="plaintext"
-		original="messages"
+		original="EXT:category_types/Resources/Private/Language/locallang.xlf"
 		date="2023-03-20T13:05:33Z"
+		product-name="category_types"
 	>
 		<header/>
 		<body>
