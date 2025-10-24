@@ -50,3 +50,4 @@ FGTCLB Category Types
     Introduction/Index
     Administration/Index
     Developers/Index
+    Changelog/Changelog-2
