@@ -8,6 +8,9 @@ services:
     resource: '../Classes/*'
     exclude: '../Classes/Domain/Model/*.php'
 
+  FGTCLB\AcademicPrograms\Factory\DemandFactory:
+    public: true
+
   FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository:
     public: true
 
