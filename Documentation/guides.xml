@@ -13,7 +13,7 @@
                edit-on-github="fgtclb/academic-extensions"
                edit-on-github-directory="packages/fgtclb/academic-base/Documentation"
                typo3-core-preferred="stable"/>
-    <project title="FGTCLB Category Types" release="2.0.2" version="2.0.2" copyright="2023"/>
+    <project title="FGTCLB Category Types" release="2.1.0" copyright="2023"/>
     <inventory id="t3tsref" url="http://docs.typo3.org/typo3cms/TyposcriptReference/"/>
     <inventory id="t3editors" url="http://docs.typo3.org/typo3cms/EditorsTutorial/"/>
     <inventory id="t3start" url="http://docs.typo3.org/typo3cms/GettingStartedTutorial/"/>
