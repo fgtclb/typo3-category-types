@@ -9,12 +9,12 @@ $EM_CONF[$_EXTKEY] = [
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.22-13.4.99',
-            'academic_base' => '2.1.0',
+            'academic_base' => '2.1.1',
         ],
         'conflicts' => [],
         'suggests' => [],
     ],
     'state' => 'beta',
     'title' => 'FGTCLB: Basic Typed categories',
-    'version' => '2.1.0',
+    'version' => '2.1.1',
 ];
