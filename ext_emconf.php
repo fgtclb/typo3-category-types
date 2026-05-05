@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'FGTCLB: Basic Typed categories',
     'description' => 'Basic extension for typed categories',
-    'version' => '2.3.3',
+    'version' => '2.3.4',
     'category' => 'misc',
     'state' => 'beta',
     'author' => 'FGTCLB',
@@ -12,7 +12,7 @@ $EM_CONF[$_EXTKEY] = [
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.22-13.4.99',
-            'academic_base' => '2.3.3',
+            'academic_base' => '2.3.4',
         ],
     ],
 ];
