@@ -26,10 +26,10 @@ extension by one of the following methods:
     You can always get current version from `TER`_ by downloading the zip
     version. Upload the file afterwards in the Extension Manager.
 
-and :ref:`configure <extensionConfiguration>` it.
+and configure it afterwards.
 
 Inside your own site configuration follow the instructions for
-:ref:`table configuration <tableConfiguration>`.
+table configuration.
 
 .. _TER: https://extensions.typo3.org/extension/category_types
 
