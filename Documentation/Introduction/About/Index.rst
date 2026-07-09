@@ -1,5 +1,3 @@
-.. include:: /Includes.rst.txt
-
 .. _what-does-it-do:
 
 What does it do?

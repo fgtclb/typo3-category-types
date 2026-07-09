@@ -1,5 +1,3 @@
-.. include:: /Includes.rst.txt
-
 .. _developers:
 
 For Developers

@@ -1,39 +1,56 @@
-.. include:: /Includes.rst.txt
+..  _installation:
 
-.. _installation:
-
+============
 Installation
 ============
 
-The extension needs to be installed as any other extension of TYPO3 CMS. Get the
-extension by one of the following methods:
+The extension has to be installed like any other TYPO3 CMS extension. You can
+download and install it using one of the following methods.
 
-#.  **Use composer**:
-    Run
+..  tabs::
 
-    .. code-block:: bash
+    ..  group-tab:: Composer
 
-        composer require fgtclb/category-types
+        ..  code-block:: bash
+            :caption: Install the stable release
 
-    in your TYPO3 installation.
+            composer require 'fgtclb/category-types':'^2'
 
-#.  **Get it from the Extension Manager**:
-    Switch to the module :guilabel:`Admin Tools > Extensions`.
-    Switch to :guilabel:`Get Extensions` and search for the extension key
-    *category_types* and import the extension from the repository.
+        ..  tip::
 
-#. **Get it from typo3.org**:
-    You can always get current version from `TER`_ by downloading the zip
-    version. Upload the file afterwards in the Extension Manager.
+            The ``2.x`` version can already be used and tested in Composer based
+            instances. Configure ``minimum-stability: dev`` and ``prefer-stable``
+            in your root :file:`composer.json` so requiring the extension still
+            prefers stable releases over development versions:
 
-and configure it afterwards.
+            ..  code-block:: bash
 
-Inside your own site configuration follow the instructions for
-table configuration.
+                composer config minimum-stability "dev" \
+                    && composer config "prefer-stable" true
 
-.. _TER: https://extensions.typo3.org/extension/category_types
+            and install the development version with:
 
-Compatibility
--------------
+            ..  code-block:: bash
 
-*category_types* supports TYPO3 v11.
+                composer require 'fgtclb/category-types':'2.*.*@dev'
+
+    ..  group-tab:: Extension Manager
+
+        #.  Switch to the module :guilabel:`Admin Tools > Extensions`.
+        #.  Switch to :guilabel:`Get Extensions`.
+        #.  Search for the extension key :guilabel:`category_types`.
+        #.  Import the extension from the repository.
+
+    ..  group-tab:: Upload ZIP (TER)
+
+        #.  Get the current version from `TER`_ by downloading the ZIP version.
+            Alternatively, get the ZIP from the `GitHub Releases`_ page.
+        #.  Switch to the module :guilabel:`Admin Tools > Extensions`.
+        #.  Enable :guilabel:`Upload Extension`.
+        #.  Select or drag the extension ZIP archive and upload the file.
+
+After installation, configure the extension and set up your typed categories in
+the site configuration.
+
+..  _TER: https://extensions.typo3.org/extension/category_types
+..  _GitHub Releases: https://github.com/fgtclb/category-types/releases

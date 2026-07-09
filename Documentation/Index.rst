@@ -1,12 +1,4 @@
-.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: /Includes.rst.txt
-
-
-.. _start:
+..  _start:
 
 =====================
 FGTCLB Category Types
@@ -40,14 +32,51 @@ FGTCLB Category Types
 :Rendered:
     |today|
 
-**Table of Contents**
+----
 
-.. toctree::
-    :maxdepth: 5
+Provide typed categories in TYPO3: group system categories by type and use them
+consistently across the academic extensions.
+
+----
+
+..  card-grid::
+    :columns: 1
+    :columns-md: 2
+    :gap: 4
+    :class: pb-4
+    :card-height: 100
+
+    ..  card:: :ref:`Introduction <introduction>`
+
+        What the extension does and the main concepts behind it.
+
+    ..  card:: :ref:`Administration <administration>`
+
+        Install and configure :guilabel:`category_types` for your
+        installation.
+
+    ..  card:: :ref:`Developers <developers>`
+
+        Reference for developers: classes, icons and TCA integration.
+
+    ..  card:: :ref:`Changelog <changelog-v2>`
+
+        Learn about what has changed and which actions are required to
+        upgrade.
+
+..  toctree::
+    :maxdepth: 2
     :titlesonly:
-    :glob:
+    :hidden:
 
     Introduction/Index
     Administration/Index
     Developers/Index
     Changelog/Changelog-2
+
+..  Meta Menu
+
+..  toctree::
+    :hidden:
+
+    Sitemap
