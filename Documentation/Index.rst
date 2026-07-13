@@ -59,7 +59,7 @@ consistently across the academic extensions.
 
         Reference for developers: classes, icons and TCA integration.
 
-    ..  card:: :ref:`Changelog <changelog-v2>`
+    ..  card:: :ref:`Changelog <changelog-v3>`
 
         Learn about what has changed and which actions are required to
         upgrade.
@@ -72,6 +72,7 @@ consistently across the academic extensions.
     Introduction/Index
     Administration/Index
     Developers/Index
+    Changelog/Changelog-3
     Changelog/Changelog-2
 
 ..  Meta Menu
