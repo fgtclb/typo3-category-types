@@ -9,6 +9,8 @@ Every change to the FGTCLB Category Types extension is documented here.
 .. toctree::
    :titlesonly:
 
+   2.4/Index
+   2.3/Index
    2.2/Index
    2.1/Index
    2.0/Index
