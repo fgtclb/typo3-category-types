@@ -15,7 +15,7 @@
     "typo3/cms-core": "^13.4"
   },
   "require-dev": {
-    "fgtclb/environment-state-manager": "^1.0"
+    "fgtclb/environment-state-manager": "^2.0.1@dev"
   },
   "extra": {
     "typo3/cms": {
