@@ -24,8 +24,10 @@
       "ignore-as-root": false,
       "web-dir": ".Build/Web",
       "app-dir": ".Build",
+      "version": "3.0.0-dev",
       "Package": {
-        "serviceProvider": "FGTCLB\\CategoryTypes\\ServiceProvider"
+        "serviceProvider": "FGTCLB\\CategoryTypes\\ServiceProvider",
+        "providesPackages": {}
       }
     },
     "branch-alias": {
