@@ -218,10 +218,9 @@ class CategoryRepository
 
         $categoryCollection = $this->categoryCollectionFactory->createCategoryCollection($group);
 
-        if ($result->rowCount() === 0) {
-            return $categoryCollection;
-        }
-
+        // No early return on `rowCount()`: for a SELECT statement that value is
+        // driver dependent, and SQLite reports 0 for a result that does carry rows.
+        // Iterating the result is the only portable way to tell it is empty.
         foreach ($result->fetchAllAssociative() as $row) {
             $category = $this->buildCategoryObjectFromArray($group, $row);
             $categoryCollection->attach($category);
