@@ -17,7 +17,7 @@ class CategoryTypeRegistry implements \JsonSerializable
     /**
      * @var array<string, CategoryType[]>
      */
-    protected array $groupedRegistry;
+    protected array $groupedRegistry = [];
 
     /**
      * @param CategoryType ...$categoryTypes
