@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FGTCLB\CategoryTypes\ViewHelpers\Form;
 
+use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
+
 class FilterSelectViewHelper extends AbstractSelectViewHelper
 {
     public function initializeArguments(): void
@@ -28,13 +30,15 @@ class FilterSelectViewHelper extends AbstractSelectViewHelper
         $optionsFromArgument = $this->arguments['options'];
 
         foreach ($optionsFromArgument as $option) {
+            $value = $this->optionProperty($option, 'optionValueField') ?? (string)$option->getUid();
             $options[] = [
-                'label' => $option->getTitle(),
+                'label' => $this->optionProperty($option, 'optionLabelField') ?? (string)$option->getTitle(),
+                'value' => $value,
                 'uid' => $option->getUid(),
                 'parentId' => $option->getParentId(),
                 'isRoot' => $option->isRoot(),
                 'type' => (string)$option->getType(),
-                'isSelected' => $this->isSelected((string)$option->getUid()),
+                'isSelected' => $this->isSelected($value),
                 'isDisabled' => $option->isDisabled(),
                 'level' => 0,
                 'children' => [],
@@ -59,6 +63,33 @@ class FilterSelectViewHelper extends AbstractSelectViewHelper
         }
 
         return $options;
+    }
+
+    /**
+     * Resolves `optionValueField` or `optionLabelField` on a single option, and returns
+     * `null` when the argument was not given so the caller can fall back to the getter the
+     * category filter uses by default.
+     */
+    private function optionProperty(mixed $option, string $argumentName): ?string
+    {
+        if (!$this->hasArgument($argumentName)) {
+            return null;
+        }
+
+        $property = ObjectAccess::getPropertyPath($option, (string)$this->arguments[$argumentName]);
+        if (!is_scalar($property) && !$property instanceof \Stringable && $property !== null) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Property "%s" of "%s", read through "%s", cannot be cast to string.',
+                    (string)$this->arguments[$argumentName],
+                    get_debug_type($option),
+                    $argumentName,
+                ),
+                1785706600,
+            );
+        }
+
+        return (string)$property;
     }
 
     /**
@@ -113,8 +144,8 @@ class FilterSelectViewHelper extends AbstractSelectViewHelper
     protected function renderOptionTags($options): string
     {
         $output = '';
-        foreach ($options as $value => $option) {
-            $output .= '<option value="' . $option['uid'] . '"';
+        foreach ($options as $option) {
+            $output .= '<option value="' . $option['value'] . '"';
             $output .= ' class="' . $this->arguments['groupLevelClassPrefix'] . $option['level'] . '"';
             if ($option['isSelected']) {
                 $output .= ' selected="selected"';
