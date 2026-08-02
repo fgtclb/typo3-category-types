@@ -1,0 +1,13 @@
+groups:
+  - identifier: testing
+    title: 'Testing'
+    icon: 'EXT:core/Resources/Public/Icons/T3Icons/svgs/apps/apps-pagetree-folder-contains-category.svg'
+types:
+  - identifier: testing_first
+    title: 'Testing first'
+    group: testing
+    icon: 'EXT:core/Resources/Public/Icons/T3Icons/svgs/apps/apps-pagetree-folder-contains-category.svg'
+  - identifier: testing_second
+    title: 'Testing second'
+    group: testing
+    icon: 'EXT:core/Resources/Public/Icons/T3Icons/svgs/apps/apps-pagetree-folder-contains-category.svg'
