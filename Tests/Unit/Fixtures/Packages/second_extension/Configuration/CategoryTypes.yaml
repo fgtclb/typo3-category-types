@@ -1,0 +1,5 @@
+types:
+  - identifier: country
+    title: 'Country'
+    group: partners
+    icon: 'EXT:second_extension/Resources/Public/Icons/country.svg'

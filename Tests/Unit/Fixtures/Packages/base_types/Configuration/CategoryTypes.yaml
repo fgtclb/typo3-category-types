@@ -1,0 +1,10 @@
+types:
+  - identifier: research_field
+    title: 'Research field'
+    group: programs
+    icon: 'EXT:base_types/Resources/Public/Icons/research_field.svg'
+    priority: 10
+  - identifier: degree
+    title: 'Degree'
+    group: programs
+    icon: 'EXT:base_types/Resources/Public/Icons/degree.svg'

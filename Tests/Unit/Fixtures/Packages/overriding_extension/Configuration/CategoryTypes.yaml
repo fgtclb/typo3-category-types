@@ -1,0 +1,5 @@
+types:
+  - identifier: research_field
+    group: programs
+    title: 'Subject area'
+    useExisting: true
