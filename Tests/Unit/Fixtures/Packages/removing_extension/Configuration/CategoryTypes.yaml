@@ -1,0 +1,4 @@
+types:
+  - identifier: degree
+    group: programs
+    remove: true

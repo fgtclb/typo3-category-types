@@ -1,0 +1,5 @@
+types:
+  - identifier: never_defined
+    group: programs
+    title: 'Override without an original'
+    useExisting: true
