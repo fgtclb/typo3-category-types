@@ -12,6 +12,7 @@ use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
+use TYPO3Fluid\Fluid\Core\Variables\StandardVariableProvider;
 
 /**
  * The collection groups categories by their type identifier, and the identifiers it
@@ -230,6 +231,83 @@ final class CategoryCollectionTest extends UnitTestCase
         $this->expectExceptionCode(1739372162);
 
         $subject->getCategoriesByTypeName('country');
+    }
+
+    /**
+     * `offsetExists()` used to answer from the lazily built grouping, so a type only
+     * "existed" once something had called `getAllCategoriesByType()` on that instance,
+     * while `offsetGet()` answered all along. Both now read the registered type
+     * identifiers.
+     */
+    #[Test]
+    public function knownTypeExistsBeforeTheGroupingWasComputed(): void
+    {
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['research_field']);
+
+        $this->assertTrue($subject->offsetExists('research_field'));
+        $this->assertTrue($subject->offsetExists('researchField'));
+        $this->assertTrue(isset($subject['research_field']));
+    }
+
+    #[Test]
+    public function existenceAndLookupAgreeOnAnUntouchedCollection(): void
+    {
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['research_field']);
+
+        $this->assertSame(
+            $subject->offsetExists('research_field'),
+            $subject->offsetGet('research_field') !== false,
+        );
+    }
+
+    #[Test]
+    public function unknownTypeDoesNotExist(): void
+    {
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['research_field']);
+
+        $this->assertFalse($subject->offsetExists('country'));
+        $this->assertFalse($subject->offsetExists('countryOfOrigin'));
+    }
+
+    #[Test]
+    public function noTypeExistsWhileNoTypeIdentifiersAreKnown(): void
+    {
+        $this->assertFalse((new CategoryCollection())->offsetExists('research_field'));
+    }
+
+    /**
+     * Why the disagreement mattered: Fluid resolves a path segment on an `ArrayAccess`
+     * subject through `offsetExists()` and only reads the offset once that answered
+     * `true` (`StandardVariableProvider::getByPath()`). `{categories.researchField}`
+     * therefore rendered nothing — silently — until something else had computed the
+     * grouping first.
+     */
+    #[Test]
+    public function templateExpressionResolvesOnAnUntouchedCollection(): void
+    {
+        $field = $this->typedCategory(1, 'research_field');
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['research_field']);
+        $subject->attach($field);
+
+        $variableProvider = new StandardVariableProvider(['categories' => $subject]);
+
+        $this->assertSame([1 => $field], $variableProvider->getByPath('categories.researchField'));
+    }
+
+    #[Test]
+    public function templateExpressionOfAnUnknownTypeResolvesToNull(): void
+    {
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['research_field']);
+
+        $variableProvider = new StandardVariableProvider(['categories' => $subject]);
+
+        $this->assertNull($variableProvider->getByPath('categories.country'));
     }
 
     /**
