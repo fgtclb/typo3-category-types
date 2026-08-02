@@ -1,0 +1,10 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","slug","title"
+,1,0,1,0,0,0,0,"/","Site Root"
+"sys_category",
+,"uid","pid","deleted","hidden","parent","type","title","sys_language_uid","l10n_parent"
+,1,1,0,0,0,"testing_first","First Category",0,0
+,2,1,0,0,0,"testing_second","Second Category",0,0
+,3,1,0,0,0,"testing_first","Third Category",0,0
+,4,1,0,0,0,"","Untyped Category",0,0
+,5,1,0,1,0,"testing_first","Hidden Category",0,0

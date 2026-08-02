@@ -1,0 +1,5 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:ct="http://typo3.org/ns/FGTCLB/CategoryTypes/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+><ct:be.category page="{page}" group="{group}"><f:for each="{category.allCategoriesByType}" as="categories" key="type">[{type}<f:for each="{categories}" as="category">:{category.title}</f:for>]</f:for></ct:be.category></html>
