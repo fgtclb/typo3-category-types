@@ -135,7 +135,7 @@ class CategoryRepository
 
     /**
      * @param string $group
-     * @param array<int> $idList
+     * @param array<int> $idList A positive selection of categories, an empty list selects none
      */
     public function findByGroupAndUidList(
         string $group,
@@ -153,7 +153,10 @@ class CategoryRepository
                     ),
                 ),
                 $queryBuilder->expr()->in('sys_category.sys_language_uid', [0, -1]),
-                $queryBuilder->expr()->in('uid', $idList),
+                $queryBuilder->expr()->in(
+                    'uid',
+                    $queryBuilder->quoteArrayBasedValueListToIntegerList($idList),
+                ),
             )->executeQuery();
 
         $categoryCollection = $this->categoryCollectionFactory->createCategoryCollection($group);

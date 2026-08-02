@@ -145,6 +145,37 @@ final class CategoryRepositoryGroupSelectionTest extends AbstractCategoryTypesTe
         $this->assertCount(0, $this->subject()->findByGroupAndUidList('testing', [999]));
     }
 
+    /**
+     * The uid list is a positive selection, so an empty one can only mean "no category" -
+     * reading it as "no restriction" would return the whole group instead.
+     *
+     * Handed to `ExpressionBuilder::in()` as a plain array, an empty list raises an
+     * `\InvalidArgumentException` (1701857902) on TYPO3 v13 and v14 and, on TYPO3 v12,
+     * produces `uid IN ()`, which every DBMS but SQLite rejects with a syntax error.
+     * `QueryBuilder::quoteArrayBasedValueListToIntegerList()` turns it into `NULL`.
+     */
+    #[Test]
+    public function emptyUidListReturnsAnEmptyCollection(): void
+    {
+        $this->assertCount(0, $this->subject()->findByGroupAndUidList('testing', []));
+    }
+
+    /**
+     * The returned collection carries the type identifiers of the group like the one of
+     * every other selection, so a template iterating the types keeps its shape instead of
+     * finding nothing at all. A collection built without the factory would answer `[]`.
+     */
+    #[Test]
+    public function collectionOfAnEmptyUidListStillKnowsTheGroupTypes(): void
+    {
+        $collection = $this->subject()->findByGroupAndUidList('testing', []);
+
+        $this->assertSame(
+            ['testing_first' => [], 'testing_second' => []],
+            $collection->getAllCategoriesByType(),
+        );
+    }
+
     #[Test]
     public function requestedCategoriesOfAnUnknownGroupAreRejected(): void
     {
@@ -152,6 +183,18 @@ final class CategoryRepositoryGroupSelectionTest extends AbstractCategoryTypesTe
         $this->expectExceptionCode(1683633304209);
 
         $this->subject()->findByGroupAndUidList('unknown', [1]);
+    }
+
+    /**
+     * An empty uid list does not change how an unknown group is answered.
+     */
+    #[Test]
+    public function emptyUidListOfAnUnknownGroupIsRejectedAsWell(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionCode(1683633304209);
+
+        $this->subject()->findByGroupAndUidList('unknown', []);
     }
 
     private function subject(): CategoryRepository
