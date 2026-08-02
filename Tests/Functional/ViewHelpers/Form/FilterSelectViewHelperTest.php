@@ -123,9 +123,10 @@ final class FilterSelectViewHelperTest extends AbstractViewHelperTestCase
     }
 
     /**
-     * A category as the value is what `{demand.filterCollection.filterCategories.<type>}`
-     * hands over. `Category` is no Extbase entity, so the persistence manager has no
-     * identifier for it and the cast falls back to `__toString()`, which returns the uid.
+     * `{demand.filterCollection.filterCategories.<type>}` hands over a list of categories,
+     * and every element goes through the same cast - so a single one covers it. `Category`
+     * is no Extbase entity, so the persistence manager has no identifier for it and the cast
+     * falls back to `__toString()`, which returns the uid.
      */
     #[Test]
     public function selectedValueCanBeACategory(): void
@@ -142,9 +143,9 @@ final class FilterSelectViewHelperTest extends AbstractViewHelperTestCase
     }
 
     /**
-     * `optionValueField` is not a registered argument of this view helper, it arrives through
-     * the additional-argument handling of the tag based base class - and the partials of the
-     * three consuming extensions pass it. It still reaches `getOptionValueScalar()`.
+     * `optionValueField` decides how an object handed over as the value is turned into the
+     * string the options are compared against - the case the three `DemandCategories.html`
+     * partials pass it for.
      */
     #[Test]
     public function selectedValueCanBeReadFromAPropertyOfTheValueObject(): void
@@ -385,6 +386,200 @@ final class FilterSelectViewHelperTest extends AbstractViewHelperTestCase
             '<select name="filter[researchField]">[1:Root Category][2:Child Category]</select>',
             $output,
         );
+    }
+
+    /**
+     * The three `DemandCategories.html` partials pass both fields. Before they were
+     * registered they reached the markup as attributes of the `select` element, where
+     * neither of them is valid HTML.
+     */
+    #[Test]
+    public function optionFieldsAreNotRenderedAsAttributes(): void
+    {
+        $output = $this->renderWithOptionFields(['options' => [$this->category(1, 0, 'Root Category')]]);
+
+        $this->assertSame(
+            '<select name="filter[researchField]">'
+            . '<option value="1" class="level-0">Root Category</option>' . LF
+            . '</select>',
+            $output,
+        );
+    }
+
+    #[Test]
+    public function optionLabelIsReadFromTheConfiguredField(): void
+    {
+        $output = $this->renderWithOptionFields([
+            'options' => [$this->category(1, 0, 'Root Category')],
+            'optionLabelField' => 'type',
+        ]);
+
+        $this->assertStringContainsString('<option value="1" class="level-0">testing_first</option>', $output);
+    }
+
+    #[Test]
+    public function optionValueIsReadFromTheConfiguredField(): void
+    {
+        $output = $this->renderWithOptionFields([
+            'options' => [$this->category(2, 1, 'Child Category')],
+            'optionValueField' => 'parentId',
+        ]);
+
+        $this->assertStringContainsString('<option value="1" class="level-0">Child Category</option>', $output);
+    }
+
+    /**
+     * The value the selection is compared against comes from the same field, so a value
+     * field other than the uid stays consistent between option and selection.
+     */
+    #[Test]
+    public function selectionIsComparedAgainstTheConfiguredValueField(): void
+    {
+        $output = $this->renderWithOptionFields([
+            'value' => '1',
+            'options' => [$this->category(2, 1, 'Child Category'), $this->category(3, 2, 'Grandchild Category')],
+            'optionValueField' => 'parentId',
+        ]);
+
+        $this->assertStringContainsString(
+            '<option value="1" class="level-0" selected="selected">Child Category</option>',
+            $output,
+        );
+        $this->assertStringContainsString('<option value="2" class="level-0">Grandchild Category</option>', $output);
+    }
+
+    /**
+     * Every property a `Category` exposes is a scalar or `Stringable`, so the rejection
+     * needs an option of its own kind - which is what an `options` argument holding
+     * anything but categories amounts to.
+     */
+    #[Test]
+    public function optionFieldThatCannotBeCastToAStringIsRejected(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionCode(1785706600);
+
+        $this->renderWithOptionFields(['options' => [new class () {
+            public function getUid(): int
+            {
+                return 1;
+            }
+
+            /**
+             * @return array<int, string>
+             */
+            public function getTitle(): array
+            {
+                return ['not', 'a', 'string'];
+            }
+        }]]);
+    }
+
+    /**
+     * `multiple` is a valid attribute of a `select`, so before it was registered a template
+     * passing it got a real multi select - but the name kept its single-value shape and the
+     * browser submitted one of the selected options. The name carries the suffix now, the
+     * way the core select view helper builds it, and the hidden field lets an empty
+     * selection reach the controller.
+     */
+    #[Test]
+    public function multipleSelectSubmitsAnArray(): void
+    {
+        $output = $this->renderMultiple(['options' => [$this->category(1, 0, 'Root Category')]]);
+
+        $this->assertSame(
+            '<input type="hidden" name="filter[researchField]" value="" />'
+            . '<select multiple="multiple" name="filter[researchField][]">'
+            . '<option value="1" class="level-0">Root Category</option>' . LF
+            . '</select>',
+            $output,
+        );
+    }
+
+    #[Test]
+    public function singleSelectKeepsItsName(): void
+    {
+        $output = $this->renderMultiple(['multiple' => false]);
+
+        $this->assertStringContainsString('<select name="filter[researchField]">', $output);
+    }
+
+    #[Test]
+    public function everyOptionOfAMultipleSelectIsSelectedByDefaultOnDemand(): void
+    {
+        $output = $this->renderMultiple([
+            'options' => [$this->category(1, 0, 'Root Category'), $this->category(2, 1, 'Child Category')],
+            'selectAllByDefault' => true,
+        ]);
+
+        $this->assertStringContainsString('<option value="1" class="level-0" selected="selected">', $output);
+        $this->assertStringContainsString('<option value="2" class="level-0" selected="selected">', $output);
+    }
+
+    /**
+     * A selection replaces the default - "if none was set before" is what the argument
+     * promises.
+     */
+    #[Test]
+    public function selectAllByDefaultStepsBackForASelection(): void
+    {
+        $output = $this->renderMultiple([
+            'value' => ['2'],
+            'options' => [$this->category(1, 0, 'Root Category'), $this->category(2, 1, 'Child Category')],
+            'selectAllByDefault' => true,
+        ]);
+
+        $this->assertStringContainsString('<option value="1" class="level-0">Root Category</option>', $output);
+        $this->assertStringContainsString(
+            '<option value="2" class="level-0" selected="selected">Child Category</option>',
+            $output,
+        );
+    }
+
+    #[Test]
+    public function selectAllByDefaultIsIgnoredForASingleSelect(): void
+    {
+        $output = $this->renderMultiple([
+            'options' => [$this->category(1, 0, 'Root Category')],
+            'multiple' => false,
+            'selectAllByDefault' => true,
+        ]);
+
+        $this->assertStringContainsString('<option value="1" class="level-0">Root Category</option>', $output);
+    }
+
+    /**
+     * @param array<string, mixed> $variables
+     */
+    private function renderWithOptionFields(array $variables = []): string
+    {
+        return $this->render('FilterSelectWithOptionFields', array_replace(
+            [
+                'name' => 'filter[researchField]',
+                'value' => '',
+                'options' => [],
+                'optionValueField' => 'uid',
+                'optionLabelField' => 'title',
+            ],
+            $variables,
+        ));
+    }
+
+    /**
+     * @param array<string, mixed> $variables
+     */
+    private function renderMultiple(array $variables = []): string
+    {
+        return $this->render('FilterSelectMultiple', array_replace(
+            [
+                'name' => 'filter[researchField]',
+                'value' => '',
+                'options' => [],
+                'multiple' => true,
+                'selectAllByDefault' => false,
+            ],
+            $variables,
+        ));
     }
 
     /**

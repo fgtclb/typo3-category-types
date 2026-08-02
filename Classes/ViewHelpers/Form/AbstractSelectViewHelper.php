@@ -34,10 +34,23 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
                 'defaultValue' => false,
                 'description' => 'If true, places auto-generated option tags after those rendered in the tag content. If false, automatic options come first.',
             ],
+            'optionValueField' => [
+                'type' => 'string',
+                'description' => 'If specified, will call the appropriate getter on each object to determine the value.',
+            ],
+            'optionLabelField' => [
+                'type' => 'string',
+                'description' => 'If specified, will call the appropriate getter on each object to determine the label.',
+            ],
             'sortByOptionLabel' => [
                 'type' => 'boolean',
                 'defaultValue' => false,
                 'description' => 'If true, List will be sorted by label.',
+            ],
+            'selectAllByDefault' => [
+                'type' => 'boolean',
+                'defaultValue' => false,
+                'description' => 'If specified options are selected if none was set before.',
             ],
             'errorClass' => [
                 'type' => 'string',
@@ -51,6 +64,11 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
             'prependOptionValue' => [
                 'type' => 'string',
                 'description' => 'If specified, will provide an option at first position with the specified value.',
+            ],
+            'multiple' => [
+                'type' => 'boolean',
+                'defaultValue' => false,
+                'description' => 'If set multiple options may be selected.',
             ],
             'required' => [
                 'type' => 'boolean',
@@ -74,6 +92,12 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
         }
 
         $name = $this->getName();
+        if ($this->arguments['multiple'] === true) {
+            $this->tag->addAttribute('multiple', 'multiple');
+            // Without the suffix the browser submits one of the selected values instead of
+            // all of them, the same way the core select view helper builds the name.
+            $name .= '[]';
+        }
         $this->tag->addAttribute('name', $name);
 
         $this->initSelectedValues();
@@ -93,6 +117,19 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
 
         // Register field name for token generation.
         $this->registerFieldNameForFormTokenGeneration($name);
+        if ($this->arguments['multiple'] === true) {
+            $content .= $this->renderHiddenFieldForEmptyValue();
+            // A multi select submits one value per selected option, so the field name has to
+            // be registered as often as there are options. It is registered once above.
+            for ($i = 1; $i < count($options); $i++) {
+                $this->registerFieldNameForFormTokenGeneration($name);
+            }
+            $viewHelperVariableContainer->addOrUpdate(
+                self::class,
+                'registerFieldNameForFormTokenGeneration',
+                $name
+            );
+        }
 
         $prependContent = $this->renderPrependOptionTag();
 
@@ -188,7 +225,9 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
     {
         if (is_object($valueElement)) {
             if ($this->hasArgument('optionValueField')) {
-                return ObjectAccess::getPropertyPath($valueElement, $this->arguments['optionValueField']);
+                // Cast: `ObjectAccess` hands back the property as it is typed, an `uid` as an
+                // integer - and the selected values are compared as strings.
+                return (string)ObjectAccess::getPropertyPath($valueElement, $this->arguments['optionValueField']);
             }
             // @todo use $this->persistenceManager->isNewObject() once it is implemented
             if ($this->persistenceManager->getIdentifierByObject($valueElement) !== null) {
@@ -222,6 +261,24 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
     {
         if (in_array((string)$value, $this->selectedValues)) {
             return true;
+        }
+
+        // Only a multi select can preselect every option, and only while nothing is selected.
+        return $this->arguments['multiple'] === true
+            && $this->arguments['selectAllByDefault'] === true
+            && $this->hasSelectedValue() === false;
+    }
+
+    /**
+     * An unselected select still carries one empty selected value, which is what the value
+     * attribute of a form without submitted data resolves to.
+     */
+    private function hasSelectedValue(): bool
+    {
+        foreach ($this->selectedValues as $selectedValue) {
+            if ($selectedValue !== '') {
+                return true;
+            }
         }
 
         return false;
