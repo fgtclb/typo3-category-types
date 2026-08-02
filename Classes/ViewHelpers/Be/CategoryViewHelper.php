@@ -17,15 +17,15 @@ class CategoryViewHelper extends AbstractViewHelper
         parent::initializeArguments();
 
         $arguments = [
+            // A required argument must not carry a default value: Fluid 5, shipped with
+            // TYPO3 v14, rejects that combination when the argument is defined.
             'page' => [
                 'type' => 'int',
-                'defaultValue' => [],
                 'description' => 'The page ID for which the categories should be fetched',
                 'required' => true,
             ],
             'group' => [
                 'type' => 'string',
-                'defaultValue' => 'default',
                 'description' => 'The group identifier for the categories for this page type',
                 'required' => true,
             ],
