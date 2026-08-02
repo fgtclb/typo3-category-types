@@ -6,14 +6,10 @@ namespace FGTCLB\CategoryTypes\ViewHelpers\Be;
 
 use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
-use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
 
 class CategoryViewHelper extends AbstractViewHelper
 {
-    use CompileWithRenderStatic;
-
     protected $escapeOutput = false;
 
     public function initializeArguments(): void
@@ -43,27 +39,17 @@ class CategoryViewHelper extends AbstractViewHelper
         $this->registerArguments($arguments);
     }
 
-    /**
-     * @param array{
-     *     page: int,
-     *     group: string,
-     *     as: string
-     * } $arguments
-     */
-    public static function renderStatic(
-        array $arguments,
-        \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
-    ): string {
-        $templateVariableContainer = $renderingContext->getVariableProvider();
+    public function render(): string
+    {
+        $templateVariableContainer = $this->renderingContext->getVariableProvider();
 
         /** @var CategoryRepository $repository */
         $repository = GeneralUtility::makeInstance(CategoryRepository::class);
-        $categories = $repository->findByGroupAndPageId($arguments['group'], $arguments['page'], true);
+        $categories = $repository->findByGroupAndPageId($this->arguments['group'], $this->arguments['page'], true);
 
-        $templateVariableContainer->add($arguments['as'], $categories);
-        $output = $renderChildrenClosure();
-        $templateVariableContainer->remove($arguments['as']);
+        $templateVariableContainer->add($this->arguments['as'], $categories);
+        $output = $this->renderChildren();
+        $templateVariableContainer->remove($this->arguments['as']);
 
         return $output;
     }
