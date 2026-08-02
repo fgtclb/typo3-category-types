@@ -1,0 +1,9 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:ct="http://typo3.org/ns/FGTCLB/CategoryTypes/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+><ct:form.filterSelect
+    name="{name}"
+    options="{options}"
+    renderOptions="false"
+><f:for each="{options}" as="option">[{option.uid}:{option.label}]</f:for></ct:form.filterSelect></html>

@@ -10,6 +10,11 @@
             "role": "Maintainer"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "TESTS\\CategoryTypesGroup\\": "Classes/"
+        }
+    },
     "require": {
         "typo3/cms-core": "^12.4.22 || ^13.4",
         "fgtclb/category-types": "~2.4.0@dev"
