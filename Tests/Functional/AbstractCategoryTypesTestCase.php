@@ -13,4 +13,18 @@ abstract class AbstractCategoryTypesTestCase extends FunctionalTestCase
         'fgtclb/academic-base',
         'fgtclb/category-types',
     ];
+
+    /**
+     * Add a fixture extension for a single test case, without restating the list above.
+     * Must be called before `parent::setUp()`. Mirrors the helper of the
+     * `EXT:academic_persons` test case.
+     */
+    protected function addTestExtension(string ...$extensions): void
+    {
+        foreach ($extensions as $extension) {
+            if ($extension !== '' && !in_array($extension, $this->testExtensionsToLoad, true)) {
+                $this->testExtensionsToLoad[] = $extension;
+            }
+        }
+    }
 }
