@@ -184,6 +184,13 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess, \String
 
     /**
      * ArrayAccess method offsetExists
+     *
+     * Answers from the registered type identifiers, which is what {@see offsetGet()}
+     * resolves against as well. Reading the lazily built `$typeSortedCollection` here
+     * instead made a type exist only after something had computed the grouping - and
+     * Fluid resolves `{collection.someType}` through this method, so a template that
+     * did not touch `allCategoriesByType` first rendered nothing.
+     *
      * @return bool
      */
     public function offsetExists(mixed $offset): bool
@@ -192,7 +199,7 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess, \String
             return false;
         }
         $lowerName = GeneralUtility::camelCaseToLowerCaseUnderscored($offset);
-        return array_key_exists($lowerName, $this->typeSortedCollection);
+        return in_array($lowerName, $this->typeIdentifiers, true);
     }
 
     /**
