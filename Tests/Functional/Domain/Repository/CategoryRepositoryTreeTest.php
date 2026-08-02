@@ -143,6 +143,71 @@ final class CategoryRepositoryTreeTest extends AbstractCategoryTypesTestCase
         $this->assertSame(['Second Type Root', 'Child Of Another Type'], array_column($rootline, 'title'));
     }
 
+    #[Test]
+    public function rootlineOfAnUnknownCategoryIsEmpty(): void
+    {
+        $this->assertSame([], $this->subject()->getCategoryRootline(999));
+    }
+
+    /**
+     * Reached from `Category::getParentId()` of a root category, which is `0`.
+     */
+    #[Test]
+    public function rootlineOfUidZeroIsEmpty(): void
+    {
+        $this->assertSame([], $this->subject()->getCategoryRootline(0));
+    }
+
+    /**
+     * `getCategoryArray()` lifts every restriction except the deleted one, so a deleted
+     * category is as unresolvable as an unknown one.
+     */
+    #[Test]
+    public function rootlineOfADeletedCategoryIsEmpty(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/../../Fixtures/CategoryRepository/categoryTreeBroken.csv');
+
+        $this->assertSame([], $this->subject()->getCategoryRootline(8));
+    }
+
+    /**
+     * Deleting a category leaves its children in place, so an ancestor going missing is
+     * ordinary editorial data. What could be resolved is returned rather than nothing.
+     */
+    #[Test]
+    public function rootlineStopsWhereAnAncestorWasDeleted(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/../../Fixtures/CategoryRepository/categoryTreeBroken.csv');
+
+        $rootline = $this->subject()->getCategoryRootline(9);
+
+        $this->assertSame(['Child Of Deleted Root'], array_column($rootline, 'title'));
+    }
+
+    #[Test]
+    public function rootlineOfASelfReferencingCategoryHoldsThatCategoryOnly(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/../../Fixtures/CategoryRepository/categoryTreeBroken.csv');
+
+        $rootline = $this->subject()->getCategoryRootline(10);
+
+        $this->assertSame(['Self Referencing Category'], array_column($rootline, 'title'));
+    }
+
+    /**
+     * Two categories pointing at each other: the walk ends when it reaches a uid it has
+     * already collected, so the entry category is the last element of the reversed result.
+     */
+    #[Test]
+    public function rootlineOfACycleEndsWhereItStarted(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/../../Fixtures/CategoryRepository/categoryTreeBroken.csv');
+
+        $rootline = $this->subject()->getCategoryRootline(11);
+
+        $this->assertSame(['Cycle Second', 'Cycle First'], array_column($rootline, 'title'));
+    }
+
     private function subject(): CategoryRepository
     {
         return $this->get(CategoryRepository::class);

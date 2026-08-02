@@ -264,27 +264,42 @@ class CategoryRepository
     }
 
     /**
-     * @param array<int, mixed> $rootline
-     * @return array<int, mixed>
+     * Returns the raw database rows of a category and all its ancestors, root first.
+     *
+     * A category that cannot be resolved - unknown, deleted, or removed in the current
+     * workspace - ends the walk instead of failing. For the requested uid that means an
+     * empty rootline; for an ancestor it means the part that could be resolved, because
+     * deleting a category leaves its children in place.
+     *
+     * @param array<int, array<string, mixed>> $rootline
+     * @return array<int, array<string, mixed>>
      */
     public function getCategoryRootline(int $uid, array $rootline = []): array
     {
+        // A category referencing itself or one of its own descendants would recurse until
+        // the memory limit is reached, which is a fatal error no caller can catch.
+        if (in_array($uid, array_map(intval(...), array_column($rootline, 'uid')), true)) {
+            return array_reverse($rootline);
+        }
         $category = $this->getCategoryArray($uid);
+        if ($category === null) {
+            return array_reverse($rootline);
+        }
         $rootline[] = $category;
 
-        if ($category['parent'] !== 0) {
-            $rootline = $this->getCategoryRootline($category['parent'], $rootline);
-        } else {
-            $rootline = array_reverse($rootline);
+        // The parent is cast because a string '0' would recurse into uid 0 rather than
+        // end the walk at the root.
+        if ((int)$category['parent'] !== 0) {
+            return $this->getCategoryRootline((int)$category['parent'], $rootline);
         }
 
-        return $rootline;
+        return array_reverse($rootline);
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null
      */
-    private function getCategoryArray(int $uid): array
+    private function getCategoryArray(int $uid): ?array
     {
         $context = GeneralUtility::makeInstance(Context::class);
         $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
@@ -306,7 +321,14 @@ class CategoryRepository
             )
             ->executeQuery()
             ->fetchAssociative();
+        if ($category === false) {
+            return null;
+        }
+        // Sets the record to `false` when the workspace deleted or moved it away.
         $pageRepository->versionOL('sys_category', $category, false, true);
+        if (!is_array($category)) {
+            return null;
+        }
         if ($category['l10n_parent'] > 0) {
             $category = $pageRepository->getLanguageOverlay('sys_category', $category);
         }

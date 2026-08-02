@@ -1,0 +1,7 @@
+"sys_category",
+,"uid","pid","deleted","hidden","parent","type","title","sys_language_uid","l10n_parent"
+,8,1,1,0,0,"testing_first","Deleted Root Category",0,0
+,9,1,0,0,8,"testing_first","Child Of Deleted Root",0,0
+,10,1,0,0,10,"testing_first","Self Referencing Category",0,0
+,11,1,0,0,12,"testing_first","Cycle First",0,0
+,12,1,0,0,11,"testing_first","Cycle Second",0,0
