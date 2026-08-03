@@ -102,6 +102,26 @@ final class CategoryCollectionTest extends UnitTestCase
         $this->assertFalse($subject->exist($this->category(2)));
     }
 
+    /**
+     * `exist()` and `attach()` have to answer the same question. They did not while
+     * `exist()` compared the objects: the same record read a second time after an edit
+     * is a different object with an equal uid, which `attach()` rejects as already
+     * present while `exist()` reported it as absent.
+     */
+    #[Test]
+    public function existAnswersOnTheUidJustAsAttachDoes(): void
+    {
+        $subject = new CategoryCollection();
+        $subject->attach($this->category(1, 'Original'));
+
+        $sameUidDifferentTitle = $this->category(1, 'Renamed');
+
+        $this->assertTrue($subject->exist($sameUidDifferentTitle));
+
+        $this->expectException(CategoryExistException::class);
+        $subject->attach($sameUidDifferentTitle);
+    }
+
     #[Test]
     public function collectionIteratesOverItsCategoriesKeyedByUid(): void
     {
@@ -150,6 +170,52 @@ final class CategoryCollectionTest extends UnitTestCase
         $subject->setTypeIdentifiers(['research_field', 'country']);
 
         $this->assertSame(['research_field' => [], 'country' => []], $subject->getAllCategoriesByType());
+    }
+
+    /**
+     * The grouped view is built on every call. It used to be kept in a property whose
+     * empty entries were seeded only while that property was still empty, so identifiers
+     * set after a first grouping never got one: `getCategoriesByTypeName()` then read a
+     * missing key and returned `null` against its `array` return type.
+     */
+    #[Test]
+    public function typeIdentifiersSetAfterAFirstGroupingAreHonoured(): void
+    {
+        $field = $this->typedCategory(1, 'research_field');
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['research_field']);
+        $subject->attach($field);
+        $subject->getAllCategoriesByType();
+
+        $subject->setTypeIdentifiers(['research_field', 'country']);
+
+        $this->assertSame(
+            ['research_field' => [1 => $field], 'country' => []],
+            $subject->getAllCategoriesByType(),
+        );
+        $this->assertSame([], $subject->getCategoriesByTypeName('country'));
+    }
+
+    /**
+     * The counterpart: an identifier dropped after a first grouping disappears from the
+     * grouped view instead of lingering as a stale entry.
+     */
+    #[Test]
+    public function typeIdentifiersRemovedAfterAFirstGroupingAreDropped(): void
+    {
+        $field = $this->typedCategory(1, 'research_field');
+        $country = $this->typedCategory(2, 'country');
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['research_field', 'country']);
+        $subject->attach($field);
+        $subject->attach($country);
+        $subject->getAllCategoriesByType();
+
+        $subject->setTypeIdentifiers(['research_field']);
+
+        $this->assertSame(['research_field' => [1 => $field]], $subject->getAllCategoriesByType());
     }
 
     #[Test]

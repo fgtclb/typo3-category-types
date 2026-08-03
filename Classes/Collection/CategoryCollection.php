@@ -21,11 +21,6 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess, \String
     protected array $collection = [];
 
     /**
-     * @var array<string, Category[]>
-     */
-    protected array $typeSortedCollection = [];
-
-    /**
      * @var array<string>
      */
     protected array $typeIdentifiers = [];
@@ -56,29 +51,35 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess, \String
     }
 
     /**
+     * Built on every call. Keeping the result in a property made the empty entries
+     * of {@see $typeIdentifiers} stale as soon as the identifiers were replaced: the
+     * seeding below ran only while that property was still empty, so an identifier
+     * added later never got its entry and {@see getCategoriesByTypeName()} returned
+     * `null` against its `array` return type. The loop over the categories re-ran on
+     * every call regardless, so nothing was actually cached.
+     *
      * @return array<string, Category[]>
      */
     public function getAllCategoriesByType(): array
     {
-        if (empty($this->typeIdentifiers)) {
+        if ($this->typeIdentifiers === []) {
             return [];
         }
 
-        if (empty($this->typeSortedCollection)) {
-            foreach ($this->typeIdentifiers as $typeIdentifier) {
-                $this->typeSortedCollection[$typeIdentifier] = [];
-            }
+        $typeSortedCollection = [];
+        foreach ($this->typeIdentifiers as $typeIdentifier) {
+            $typeSortedCollection[$typeIdentifier] = [];
         }
 
         foreach ($this->collection as $category) {
             $categoryIdentifier = $category->getUid();
             $typeIdentifier = (string)$category->getType();
             if (in_array($typeIdentifier, $this->typeIdentifiers, true)) {
-                $this->typeSortedCollection[$typeIdentifier][$categoryIdentifier] = $category;
+                $typeSortedCollection[$typeIdentifier][$categoryIdentifier] = $category;
             }
         }
 
-        return $this->typeSortedCollection;
+        return $typeSortedCollection;
     }
 
     /**
@@ -122,12 +123,17 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess, \String
     }
 
     /**
+     * Answers on the uid, which is what {@see attach()} guards on. Comparing the
+     * objects instead made the two disagree for the case that matters: the same
+     * record read a second time after an edit is a different object with equal uid,
+     * which `attach()` rejects as already present while this reported it as absent.
+     *
      * @param Category $category
      * @return bool
      */
     public function exist(Category $category): bool
     {
-        return in_array($category, $this->collection, false);
+        return array_key_exists($category->getUid(), $this->collection);
     }
 
     /**
@@ -186,10 +192,11 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess, \String
      * ArrayAccess method offsetExists
      *
      * Answers from the registered type identifiers, which is what {@see offsetGet()}
-     * resolves against as well. Reading the lazily built `$typeSortedCollection` here
-     * instead made a type exist only after something had computed the grouping - and
-     * Fluid resolves `{collection.someType}` through this method, so a template that
-     * did not touch `allCategoriesByType` first rendered nothing.
+     * resolves against as well. Reading the grouped view of
+     * {@see getAllCategoriesByType()} here instead made a type exist only after
+     * something had computed the grouping - and Fluid resolves `{collection.someType}`
+     * through this method, so a template that did not touch `allCategoriesByType` first
+     * rendered nothing.
      *
      * @return bool
      */

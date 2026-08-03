@@ -66,7 +66,7 @@ class CategoryTypeGroup
      * }|array<string, mixed> $array
      * @return self
      */
-    public function fromArray(array $array): self
+    public static function fromArray(array $array): self
     {
         return new self(
             identifier: (string)($array['identifier'] ?? ''),
