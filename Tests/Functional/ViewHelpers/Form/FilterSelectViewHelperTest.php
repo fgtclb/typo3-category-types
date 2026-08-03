@@ -18,10 +18,10 @@ use PHPUnit\Framework\Attributes\Test;
  * prepended option, `required`, the child content, the `renderOptions` variable and the
  * selected-value handling - is asserted here rather than in a test of its own: the class is
  * not abstract, but on its own it renders an empty select, because its `getOptions()`
- * returns `[]`. Its own `renderOptionTags()`, which the filter select overrides, is covered
- * in `AbstractSelectViewHelperTest` - the three `SortingSelectViewHelper` implementations of
- * `EXT:academic_partners`, `EXT:academic_programs` and `EXT:academic_projects` are its other
- * subclasses and use it.
+ * returns `[]`. Its `renderOptionTags()` writes the markup for this class as well and is
+ * covered in `AbstractSelectViewHelperTest` - the three `SortingSelectViewHelper`
+ * implementations of `EXT:academic_partners`, `EXT:academic_programs` and
+ * `EXT:academic_projects` are its other subclasses and share it too.
  *
  * The options are built as `Category` objects instead of being read from the database, which
  * pins the order the assertions rely on: none of the repository methods sorts. `isRoot()`
@@ -77,6 +77,39 @@ final class FilterSelectViewHelperTest extends AbstractViewHelperTestCase
 
         $this->assertStringContainsString(
             '<option value="1" class="level-0">Fluid &amp; &quot;Templating&quot; &lt;b&gt;</option>',
+            $output,
+        );
+    }
+
+    /**
+     * A category title is free text an editor types, and `optionValueField` may name any
+     * property since the four select arguments were registered - so the value is as
+     * uncontrolled as the label, which was escaped from the start.
+     */
+    #[Test]
+    public function optionValueIsEscaped(): void
+    {
+        $output = $this->renderWithOptionFields([
+            'options' => [$this->category(1, 0, '" autofocus onfocus="alert(1)')],
+            'optionValueField' => 'title',
+        ]);
+
+        $this->assertStringContainsString(
+            '<option value="&quot; autofocus onfocus=&quot;alert(1)" class="level-0">',
+            $output,
+        );
+    }
+
+    #[Test]
+    public function levelClassPrefixIsEscaped(): void
+    {
+        $output = $this->renderFilterSelect([
+            'options' => [$this->category(1, 0, 'Root Category')],
+            'groupLevelClassPrefix' => '" autofocus onfocus="alert(1)',
+        ]);
+
+        $this->assertStringContainsString(
+            '<option value="1" class="&quot; autofocus onfocus=&quot;alert(1)0">',
             $output,
         );
     }
@@ -181,6 +214,25 @@ final class FilterSelectViewHelperTest extends AbstractViewHelperTestCase
         $this->assertStringContainsString('<option value="1" class="level-0">Root Category</option>', $output);
         $this->assertStringContainsString(
             '<option value="2" class="level-0" disabled="disabled">Child Category</option>',
+            $output,
+        );
+    }
+
+    /**
+     * A disabled category can be the selected one, and both attributes are written by the
+     * same option. `disabled` comes from the option array now and therefore precedes
+     * `selected`, which the base class appends last.
+     */
+    #[Test]
+    public function disabledCategoryCanBeTheSelectedOne(): void
+    {
+        $disabled = $this->category(2, 1, 'Child Category');
+        $disabled->setDisabled(true);
+
+        $output = $this->renderFilterSelect(['value' => '2', 'options' => [$disabled]]);
+
+        $this->assertStringContainsString(
+            '<option value="2" class="level-0" disabled="disabled" selected="selected">Child Category</option>',
             $output,
         );
     }

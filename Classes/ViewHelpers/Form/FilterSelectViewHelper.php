@@ -62,6 +62,16 @@ class FilterSelectViewHelper extends AbstractSelectViewHelper
             $options = $this->linearizeOptionsTree($options, $optionsTree);
         }
 
+        // Added last: the level is only known once the options were grouped, and the base
+        // class writes the markup from this array.
+        foreach ($options as $key => $option) {
+            $attributes = ['class' => $this->arguments['groupLevelClassPrefix'] . $option['level']];
+            if ($option['isDisabled'] === true) {
+                $attributes['disabled'] = 'disabled';
+            }
+            $options[$key]['attributes'] = $attributes;
+        }
+
         return $options;
     }
 
@@ -135,26 +145,5 @@ class FilterSelectViewHelper extends AbstractSelectViewHelper
             }
         }
         return $options;
-    }
-
-    /**
-     * @param array<int, mixed> $options
-     * @return string
-     */
-    protected function renderOptionTags($options): string
-    {
-        $output = '';
-        foreach ($options as $option) {
-            $output .= '<option value="' . $option['value'] . '"';
-            $output .= ' class="' . $this->arguments['groupLevelClassPrefix'] . $option['level'] . '"';
-            if ($option['isSelected']) {
-                $output .= ' selected="selected"';
-            }
-            if ($option['isDisabled']) {
-                $output .= ' disabled="disabled"';
-            }
-            $output .= '>' . htmlspecialchars((string)$option['label']) . '</option>' . LF;
-        }
-        return $output;
     }
 }
