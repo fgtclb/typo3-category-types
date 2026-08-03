@@ -12,12 +12,12 @@ use PHPUnit\Framework\Attributes\Test;
  * `getOptions()` returns `[]` - so everything it contributes around the options is asserted
  * through `FilterSelectViewHelperTest`, which uses the subclass shipped here.
  *
- * What that leaves is `renderOptionTags()`, which the filter select overrides and therefore
- * never reaches. The three `SortingSelectViewHelper` implementations of
- * `EXT:academic_partners`, `EXT:academic_programs` and `EXT:academic_projects` do use it:
- * they only fill `getOptions()` and let the base class write the markup. The
- * `TestSelectViewHelper` of the `test_category_types_group` fixture extension is built the
- * same way and stands in for them, so the contract stays covered inside this extension.
+ * What that leaves is `renderOptionTags()` and `renderOptionTag()`, which every subclass
+ * shares: `ViewHelpers\Form\FilterSelectViewHelper` and the three `SortingSelectViewHelper`
+ * implementations of `EXT:academic_partners`, `EXT:academic_programs` and
+ * `EXT:academic_projects` only fill `getOptions()` and let the base class write the markup.
+ * The `TestSelectViewHelper` of the `test_category_types_group` fixture extension is built
+ * the same way and stands in for them, so the contract stays covered inside this extension.
  */
 final class AbstractSelectViewHelperTest extends AbstractViewHelperTestCase
 {
@@ -62,6 +62,22 @@ final class AbstractSelectViewHelperTest extends AbstractViewHelperTestCase
 
         $this->assertStringContainsString(
             '<option value="title">Fluid &amp; &quot;Templating&quot; &lt;b&gt;</option>',
+            $output,
+        );
+    }
+
+    /**
+     * The label was escaped and the value was not, although both are written by the same
+     * method. A value reaches the markup unchanged from `getOptions()`, which a subclass
+     * fills - for the category filter from a property the template names.
+     */
+    #[Test]
+    public function optionValueIsEscaped(): void
+    {
+        $output = $this->renderTestSelect(['options' => ['" autofocus onfocus="alert(1)' => 'By title']]);
+
+        $this->assertStringContainsString(
+            '<option value="&quot; autofocus onfocus=&quot;alert(1)">By title</option>',
             $output,
         );
     }

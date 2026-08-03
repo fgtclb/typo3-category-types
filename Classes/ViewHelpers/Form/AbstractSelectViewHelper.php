@@ -287,6 +287,11 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
     /**
      * Render the option tags.
      *
+     * Every option goes through `renderOptionTag()`, the way the core select view helper
+     * does it - so there is one place writing an option, and one place escaping it. An
+     * option that needs more than the value, the label and the selected state carries the
+     * additional attributes in an `attributes` key.
+     *
      * @param array<array<string, mixed>> $options the options for the form.
      * @return string rendered tags.
      */
@@ -294,11 +299,13 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
     {
         $output = '';
         foreach ($options as $option) {
-            $output .= '<option value="' . $option['value'] . '"';
-            if ($option['isSelected']) {
-                $output .= ' selected="selected"';
-            }
-            $output .= '>' . htmlspecialchars((string)$option['label']) . '</option>' . LF;
+            $attributes = $option['attributes'] ?? [];
+            $output .= $this->renderOptionTag(
+                (string)$option['value'],
+                (string)$option['label'],
+                (bool)$option['isSelected'],
+                is_array($attributes) ? $attributes : [],
+            ) . LF;
         }
         return $output;
     }
@@ -309,11 +316,15 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
      * @param string $value value attribute of the option tag (will be escaped)
      * @param string $label content of the option tag (will be escaped)
      * @param bool $isSelected specifies whether or not to add selected attribute
+     * @param array<string, mixed> $attributes additional attributes, keyed by name (values will be escaped)
      * @return string the rendered option tag
      */
-    protected function renderOptionTag($value, $label, $isSelected)
+    protected function renderOptionTag($value, $label, $isSelected, array $attributes = [])
     {
         $output = '<option value="' . htmlspecialchars((string)$value) . '"';
+        foreach ($attributes as $attributeName => $attributeValue) {
+            $output .= ' ' . $attributeName . '="' . htmlspecialchars((string)$attributeValue) . '"';
+        }
         if ($isSelected) {
             $output .= ' selected="selected"';
         }
