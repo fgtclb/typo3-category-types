@@ -55,12 +55,29 @@ final class CategoryTypeGroupTest extends UnitTestCase
         );
     }
 
+    #[Test]
+    public function fromArrayBuildsANewGroup(): void
+    {
+        $built = CategoryTypeGroup::fromArray(['identifier' => 'built', 'group' => 'other', 'priority' => 9]);
+
+        $this->assertSame(['identifier' => 'built', 'group' => 'other', 'priority' => 9], $built->toArray());
+    }
+
+    #[Test]
+    public function fromArrayDefaultsMissingKeysAndCastsScalars(): void
+    {
+        $built = CategoryTypeGroup::fromArray(['priority' => '7']);
+
+        $this->assertSame(['identifier' => '', 'group' => '', 'priority' => 7], $built->toArray());
+    }
+
     /**
-     * Note that `fromArray()` is an instance method here, unlike the static counterpart
-     * on `CategoryType` — it still builds a new object rather than filling this one.
+     * The method was an instance method until it was aligned with the static counterpart
+     * on `CategoryType`. PHP allows an arrow call to a static method, so the previous
+     * calling convention keeps working and the receiver is still left untouched.
      */
     #[Test]
-    public function fromArrayBuildsANewGroupAndLeavesTheReceiverUntouched(): void
+    public function fromArrayCanStillBeCalledOnAnInstance(): void
     {
         $subject = new CategoryTypeGroup('original', 'academic', 1);
 
@@ -68,13 +85,5 @@ final class CategoryTypeGroupTest extends UnitTestCase
 
         $this->assertSame(['identifier' => 'built', 'group' => 'other', 'priority' => 9], $built->toArray());
         $this->assertSame(['identifier' => 'original', 'group' => 'academic', 'priority' => 1], $subject->toArray());
-    }
-
-    #[Test]
-    public function fromArrayDefaultsMissingKeysAndCastsScalars(): void
-    {
-        $built = (new CategoryTypeGroup())->fromArray(['priority' => '7']);
-
-        $this->assertSame(['identifier' => '', 'group' => '', 'priority' => 7], $built->toArray());
     }
 }

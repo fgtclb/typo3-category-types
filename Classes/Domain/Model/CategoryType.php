@@ -39,6 +39,11 @@ class CategoryType implements \JsonSerializable, \Stringable
     }
 
     /**
+     * Used by {@see CategoryTypeLoader} on the uncached path, together with
+     * {@see CategoryType::toArray()}. {@see CategoryType::__set_state()} serves the
+     * cached path, where the loader requires a var_exported file - it did not replace
+     * these two.
+     *
      * @param array{
      *     identifier?: string,
      *     extensionKey?: string,
@@ -48,9 +53,6 @@ class CategoryType implements \JsonSerializable, \Stringable
      *     priority?: int,
      * }|array<string, mixed> $array
      * @return CategoryType
-     * @todo Original used within {@see CategoryTypeLoader}, but replaced with {@see CategoryType::__set_state()}. Check
-     *       if other usages are usefill or remove this method along with {@see CategoryType::toArray()}. Other usage
-     *       may be to encode/decode from json and methods are use-full in that context.
      */
     public static function fromArray(array $array): CategoryType
     {
@@ -65,6 +67,11 @@ class CategoryType implements \JsonSerializable, \Stringable
     }
 
     /**
+     * Used by {@see CategoryTypeLoader} on the uncached path, together with
+     * {@see CategoryType::fromArray()}. {@see CategoryType::__set_state()} serves the
+     * cached path, where the loader requires a var_exported file - it did not replace
+     * these two.
+     *
      * @return array{
      *     identifier: string,
      *     extensionKey: string,
@@ -73,9 +80,6 @@ class CategoryType implements \JsonSerializable, \Stringable
      *     icon: string,
      *     priority: int,
      * }
-     * @todo Original used within {@see CategoryTypeLoader}, but replaced with {@see CategoryType::__set_state()}. Check
-     *       if other usages are usefill or remove this method along with {@see CategoryType::fromArray()}. Other usage
-     *       may be to encode/decode from json and methods are use-full in that context.
      */
     public function toArray(): array
     {
