@@ -26,7 +26,8 @@
       "app-dir": ".Build",
       "Package": {
         "serviceProvider": "FGTCLB\\CategoryTypes\\ServiceProvider"
-      }
+      },
+      "version": "2.4.0-dev"
     },
     "branch-alias": {
       "dev-2": "2.4.x-dev"
