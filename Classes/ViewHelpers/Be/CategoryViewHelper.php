@@ -6,6 +6,7 @@ namespace FGTCLB\CategoryTypes\ViewHelpers\Be;
 
 use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 class CategoryViewHelper extends AbstractViewHelper
@@ -41,15 +42,17 @@ class CategoryViewHelper extends AbstractViewHelper
 
     public function render(): string
     {
-        $templateVariableContainer = $this->renderingContext->getVariableProvider();
-
+        if (!($this->renderingContext instanceof RenderingContextInterface)) {
+            return '';
+        }
+        $renderingContext = $this->renderingContext;
         /** @var CategoryRepository $repository */
         $repository = GeneralUtility::makeInstance(CategoryRepository::class);
         $categories = $repository->findByGroupAndPageId($this->arguments['group'], $this->arguments['page'], true);
 
-        $templateVariableContainer->add($this->arguments['as'], $categories);
+        $renderingContext->getVariableProvider()->add($this->arguments['as'], $categories);
         $output = $this->renderChildren();
-        $templateVariableContainer->remove($this->arguments['as']);
+        $renderingContext->getVariableProvider()->remove($this->arguments['as']);
 
         return $output;
     }

@@ -6,6 +6,7 @@ namespace FGTCLB\CategoryTypes\ViewHelpers\Form;
 
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 use TYPO3\CMS\Fluid\ViewHelpers\Form\AbstractFormFieldViewHelper;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 
 class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
 {
@@ -87,6 +88,12 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
 
     public function render(): string
     {
+        if (!($this->renderingContext instanceof RenderingContextInterface)) {
+            return '';
+        }
+        // The local is what the guard narrows: phpstan loses the narrowing of a property
+        // across the method calls below, a local it keeps.
+        $renderingContext = $this->renderingContext;
         if (isset($this->arguments['required']) && $this->arguments['required']) {
             $this->tag->addAttribute('required', 'required');
         }
@@ -106,10 +113,8 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
         if (isset($this->arguments['renderOptions'])
             && (bool)$this->arguments['renderOptions'] === false
         ) {
-            $this->renderingContext->getVariableProvider()->add('options', $options);
+            $renderingContext->getVariableProvider()->add('options', $options);
         }
-
-        $viewHelperVariableContainer = $this->renderingContext->getViewHelperVariableContainer();
 
         $this->addAdditionalIdentityPropertiesIfNeeded();
         $this->setErrorClassAttribute();
@@ -124,7 +129,7 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
             for ($i = 1; $i < count($options); $i++) {
                 $this->registerFieldNameForFormTokenGeneration($name);
             }
-            $viewHelperVariableContainer->addOrUpdate(
+            $renderingContext->getViewHelperVariableContainer()->addOrUpdate(
                 self::class,
                 'registerFieldNameForFormTokenGeneration',
                 $name
@@ -140,14 +145,14 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
             $tagContent = $this->renderOptionTags($options);
         }
 
-        $viewHelperVariableContainer->addOrUpdate(self::class, 'selectedValue', $this->selectedValues);
+        $renderingContext->getViewHelperVariableContainer()->addOrUpdate(self::class, 'selectedValue', $this->selectedValues);
 
         $childContent = $this->renderChildren();
 
-        $viewHelperVariableContainer->remove(self::class, 'selectedValue');
-        $viewHelperVariableContainer->remove(self::class, 'registerFieldNameForFormTokenGeneration');
+        $renderingContext->getViewHelperVariableContainer()->remove(self::class, 'selectedValue');
+        $renderingContext->getViewHelperVariableContainer()->remove(self::class, 'registerFieldNameForFormTokenGeneration');
         if (isset($this->arguments['renderOptions']) && (bool)$this->arguments['renderOptions'] === false) {
-            $this->renderingContext->getVariableProvider()->remove('options');
+            $renderingContext->getVariableProvider()->remove('options');
         }
 
         if (isset($this->arguments['optionsAfterContent']) && $this->arguments['optionsAfterContent']) {
