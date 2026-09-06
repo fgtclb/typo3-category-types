@@ -19,6 +19,7 @@ final class CategoryTypeTest extends UnitTestCase
      *     group: string,
      *     icon: string,
      *     priority: int,
+     *     inlineIcon: bool,
      * }
      */
     private function completeArray(): array
@@ -30,6 +31,7 @@ final class CategoryTypeTest extends UnitTestCase
             'group' => 'programs',
             'icon' => 'EXT:academic_programs/Resources/Public/Icons/field_of_study.svg',
             'priority' => 30,
+            'inlineIcon' => true,
         ];
     }
 
@@ -45,6 +47,7 @@ final class CategoryTypeTest extends UnitTestCase
         $this->assertSame($values['group'], $subject->getGroup());
         $this->assertSame($values['icon'], $subject->getIcon());
         $this->assertSame($values['priority'], $subject->getPriority());
+        $this->assertSame($values['inlineIcon'], $subject->isInlineIcon());
     }
 
     /**
@@ -121,6 +124,7 @@ final class CategoryTypeTest extends UnitTestCase
                 'group' => '',
                 'icon' => '',
                 'priority' => 0,
+                'inlineIcon' => false,
             ],
             $subject->toArray(),
         );
@@ -139,6 +143,23 @@ final class CategoryTypeTest extends UnitTestCase
         $subject = $factory(['identifier' => 'cast', 'priority' => '42']);
 
         $this->assertSame(42, $subject->getPriority());
+    }
+
+    /**
+     * Inlining an icon file is opt in, and the default has to be the conservative one:
+     * a type that says nothing keeps the core provider and its `<img>` markup. A YAML
+     * file that does say something says it as a boolean, and the cached registry is
+     * rebuilt through `__set_state()`, so both paths are covered.
+     *
+     * @param callable(array<string, mixed>): CategoryType $factory
+     */
+    #[DataProvider('factoryMethods')]
+    #[Test]
+    public function inlineIconDefaultsToOffAndIsRestoredWhenSet(callable $factory): void
+    {
+        $this->assertFalse($factory(['identifier' => 'silent'])->isInlineIcon());
+        $this->assertTrue($factory(['identifier' => 'asking', 'inlineIcon' => true])->isInlineIcon());
+        $this->assertFalse($factory(['identifier' => 'declining', 'inlineIcon' => false])->isInlineIcon());
     }
 
     #[Test]

@@ -1,0 +1,24 @@
+groups:
+  - identifier: testicons
+    title: 'Testing icons'
+    icon: 'EXT:test_category_types_icons/Resources/Public/Icons/Vector.svg'
+types:
+  - identifier: vector
+    title: 'Vector icon, opted in'
+    group: testicons
+    icon: 'EXT:test_category_types_icons/Resources/Public/Icons/Vector.svg'
+    inlineIcon: true
+  - identifier: plain
+    title: 'Vector icon, not opted in'
+    group: testicons
+    icon: 'EXT:test_category_types_icons/Resources/Public/Icons/Plain.svg'
+  - identifier: bitmap
+    title: 'Bitmap icon, opted in'
+    group: testicons
+    icon: 'EXT:test_category_types_icons/Resources/Public/Icons/Bitmap.png'
+    inlineIcon: true
+  - identifier: missing
+    title: 'Missing icon file, opted in'
+    group: testicons
+    icon: 'EXT:test_category_types_icons/Resources/Public/Icons/Missing.svg'
+    inlineIcon: true

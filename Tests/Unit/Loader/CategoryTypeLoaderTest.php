@@ -105,6 +105,7 @@ final class CategoryTypeLoaderTest extends UnitTestCase
                 'group' => 'programs',
                 'icon' => 'EXT:base_types/Resources/Public/Icons/research_field.svg',
                 'priority' => 10,
+                'inlineIcon' => true,
             ],
             $categoryTypes['programs.research_field']->toArray(),
         );
@@ -116,6 +117,20 @@ final class CategoryTypeLoaderTest extends UnitTestCase
         $categoryTypes = $this->subject('base_types')->loadUncached();
 
         $this->assertSame(0, $categoryTypes['programs.degree']->getPriority());
+    }
+
+    /**
+     * Inlining an icon is opt in, so a type that says nothing about it must arrive with
+     * the flag off - which is what leaves a third party icon file with the core provider
+     * and the `<img>` markup it has always had.
+     */
+    #[Test]
+    public function omittedInlineIconDefaultsToOff(): void
+    {
+        $categoryTypes = $this->subject('base_types')->loadUncached();
+
+        $this->assertTrue($categoryTypes['programs.research_field']->isInlineIcon());
+        $this->assertFalse($categoryTypes['programs.degree']->isInlineIcon());
     }
 
     #[Test]
@@ -174,6 +189,9 @@ final class CategoryTypeLoaderTest extends UnitTestCase
                 // Not restated by the override, so the original value survives.
                 'icon' => 'EXT:base_types/Resources/Public/Icons/research_field.svg',
                 'priority' => 10,
+                // The same: an override that says nothing about inlining does not
+                // silently withdraw the opt in of the type it overrides.
+                'inlineIcon' => true,
             ],
             $categoryTypes['programs.research_field']->toArray(),
         );

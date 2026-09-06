@@ -4,6 +4,7 @@ types:
     group: programs
     icon: 'EXT:base_types/Resources/Public/Icons/research_field.svg'
     priority: 10
+    inlineIcon: true
   - identifier: degree
     title: 'Degree'
     group: programs
