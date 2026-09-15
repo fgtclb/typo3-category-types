@@ -1,7 +1,7 @@
 {
   "name": "fgtclb/category-types",
   "type": "typo3-cms-extension",
-  "description": "Base package for FGTCLB Academic packages",
+  "description": "FGTCLB: Basic Typed Categories - Basic extension for typed categories",
   "license": "GPL-2.0-or-later",
   "authors": [
     {

@@ -102,7 +102,7 @@ including what to expect and our safe harbor statement.
 ## Simplified EU Declaration of Conformity (Annex VI)
 
 > Hereby, web-vision GmbH declares that the product with digital elements
-> type FGTCLB: Basic Typed categories is in compliance with Regulation (EU) 2024/2847.
+> type FGTCLB: Basic Typed Categories is in compliance with Regulation (EU) 2024/2847.
 >
 > The full text of the EU declaration of conformity is available at the
 > following internet address:

@@ -1,11 +1,11 @@
 # EU Declaration of Conformity
 
-**Product:** FGTCLB: Basic Typed categories
+**Product:** FGTCLB: Basic Typed Categories
 **Reference:** DoC-category_types-2.4.0
 
 ## 1. Product identification
 
-- **Product name:** FGTCLB: Basic Typed categories
+- **Product name:** FGTCLB: Basic Typed Categories
 - **Type:** TYPO3 Extension
 - **Extension key / package:** category_types (fgtclb/category-types)
 - **Version:** 2.4.0 (initial issuance of this declaration)
@@ -26,7 +26,7 @@ of the manufacturer, web-vision GmbH.
 
 ## 4. Object of the declaration
 
-FGTCLB: Basic Typed categories, version 2.4.0, as distributed via the
+FGTCLB: Basic Typed Categories, version 2.4.0, as distributed via the
 TYPO3 Extension Repository (TER) and Packagist.
 
 ## 5. Statement of conformity
@@ -60,7 +60,7 @@ Signed for and on behalf of: web-vision GmbH
 ## Simplified EU Declaration of Conformity (Annex VI)
 
 > Hereby, web-vision GmbH declares that the product with digital elements
-> type FGTCLB: Basic Typed categories is in compliance with Regulation (EU) 2024/2847.
+> type FGTCLB: Basic Typed Categories is in compliance with Regulation (EU) 2024/2847.
 >
 > The full text of the EU declaration of conformity is available at the
 > following internet address:
