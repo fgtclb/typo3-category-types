@@ -1,65 +1,45 @@
-Icon registering
-================
+..  _developers-icons:
 
-..  code-block:: php
-    :caption: EXT:example/Configuration/Icons.php
+Category type icons
+===================
 
-    use FGTCLB\Example\Domain\Enumeration\Category;
+A category type does not register its icon in :file:`Configuration/Icons.php`.
+It names an icon **file** in :file:`Configuration/CategoryTypes.yaml`, and this
+extension registers it on :php:`BootCompletedEvent`:
 
-    // be aware, your Icons are correct located and named
-    $sourceString = function (string $icon) {
-        return sprintf(
-            'EXT:example/Resources/Public/Icons/%s.svg',
-            \TYPO3\CMS\Core\Utility\GeneralUtility::underscoredToLowerCamelCase($icon)
-        );
-    };
-    
-    $identifierString = function (string $identifier) {
-        return sprintf(
-            'example-%s',
-            $identifier
-        );
-    };
-    
-    return [
-        $identifierString(Category::TYPE_ADMISSION_RESTRICTION) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_ADMISSION_RESTRICTION),
-        ],
-        $identifierString(Category::TYPE_APPLICATION_PERIOD) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_APPLICATION_PERIOD),
-        ],
-        $identifierString(Category::TYPE_BEGIN_COURSE) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_BEGIN_COURSE),
-        ],
-        $identifierString(Category::TYPE_COSTS) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_COSTS),
-        ],
-        $identifierString(Category::TYPE_DEGREE) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_DEGREE),
-        ],
-        $identifierString(Category::TYPE_DEPARTMENT) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_DEPARTMENT),
-        ],
-        $identifierString(Category::TYPE_STANDARD_PERIOD) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_STANDARD_PERIOD),
-        ],
-        $identifierString(Category::TYPE_COURSE_TYPE) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_COURSE_TYPE),
-        ],
-        $identifierString(Category::TYPE_TEACHING_LANGUAGE) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_TEACHING_LANGUAGE),
-        ],
-        $identifierString(Category::TYPE_TOPIC) => [
-            'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-            'source' => $sourceString(Category::TYPE_TOPIC),
-        ],
-    ];
+..  code-block:: yaml
+    :caption: EXT:example/Configuration/CategoryTypes.yaml
+
+    types:
+      - identifier: degree
+        title: 'LLL:EXT:example/Resources/Private/Language/locallang.xlf:sys_category.example.degree'
+        group: example
+        icon: 'EXT:example/Resources/Public/Icons/CategoryTypes/Degree.svg'
+
+The registration happens in
+:php:`\FGTCLB\CategoryTypes\ServiceProvider::addIcons()`. The icon identifier is
+derived, never written by hand -
+:php:`\FGTCLB\CategoryTypes\Domain\Model\CategoryType::getIconIdentifier()`
+builds it from the group and the type:
+
+..  code-block:: text
+
+    category_types.<group>.<type>
+
+For the example above that is :php:`category_types.example.degree`, and that is
+the identifier the :php:`sys_category` :php:`typeicon_classes` entry uses and
+the identifier a template addresses:
+
+..  code-block:: html
+
+    <core:icon identifier="category_types.example.degree" />
+
+..  _developers-icons-provider:
+
+Which provider the icon gets
+----------------------------
+
+The one :php:`\TYPO3\CMS\Core\Imaging\IconRegistry::detectIconProvider()`
+answers for the file: :php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`
+for an SVG, :php:`\TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider` for
+a bitmap.

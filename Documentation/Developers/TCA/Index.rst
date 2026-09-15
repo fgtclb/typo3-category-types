@@ -1,131 +1,34 @@
-TCA Implementation
-==================
+..  _developers-tca:
 
-..  code-block:: php
-    :caption: EXT:example/Configuration/TCA/Overrides/sys_category.php
+TCA integration
+===============
 
-    (static function (): void {
-        $llBackendType = function (string $label) {
-            return sprintf('LLL:EXT:example/Resources/Private/Language/locallang.xlf:sys_category.type.%s', $label);
-        };
+This extension changes the :sql:`sys_category` TCA itself, in its
+:file:`Configuration/TCA/Overrides/sys_category.php`, from the declared
+:ref:`category types <developers-category-types>`:
 
-        // Optional, use your own flavour
-        $iconType = function (string $iconType) {
-            return sprintf(
-                'example-%s',
-                $iconType
-            );
-        };
-    
-        $sysCategoryTcaTypeIconOverrides = [
-            'ctrl' => [
-                'typeicon_classes' => [
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_ADMISSION_RESTRICTION
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_ADMISSION_RESTRICTION),
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_APPLICATION_PERIOD
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_APPLICATION_PERIOD),
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_BEGIN_COURSE
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_BEGIN_COURSE),
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_COSTS
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_COSTS),
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEGREE
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEGREE),
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEPARTMENT
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEPARTMENT),
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_STANDARD_PERIOD
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_STANDARD_PERIOD),
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_COURSE_TYPE
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_COURSE_TYPE),
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_TEACHING_LANGUAGE
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_TEACHING_LANGUAGE),
-                    \FGTCLB\Example\Domain\Enumeration\Category::TYPE_TOPIC
-                    => $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_TOPIC),
-                ],
-            ],
-        ];
-        $addItems = [
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_ADMISSION_RESTRICTION),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_ADMISSION_RESTRICTION,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_ADMISSION_RESTRICTION),
-                'courses',
-            ],
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_APPLICATION_PERIOD),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_APPLICATION_PERIOD,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_APPLICATION_PERIOD),
-                'courses',
-            ],
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_BEGIN_COURSE),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_BEGIN_COURSE,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_BEGIN_COURSE),
-                'courses',
-            ],
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_COSTS),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_COSTS,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_COSTS),
-                'courses',
-            ],
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEGREE),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEGREE,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEGREE),
-                'courses',
-            ],
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEPARTMENT),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEPARTMENT,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_DEPARTMENT),
-                'courses',
-            ],
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_STANDARD_PERIOD),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_STANDARD_PERIOD,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_STANDARD_PERIOD),
-                'courses',
-            ],
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_COURSE_TYPE),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_COURSE_TYPE,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_COURSE_TYPE),
-                'courses',
-            ],
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_TEACHING_LANGUAGE),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_TEACHING_LANGUAGE,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_TEACHING_LANGUAGE),
-                'courses',
-            ],
-            [
-                $llBackendType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_TOPIC),
-                \FGTCLB\Example\Domain\Enumeration\Category::TYPE_TOPIC,
-                $iconType(\FGTCLB\Example\Domain\Enumeration\Category::TYPE_TOPIC),
-                'courses',
-            ],
-        ];
-    
-        // create new group
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTcaSelectItemGroup(
-            'sys_category',
-            'type',
-            'courses',
-            'LLL:EXT:example/Resources/Private/Language/locallang.xlf:sys_category.courses',
-        );
+*   :php:`ctrl.type` and :php:`ctrl.typeicon_column` point to the :sql:`type`
+    column.
+*   The :sql:`type` column is a :php:`selectSingle` field. Its first item is
+    :php:`default`, followed by one item per declared type, with the title as
+    label, the identifier as value, the icon identifier as icon and the group as
+    item group.
+*   :php:`ctrl.typeicon_classes` maps every identifier to its icon identifier,
+    so the record icon follows the type.
+*   The :sql:`type` field is shown before :sql:`title` in every record type.
 
-        // add the items to group
-        foreach ($addItems as $addItem) {
-            \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTcaSelectItem(
-                'sys_category',
-                'type',
-                $addItem
-            );
-        }
+An extension that declares types therefore adds no :php:`addTcaSelectItem()`
+call and no :php:`typeicon_classes` entry of its own. Items added by hand are
+unknown to :php:`CategoryTypeRegistry`: they get no registered icon and no
+:php:`CategoryType` object, and the :php:`typeicon_classes` list is assigned as
+a whole when this extension builds it.
 
-        // add configuration to TCA
-        \TYPO3\CMS\Core\Utility\ArrayUtility::mergeRecursiveWithOverrule(
-            $GLOBALS['TCA']['sys_category'],
-            $sysCategoryTcaTypeIconOverrides
-        );
-    })();
+..  _developers-tca-unique:
+
+Keep identifiers unique across groups
+-------------------------------------
+
+The :sql:`type` column stores the identifier only, not the group. Two groups
+declaring the same identifier produce two items with the same value, and a
+record carrying that value cannot tell which of the two it is. Keep type
+identifiers unique across all groups of all installed extensions.
