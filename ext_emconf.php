@@ -1,7 +1,7 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => 'FGTCLB: Basic Typed categories',
+    'title' => 'FGTCLB: Basic Typed Categories',
     'description' => 'Basic extension for typed categories',
     'version' => '3.0.0',
     'category' => 'misc',
