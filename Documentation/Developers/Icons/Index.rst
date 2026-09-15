@@ -1,3 +1,5 @@
+..  _developers-icons:
+
 Category type icons
 ===================
 

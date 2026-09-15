@@ -57,7 +57,8 @@ consistently across the academic extensions.
 
     ..  card:: :ref:`Developers <developers>`
 
-        Reference for developers: classes, icons and TCA integration.
+        Reference for developers: declaring category types, TCA integration
+        and icons.
 
     ..  card:: :ref:`Changelog <changelog-v3>`
 

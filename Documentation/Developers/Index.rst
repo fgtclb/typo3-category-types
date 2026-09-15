@@ -9,6 +9,6 @@ The implementation examples use a fictional :php:`EXT:example` extension.
     :maxdepth: 5
     :titlesonly:
 
-    Classes/Index
+    CategoryTypes/Index
     TCA/Index
     Icons/Index
