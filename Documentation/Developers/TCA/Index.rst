@@ -12,7 +12,7 @@ TCA Implementation
         // Optional, use your own flavour
         $iconType = function (string $iconType) {
             return sprintf(
-                'academic-studies-%s',
+                'example-%s',
                 $iconType
             );
         };

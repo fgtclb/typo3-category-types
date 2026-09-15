@@ -9,8 +9,10 @@ framework. In order to perform typification, an addition in a separate extension
 is required.
 Examples can be found in the following FGTCLB extensions:
 
-* `Academic Studies`_
-* `Academic Research Database`_
+* `Academic Programs`_
+* `Academic Projects`_
+* `Academic Partners`_
 
-.. _Academic Studies: https://extensions.typo3.org/extension/academic_studies
-.. _Academic Research Database: https://extensions.typo3.org/extension/academic_researchdatabase
+.. _Academic Programs: https://extensions.typo3.org/extension/academic_programs
+.. _Academic Projects: https://extensions.typo3.org/extension/academic_projects
+.. _Academic Partners: https://extensions.typo3.org/extension/academic_partners
