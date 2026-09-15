@@ -3,7 +3,7 @@
 For Developers
 --------------
 
-All implementation examples are taken from EXT:academic_studies
+The implementation examples use a fictional :php:`EXT:example` extension.
 
 ..  toctree::
     :maxdepth: 5

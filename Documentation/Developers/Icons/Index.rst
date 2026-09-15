@@ -16,7 +16,7 @@ Icon registering
     
     $identifierString = function (string $identifier) {
         return sprintf(
-            'academic-studies-%s',
+            'example-%s',
             $identifier
         );
     };
