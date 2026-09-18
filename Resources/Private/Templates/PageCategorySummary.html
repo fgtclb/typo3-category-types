@@ -1,0 +1,67 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3Fluid/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+<f:comment>
+    The category summary above the content grid of the page module. It is rendered by
+    `Backend\PageCategorySummaryRenderer` for a page type an extension claims, and an
+    installation replaces it through page TSconfig:
+
+        templates.fgtclb/category-types.my-site = my-vendor/my-site:Resources/Private/Backend
+
+    which is looked up as `Resources/Private/Backend/Templates/PageCategorySummary.html`
+    of that package.
+
+    `rows` carries one entry per registered type of the group, in registry order and
+    including the types the page has no category of. Each entry has the resolved `title`
+    and `iconIdentifier` the markup below uses, and the `type` itself for an override that
+    needs more than those two.
+</f:comment>
+<div class="category-types-page-summary">
+    <table class="table table-striped">
+        <tbody>
+            <f:for each="{rows}" as="row">
+                <tr>
+                    <td style="text-wrap: nowrap;">
+                        <core:icon identifier="{row.iconIdentifier}" />
+                    </td>
+                    <td style="text-wrap: nowrap;">
+                        <strong>{row.title}</strong>
+                    </td>
+                    <td style="width: 100%">
+                        <f:if condition="{row.categories}">
+                            <f:then>
+                                <ul>
+                                    <f:for each="{row.categories}" as="category">
+                                        <li>
+                                            <f:comment>
+                                                A hidden category keeps its place in the list
+                                                and trades its type icon for the core hidden
+                                                overlay - an editor has to see that it is
+                                                assigned and switched off, which is the one
+                                                thing the page properties do not show.
+                                            </f:comment>
+                                            <core:icon identifier="{f:if(condition: category.hidden, then: 'overlay-hidden', else: row.iconIdentifier)}" />
+                                            {category.title}
+                                        </li>
+                                    </f:for>
+                                </ul>
+                            </f:then>
+                            <f:else>
+                                <p>
+                                    <f:translate
+                                        extensionName="category_types"
+                                        key="sys_category.not_set"
+                                    />
+                                </p>
+                            </f:else>
+                        </f:if>
+                    </td>
+                </tr>
+            </f:for>
+        </tbody>
+    </table>
+</div>
+</html>

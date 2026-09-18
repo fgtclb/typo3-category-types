@@ -1,0 +1,9 @@
+# The override seam of the page module category summary, the way an installation
+# registers it: a key below the composer package name of `EXT:category_types`,
+# pointing at a directory whose `Templates/` folder is searched for
+# `PageCategorySummary.html`.
+#
+# The package name is what makes the key resolve at all. Registered below
+# `typo3/cms-backend` instead, the view searches core's template directory and
+# nothing else.
+templates.fgtclb/category-types.test-override = tests/category-types-summary-override:Resources/Private/Backend

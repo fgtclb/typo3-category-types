@@ -12,3 +12,4 @@ The implementation examples use a fictional :php:`EXT:example` extension.
     CategoryTypes/Index
     TCA/Index
     Icons/Index
+    PageModuleSummary/Index
