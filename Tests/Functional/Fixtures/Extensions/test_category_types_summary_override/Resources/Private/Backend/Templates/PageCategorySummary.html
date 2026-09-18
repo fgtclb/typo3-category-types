@@ -1,0 +1,9 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3Fluid/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+<div class="summary-from-the-override">
+    <f:for each="{rows}" as="row">[{row.title}:{row.categories -> f:count()}]</f:for>
+</div>
+</html>
