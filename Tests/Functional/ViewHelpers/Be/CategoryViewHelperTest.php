@@ -8,13 +8,27 @@ use FGTCLB\CategoryTypes\Tests\Functional\ViewHelpers\AbstractViewHelperTestCase
 use PHPUnit\Framework\Attributes\Test;
 
 /**
- * `ViewHelpers\Be\CategoryViewHelper` provides the categories of a page to the backend page
- * layout of `EXT:academic_partners`, `EXT:academic_programs` and `EXT:academic_projects` -
- * their `PageLayout/Doktype*.html` partials are its only callers.
+ * `ViewHelpers\Be\CategoryViewHelper` provides the categories of a page to a backend template.
  *
- * It is the one class of this extension that differs between the branches: here it renders
- * through `renderStatic()` and `CompileWithRenderStatic`, on `main` through `render()`.
- * These tests go through a template and therefore describe both.
+ * It has **no caller in this repository** any more. Its only ones were the
+ * `PageLayout/Doktype*.html` partials of `EXT:academic_partners`,
+ * `EXT:academic_programs` and `EXT:academic_projects`, which ACE-688, ACE-689 and
+ * ACE-690 removed. None of the three was ever rendered by a core template, so nothing
+ * entered the view helper through them: the `EXT:academic_programs` one stopped being
+ * rendered when a rename turned it into that partial in March 2023, and the other two
+ * were created from the already broken shape and never rendered at all. The page module
+ * summary that replaced them reads the categories through
+ * `Domain\Repository\CategoryRepository` directly.
+ *
+ * The view helper stays public API and stays covered: a project may render it in a backend
+ * template of its own, and these tests are what that contract rests on.
+ *
+ * The class differs slightly between the branches, and these tests describe both because
+ * they go through a template rather than through the view helper's methods. Here the
+ * `page` and `group` arguments carry a `defaultValue`; on `main` they do not, and
+ * `render()` guards its rendering context there. Fluid 5, shipped with TYPO3 v14, rejects
+ * a required argument that is defined with a default, which is why the two differ at
+ * all.
  */
 final class CategoryViewHelperTest extends AbstractViewHelperTestCase
 {
