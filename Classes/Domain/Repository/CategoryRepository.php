@@ -79,7 +79,13 @@ class CategoryRepository
                     'pages.uid',
                     $queryBuilder->createNamedParameter($pageId, Connection::PARAM_INT)
                 ),
-            )->executeQuery();
+            )
+            // The backend orders categories by their manual `sorting` (TCA ctrl `sortby`);
+            // without an ORDER BY the collection order belongs to the DBMS and is not the
+            // same list twice on PostgreSQL (ACE-491). `uid` settles ties.
+            ->orderBy('sys_category.sorting', 'ASC')
+            ->addOrderBy('sys_category.uid', 'ASC')
+            ->executeQuery();
 
         $categoryCollection = $this->categoryCollectionFactory->createCategoryCollection($group);
 
@@ -109,7 +115,11 @@ class CategoryRepository
                     ),
                 ),
                 $queryBuilder->expr()->in('sys_category.sys_language_uid', [0, -1]),
-            )->executeQuery();
+            )
+            // Manual backend order, deterministic on every DBMS - see findByGroupAndPageId() (ACE-491).
+            ->orderBy('sys_category.sorting', 'ASC')
+            ->addOrderBy('sys_category.uid', 'ASC')
+            ->executeQuery();
 
         $categoryCollection = $this->categoryCollectionFactory->createCategoryCollection($group);
 
@@ -157,7 +167,11 @@ class CategoryRepository
                     'uid',
                     $queryBuilder->quoteArrayBasedValueListToIntegerList($idList),
                 ),
-            )->executeQuery();
+            )
+            // Manual backend order, deterministic on every DBMS - see findByGroupAndPageId() (ACE-491).
+            ->orderBy('sys_category.sorting', 'ASC')
+            ->addOrderBy('sys_category.uid', 'ASC')
+            ->executeQuery();
 
         $categoryCollection = $this->categoryCollectionFactory->createCategoryCollection($group);
 
@@ -217,7 +231,13 @@ class CategoryRepository
                     'sys_category_record_mm.uid_foreign',
                     $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)
                 )
-            )->executeQuery();
+            )
+            // Manual backend order, deterministic on every DBMS - see findByGroupAndPageId()
+            // (ACE-491). Both ORDER BY columns are part of the DISTINCT select list
+            // (`sys_category.*`), which PostgreSQL insists on.
+            ->orderBy('sys_category.sorting', 'ASC')
+            ->addOrderBy('sys_category.uid', 'ASC')
+            ->executeQuery();
 
         $categoryCollection = $this->categoryCollectionFactory->createCategoryCollection($group);
 

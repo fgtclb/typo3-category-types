@@ -1,0 +1,20 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","slug","title"
+,1,0,1,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,"/categorised","Categorised Page"
+"sys_category",
+,"uid","pid","deleted","hidden","parent","sorting","type","title","sys_language_uid","l10n_parent"
+,1,1,0,0,0,96,"testing_first","Late Category",0,0
+,2,1,0,0,0,32,"testing_second","Early Category",0,0
+,3,1,0,0,0,64,"testing_first","Middle Category",0,0
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","header"
+,1,2,0,0,0,"Categorised content element"
+"sys_category_record_mm",
+,"uid_local","uid_foreign","tablenames","fieldname","sorting","sorting_foreign"
+,1,2,"pages","categories",0,1
+,2,2,"pages","categories",0,2
+,3,2,"pages","categories",0,3
+,1,1,"tt_content","pi_flexform",0,1
+,2,1,"tt_content","pi_flexform",0,2
+,3,1,"tt_content","pi_flexform",0,3
