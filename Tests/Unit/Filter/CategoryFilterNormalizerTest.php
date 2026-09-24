@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace FGTCLB\CategoryTypes\Tests\Unit\Filter;
 
+use FGTCLB\CategoryTypes\Collection\CategoryCollection;
+use FGTCLB\CategoryTypes\Collection\FilterCollection;
+use FGTCLB\CategoryTypes\Domain\Model\Category;
 use FGTCLB\CategoryTypes\Filter\CategoryFilterNormalizer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -124,6 +127,52 @@ final class CategoryFilterNormalizerTest extends UnitTestCase
     public function aNonNumericValueBecomesZero(): void
     {
         $this->assertSame([0], $this->subject()->toUidList(['research_field' => 'drop table']));
+    }
+
+    #[Test]
+    public function noFilterCollectionIsAnEmptyFilterArgument(): void
+    {
+        $this->assertSame('', $this->subject()->toFilterArgument(null));
+        $this->assertSame('', $this->subject()->toFilterArgument(new FilterCollection()));
+    }
+
+    #[Test]
+    public function oneCategoryIsItsUid(): void
+    {
+        $this->assertSame('12', $this->subject()->toFilterArgument($this->filterCollection(12)));
+    }
+
+    /**
+     * The categories end up in one list, in ascending order however they were attached -
+     * so one selection has one URL. Their type is not read, so the categories here carry
+     * none; the partner list's functional test submits categories of several types.
+     */
+    #[Test]
+    public function categoriesAreOneAscendingList(): void
+    {
+        $this->assertSame('5,12,31', $this->subject()->toFilterArgument($this->filterCollection(31, 5, 12)));
+    }
+
+    /**
+     * What a list plugin redirects to is read by the same plugin again: the argument has
+     * to come back as the uids it was made of.
+     */
+    #[Test]
+    public function theFilterArgumentReadsBackAsTheSameUids(): void
+    {
+        $filterArgument = $this->subject()->toFilterArgument($this->filterCollection(31, 5, 12));
+
+        $this->assertSame([5, 12, 31], $this->subject()->toUidList(['categories' => $filterArgument]));
+    }
+
+    private function filterCollection(int ...$uids): FilterCollection
+    {
+        $categoryCollection = new CategoryCollection();
+        foreach ($uids as $uid) {
+            $categoryCollection->attach(new Category(uid: $uid, parentId: 0, title: 'Category ' . $uid));
+        }
+
+        return new FilterCollection($categoryCollection);
     }
 
     private function subject(): CategoryFilterNormalizer

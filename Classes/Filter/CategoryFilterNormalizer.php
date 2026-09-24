@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace FGTCLB\CategoryTypes\Filter;
 
+use FGTCLB\CategoryTypes\Collection\FilterCollection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Turns the category filter of a submitted demand form into a list of category uids.
+ * Turns the category filter of a submitted demand form into a list of category uids,
+ * and a resolved filter back into the one argument a list URL carries.
  *
  * The filter reaches a controller action as a plain array taken from the request, without
  * any validation on the way, so every shape has to be survivable. A value that cannot be
@@ -44,6 +46,29 @@ class CategoryFilterNormalizer
         }
 
         return array_values(array_unique($uids));
+    }
+
+    /**
+     * The reverse of {@see toUidList()}: the categories of a resolved filter as one comma
+     * separated uid list, the shape a list plugin puts into the URL it redirects to.
+     *
+     * The list is in ascending uid order, so one selection has exactly one URL whichever
+     * order its categories were selected in. The category type is left out for the reason
+     * {@see toUidList()} ignores it. An empty string means that nothing is filtered.
+     */
+    public function toFilterArgument(?FilterCollection $filterCollection): string
+    {
+        if ($filterCollection === null) {
+            return '';
+        }
+
+        $uids = [];
+        foreach ($filterCollection->getFilterCategories() as $category) {
+            $uids[] = $category->getUid();
+        }
+        sort($uids, SORT_NUMERIC);
+
+        return implode(',', array_unique($uids));
     }
 
     /**
