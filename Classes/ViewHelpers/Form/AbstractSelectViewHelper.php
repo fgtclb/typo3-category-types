@@ -257,14 +257,14 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
     }
 
     /**
-     * Render the option tags.
+     * Whether an option is rendered as selected.
      *
      * @param mixed $value Value to check for
-     * @return bool TRUE if the value should be marked a s selected; FALSE otherwise
+     * @return bool TRUE if the value should be marked as selected; FALSE otherwise
      */
     protected function isSelected(mixed $value)
     {
-        if (in_array((string)$value, $this->selectedValues)) {
+        if ($this->isBoundValue($value)) {
             return true;
         }
 
@@ -272,6 +272,15 @@ class AbstractSelectViewHelper extends AbstractFormFieldViewHelper
         return $this->arguments['multiple'] === true
             && $this->arguments['selectAllByDefault'] === true
             && $this->hasSelectedValue() === false;
+    }
+
+    /**
+     * Whether the value is one the select is bound to - the selection itself, without the
+     * preselection of `selectAllByDefault`.
+     */
+    protected function isBoundValue(mixed $value): bool
+    {
+        return in_array((string)$value, $this->selectedValues);
     }
 
     /**
