@@ -601,6 +601,329 @@ final class FilterSelectViewHelperTest extends AbstractViewHelperTestCase
     }
 
     /**
+     * `CategoryRepository::findAllApplicable()` disables every category no entry of the list
+     * carries. With `hideDisabledOptions` those are left out instead of being rendered
+     * disabled - and the argument is not rendered as an attribute of the `select` element,
+     * which is what an undeclared argument of a tag-based view helper becomes.
+     */
+    #[Test]
+    public function disabledOptionIsLeftOutOnDemand(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'options' => [$this->category(1, 0, 'Root Category'), $this->disabledCategory(2, 1, 'Child Category')],
+        ]);
+
+        $this->assertSame(
+            '<select name="filter[researchField]">'
+            . '<option value="1" class="level-0">Root Category</option>' . LF
+            . '</select>',
+            $output,
+        );
+    }
+
+    #[Test]
+    public function disabledOptionIsKeptWhenHidingIsSwitchedOff(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'options' => [$this->category(1, 0, 'Root Category'), $this->disabledCategory(2, 1, 'Child Category')],
+            'hideDisabledOptions' => false,
+        ]);
+
+        $this->assertStringContainsString(
+            '<option value="2" class="level-0" disabled="disabled">Child Category</option>',
+            $output,
+        );
+    }
+
+    /**
+     * The active filter stays visible, so the visitor sees what is selected and can change it.
+     */
+    #[Test]
+    public function disabledOptionIsKeptWhileItIsSelected(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'value' => '2',
+            'options' => [$this->category(1, 0, 'Root Category'), $this->disabledCategory(2, 1, 'Child Category')],
+        ]);
+
+        $this->assertStringContainsString(
+            '<option value="2" class="level-0" disabled="disabled" selected="selected">Child Category</option>',
+            $output,
+        );
+    }
+
+    #[Test]
+    public function disabledOptionIsKeptWhileItIsOneOfSeveralSelected(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'value' => ['1', '2'],
+            'options' => [
+                $this->category(1, 0, 'Root Category'),
+                $this->disabledCategory(2, 1, 'Child Category'),
+                $this->disabledCategory(3, 2, 'Grandchild Category'),
+            ],
+            'multiple' => true,
+        ]);
+
+        $this->assertStringContainsString('<option value="2" class="level-0" disabled="disabled" selected="selected">', $output);
+        $this->assertStringNotContainsString('value="3"', $output);
+    }
+
+    /**
+     * `selectAllByDefault` marks every option selected while nothing is - that is no active
+     * filter to keep visible, and a disabled option is never submitted anyway.
+     */
+    #[Test]
+    public function optionSelectedOnlyByDefaultIsNotKept(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'options' => [$this->category(1, 0, 'Root Category'), $this->disabledCategory(2, 1, 'Child Category')],
+            'multiple' => true,
+            'selectAllByDefault' => true,
+        ]);
+
+        $this->assertStringContainsString('<option value="1" class="level-0" selected="selected">', $output);
+        $this->assertStringNotContainsString('value="2"', $output);
+    }
+
+    /**
+     * Grouped, a parent without results stays while one of its descendants is shown, so the
+     * hierarchy the level classes indent stays intact. A grandchild that is left out does not
+     * keep its parent.
+     */
+    #[Test]
+    public function disabledParentOfAShownChildIsKeptWhenGrouped(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'options' => [
+                $this->disabledCategory(1, 0, 'Root Category'),
+                $this->category(2, 1, 'Child Category'),
+                $this->disabledCategory(3, 2, 'Grandchild Category'),
+            ],
+            'groupByParent' => true,
+        ]);
+
+        $this->assertSame(
+            '<select name="filter[researchField]">'
+            . '<option value="1" class="level-0" disabled="disabled">Root Category</option>' . LF
+            . '<option value="2" class="level-1">Child Category</option>' . LF
+            . '</select>',
+            $output,
+        );
+    }
+
+    #[Test]
+    public function disabledAncestorsOfAShownGrandchildAreKeptWhenGrouped(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'options' => [
+                $this->disabledCategory(1, 0, 'Root Category'),
+                $this->disabledCategory(2, 1, 'Child Category'),
+                $this->category(3, 2, 'Grandchild Category'),
+            ],
+            'groupByParent' => true,
+        ]);
+
+        $this->assertSame(
+            '<select name="filter[researchField]">'
+            . '<option value="1" class="level-0" disabled="disabled">Root Category</option>' . LF
+            . '<option value="2" class="level-1" disabled="disabled">Child Category</option>' . LF
+            . '<option value="3" class="level-2">Grandchild Category</option>' . LF
+            . '</select>',
+            $output,
+        );
+    }
+
+    #[Test]
+    public function disabledParentOfASelectedChildIsKeptWhenGrouped(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'value' => '2',
+            'options' => [$this->disabledCategory(1, 0, 'Root Category'), $this->disabledCategory(2, 1, 'Child Category')],
+            'groupByParent' => true,
+        ]);
+
+        $this->assertStringContainsString('<option value="1" class="level-0" disabled="disabled">', $output);
+        $this->assertStringContainsString('<option value="2" class="level-1" disabled="disabled" selected="selected">', $output);
+    }
+
+    /**
+     * The option that follows a left-out branch is its sibling, not its descendant, and does
+     * not keep it.
+     */
+    #[Test]
+    public function disabledBranchWithoutAShownOptionIsLeftOutWhenGrouped(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'options' => [
+                $this->disabledCategory(1, 0, 'Root Category'),
+                $this->disabledCategory(2, 1, 'Child Category'),
+                $this->category(6, 0, 'Second Type Root', 'testing_second'),
+            ],
+            'groupByParent' => true,
+        ]);
+
+        $this->assertSame(
+            '<select name="filter[researchField]">'
+            . '<option value="6" class="level-0">Second Type Root</option>' . LF
+            . '</select>',
+            $output,
+        );
+    }
+
+    /**
+     * Ungrouped, every option is level 0 and none is below another: a parent without results
+     * is left out even when a child of it is shown.
+     */
+    #[Test]
+    public function disabledParentIsLeftOutWhenNotGrouped(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'options' => [$this->disabledCategory(1, 0, 'Root Category'), $this->category(2, 1, 'Child Category')],
+        ]);
+
+        $this->assertSame(
+            '<select name="filter[researchField]">'
+            . '<option value="2" class="level-0">Child Category</option>' . LF
+            . '</select>',
+            $output,
+        );
+    }
+
+    /**
+     * A template that renders the options itself gets the same list the view helper would
+     * render.
+     */
+    #[Test]
+    public function optionsVariableLacksTheLeftOutOptions(): void
+    {
+        $output = $this->render('FilterSelectWithoutRenderedOptionsHidingDisabledOptions', [
+            'name' => 'filter[researchField]',
+            'options' => [$this->category(1, 0, 'Root Category'), $this->disabledCategory(2, 1, 'Child Category')],
+        ]);
+
+        $this->assertSame('<select name="filter[researchField]">[1:Root Category]</select>', $output);
+    }
+
+    /**
+     * The call the `DemandCategories.html` partials make: `optionValueField="uid"`, the
+     * selection handed over as the list of categories `FilterCollection` returns, and a
+     * prepended "all" option.
+     */
+    #[Test]
+    public function optionsAreLeftOutTheWayTheListPartialsCallTheField(): void
+    {
+        $output = $this->render('FilterSelectHidingDisabledOptionsLikeTheListPartials', [
+            'name' => 'filter[researchField]',
+            'value' => [$this->disabledCategory(2, 1, 'Child Category')],
+            'options' => [
+                $this->category(1, 0, 'Root Category'),
+                $this->disabledCategory(2, 1, 'Child Category'),
+                $this->disabledCategory(3, 2, 'Grandchild Category'),
+            ],
+        ]);
+
+        $this->assertSame(
+            '<select name="filter[researchField]">'
+            . '<option value="">All categories</option>' . LF
+            . '<option value="1" class="level-0">Root Category</option>' . LF
+            . '<option value="2" class="level-0" disabled="disabled" selected="selected">Child Category</option>' . LF
+            . '</select>',
+            $output,
+        );
+    }
+
+    /**
+     * The prepended option is not one of the options, so a filter whose options are all
+     * without results still offers the way back to every result.
+     */
+    #[Test]
+    public function prependedOptionStaysWhenEveryOptionIsLeftOut(): void
+    {
+        $output = $this->render('FilterSelectHidingDisabledOptionsLikeTheListPartials', [
+            'name' => 'filter[researchField]',
+            'value' => '',
+            'options' => [$this->disabledCategory(1, 0, 'Root Category')],
+        ]);
+
+        $this->assertSame(
+            '<select name="filter[researchField]"><option value="">All categories</option>' . LF . '</select>',
+            $output,
+        );
+    }
+
+    /**
+     * An option is kept by the same comparison that marks it selected, so no option is
+     * rendered as selected in one place and left out as unselected in the other.
+     */
+    #[Test]
+    public function selectionIsComparedTheWayTheSelectedMarkerCompares(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'value' => '02',
+            'options' => [$this->category(1, 0, 'Root Category'), $this->disabledCategory(2, 1, 'Child Category')],
+        ]);
+
+        $this->assertStringContainsString(
+            '<option value="2" class="level-0" disabled="disabled" selected="selected">Child Category</option>',
+            $output,
+        );
+    }
+
+    /**
+     * Sorting reorders the siblings before they are grouped; the kept parent still precedes
+     * its child, and a sorted root without anything shown below it is left out.
+     */
+    #[Test]
+    public function sortedAndGroupedOptionsKeepTheParentOfAShownChild(): void
+    {
+        $output = $this->renderHidingDisabledOptions([
+            'options' => [
+                $this->disabledCategory(6, 0, 'Second Type Root', 'testing_second'),
+                $this->category(2, 1, 'Child Category'),
+                $this->disabledCategory(1, 0, 'Root Category'),
+            ],
+            'sortByOptionLabel' => true,
+            'groupByParent' => true,
+        ]);
+
+        $this->assertSame(
+            '<select name="filter[researchField]">'
+            . '<option value="1" class="level-0" disabled="disabled">Root Category</option>' . LF
+            . '<option value="2" class="level-1">Child Category</option>' . LF
+            . '</select>',
+            $output,
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $variables
+     */
+    private function renderHidingDisabledOptions(array $variables = []): string
+    {
+        return $this->render('FilterSelectHidingDisabledOptions', array_replace(
+            [
+                'name' => 'filter[researchField]',
+                'value' => '',
+                'options' => [],
+                'sortByOptionLabel' => false,
+                'groupByParent' => false,
+                'multiple' => false,
+                'selectAllByDefault' => false,
+                'hideDisabledOptions' => true,
+            ],
+            $variables,
+        ));
+    }
+
+    private function disabledCategory(int $uid, int $parentId, string $title, string $type = 'testing_first'): Category
+    {
+        $category = $this->category($uid, $parentId, $title, $type);
+        $category->setDisabled(true);
+        return $category;
+    }
+
+    /**
      * @param array<string, mixed> $variables
      */
     private function renderWithOptionFields(array $variables = []): string

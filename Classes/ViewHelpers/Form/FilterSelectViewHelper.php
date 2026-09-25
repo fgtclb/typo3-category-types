@@ -13,6 +13,7 @@ class FilterSelectViewHelper extends AbstractSelectViewHelper
         parent::initializeArguments();
         $this->registerArgument('groupByParent', 'bool', 'If true, options will be grouped by parents.', false, false);
         $this->registerArgument('groupLevelClassPrefix', 'string', 'Prefix of the level indicator class for grouped options.', false, 'level-');
+        $this->registerArgument('hideDisabledOptions', 'bool', 'If true, disabled options are left out unless selected or, when grouped, an ancestor of a shown option.', false, false);
     }
 
     /**
@@ -62,6 +63,11 @@ class FilterSelectViewHelper extends AbstractSelectViewHelper
             $options = $this->linearizeOptionsTree($options, $optionsTree);
         }
 
+        // After grouping, so a parent can still be kept for a child that is shown.
+        if ((bool)$this->arguments['hideDisabledOptions'] === true) {
+            $options = $this->withoutDisabledOptions($options);
+        }
+
         // Added last: the level is only known once the options were grouped, and the base
         // class writes the markup from this array.
         foreach ($options as $key => $option) {
@@ -100,6 +106,56 @@ class FilterSelectViewHelper extends AbstractSelectViewHelper
         }
 
         return (string)$property;
+    }
+
+    /**
+     * Leaves out every disabled option, apart from a selected one and an ancestor of one that
+     * is kept. The options are linearised: the descendants of an option are the options that
+     * follow it with a higher level, so walking backwards decides every descendant first.
+     * Without grouping every level is 0, and no option has a descendant.
+     *
+     * The selection is the value the select is bound to, not `selectAllByDefault`: an option
+     * that is only selected by default is no active filter, and a disabled option is never
+     * submitted.
+     *
+     * @param array<int, mixed> $options
+     * @return array<int, mixed>
+     */
+    private function withoutDisabledOptions(array $options): array
+    {
+        $options = array_values($options);
+        $keep = [];
+        for ($index = count($options) - 1; $index >= 0; $index--) {
+            $keep[$index] = $options[$index]['isDisabled'] !== true
+                || $this->isBoundValue($options[$index]['value'])
+                || $this->hasKeptDescendant($options, $keep, $index);
+        }
+
+        return array_values(array_filter(
+            $options,
+            static fn(int $index): bool => $keep[$index],
+            ARRAY_FILTER_USE_KEY,
+        ));
+    }
+
+    /**
+     * @param array<int, mixed> $options
+     * @param array<int, bool> $keep
+     */
+    private function hasKeptDescendant(array $options, array $keep, int $index): bool
+    {
+        $level = $options[$index]['level'];
+        $count = count($options);
+        for ($descendant = $index + 1; $descendant < $count; $descendant++) {
+            if ($options[$descendant]['level'] <= $level) {
+                break;
+            }
+            if ($keep[$descendant]) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
