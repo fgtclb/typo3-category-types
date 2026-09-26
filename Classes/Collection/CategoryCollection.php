@@ -12,6 +12,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @implements \ArrayAccess<string, Category[]>
  * @implements \Iterator<int, Category>
  * @todo Only "offsetGet" implemented, consider to change from array access to ContainerInterface (get/has only).
+ *
+ * @api
  */
 class CategoryCollection implements \Countable, \Iterator, \ArrayAccess, \Stringable
 {

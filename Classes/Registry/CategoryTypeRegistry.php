@@ -7,6 +7,9 @@ namespace FGTCLB\CategoryTypes\Registry;
 use FGTCLB\CategoryTypes\Domain\Model\CategoryType;
 use FGTCLB\CategoryTypes\Exception\CategoryTypeExistException;
 
+/**
+ * @api
+ */
 class CategoryTypeRegistry implements \JsonSerializable
 {
     /**

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace FGTCLB\CategoryTypes\Domain\Model;
 
+/**
+ * @api
+ */
 class CategoryType implements \JsonSerializable, \Stringable
 {
     public function __construct(

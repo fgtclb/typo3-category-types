@@ -26,6 +26,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
  *
  * Public, because core instantiates an `itemsProcFunc` through
  * `GeneralUtility::makeInstance()`, which takes only public services from the container.
+ *
+ * @api
  */
 #[Autoconfigure(public: true)]
 final readonly class CategoryTypeItemsProcFunc

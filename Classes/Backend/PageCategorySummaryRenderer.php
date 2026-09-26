@@ -32,6 +32,8 @@ use TYPO3\CMS\Core\Utility\MathUtility;
  * would otherwise carry one copy each of the same ten lines, which is how the defect got
  * shipped three times in the first place; what stays with the extension is its two constants,
  * the page type and the category group.
+ *
+ * @api
  */
 final readonly class PageCategorySummaryRenderer
 {

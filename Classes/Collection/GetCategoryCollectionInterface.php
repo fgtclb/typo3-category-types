@@ -7,6 +7,8 @@ namespace FGTCLB\CategoryTypes\Collection;
 /**
  * Interface to ensure that expected entities provides a concrete method
  * to retrieve the CategoryCollection and are CategoryCollection aware.
+ *
+ * @api
  */
 interface GetCategoryCollectionInterface
 {

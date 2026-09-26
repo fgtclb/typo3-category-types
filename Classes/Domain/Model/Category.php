@@ -9,6 +9,9 @@ use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
 use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * @api
+ */
 class Category implements \Stringable
 {
     protected ?CategoryType $type;
