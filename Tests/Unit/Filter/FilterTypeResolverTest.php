@@ -122,6 +122,55 @@ final class FilterTypeResolverTest extends UnitTestCase
         $this->assertSame([], $filterTypes->getMore());
     }
 
+    /**
+     * The plugin settings as Extbase hands them over: TypoScript delivers every value as a
+     * string, a site setting too, as it reaches the plugin through a constant. A value set
+     * in PHP - a listener or a project controller changing the settings - may be an integer,
+     * and a project may have set none of it.
+     *
+     * @return \Generator<string, array{0: array<string, mixed>, 1: list<string>, 2: list<string>}>
+     */
+    public static function settingsDataProvider(): \Generator
+    {
+        yield 'no filter settings' => [[], ['degree', 'location', 'program_type'], []];
+        yield 'filter settings that are no array' => [['filter' => 'degree'], ['degree', 'location', 'program_type'], []];
+        yield 'the empty values of the static template' => [
+            ['filter' => ['categoryTypes' => '', 'visibleCount' => '0', 'hideDisabledOptions' => '0']],
+            ['degree', 'location', 'program_type'],
+            [],
+        ];
+        yield 'types and a count from TypoScript' => [
+            ['filter' => ['categoryTypes' => 'program_type,degree,location', 'visibleCount' => '1']],
+            ['program_type'],
+            ['degree', 'location'],
+        ];
+        yield 'a count given as an integer' => [
+            ['filter' => ['visibleCount' => 2]],
+            ['degree', 'location'],
+            ['program_type'],
+        ];
+        yield 'values that are neither a list nor a number' => [
+            ['filter' => ['categoryTypes' => ['degree'], 'visibleCount' => 'two']],
+            ['degree', 'location', 'program_type'],
+            [],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     * @param list<string> $visible
+     * @param list<string> $more
+     */
+    #[DataProvider('settingsDataProvider')]
+    #[Test]
+    public function resolvesTheOfferedTypesFromThePluginSettings(array $settings, array $visible, array $more): void
+    {
+        $filterTypes = (new FilterTypeResolver())->resolveFromSettings($this->categories(), $settings);
+
+        $this->assertSame($visible, $filterTypes->getVisible());
+        $this->assertSame($more, $filterTypes->getMore());
+    }
+
     #[Test]
     public function aCollectionWithoutTypesOffersNothing(): void
     {

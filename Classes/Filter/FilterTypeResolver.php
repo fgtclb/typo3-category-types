@@ -27,6 +27,27 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 final readonly class FilterTypeResolver
 {
     /**
+     * The filters a list offers by its plugin settings: `filter.categoryTypes` and
+     * `filter.visibleCount`, the keys the partner, project and program lists share. A value
+     * that is missing, or of a type TypoScript and site settings do not deliver, counts as
+     * not set.
+     *
+     * @param array<array-key, mixed> $settings The settings of the plugin, as Extbase merged them.
+     */
+    public function resolveFromSettings(CategoryCollection $categories, array $settings): FilterTypes
+    {
+        $filter = is_array($settings['filter'] ?? null) ? $settings['filter'] : [];
+        $categoryTypes = $filter['categoryTypes'] ?? '';
+        $visibleCount = $filter['visibleCount'] ?? 0;
+
+        return $this->resolve(
+            $categories,
+            is_string($categoryTypes) ? $categoryTypes : '',
+            is_numeric($visibleCount) ? (int)$visibleCount : 0,
+        );
+    }
+
+    /**
      * @param string $categoryTypes Comma-separated type identifiers, in the order to offer them; empty for all.
      * @param int $visibleCount How many filters to show right away, the rest go to `more`; 0 or less for all.
      */
