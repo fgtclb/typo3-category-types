@@ -122,6 +122,27 @@ final class CategoryTypeLoaderTest extends AbstractCategoryTypesTestCase
     }
 
     /**
+     * The groups have a cache entry of their own, restored through
+     * `CategoryTypeGroup::__set_state()`.
+     */
+    #[Test]
+    public function groupsAreRestoredFromTheCacheWithoutReadingAnyPackage(): void
+    {
+        $this->get(CategoryTypeLoader::class)->load();
+
+        $cachedRegistry = $this->loaderWithoutPackages()->load();
+
+        $this->assertSame(['testing'], array_keys($cachedRegistry->getGroups()));
+        $group = $cachedRegistry->getGroup('testing');
+        $this->assertNotNull($group);
+        $this->assertSame('Testing', $group->getTitle());
+        $this->assertSame(
+            'EXT:core/Resources/Public/Icons/T3Icons/svgs/apps/apps-pagetree-folder-contains-category.svg',
+            $group->getIcon(),
+        );
+    }
+
+    /**
      * Without a cache entry the same loader finds nothing, which is what makes the test
      * above evidence for the cache rather than for the fixture extension.
      */
@@ -148,6 +169,7 @@ final class CategoryTypeLoaderTest extends AbstractCategoryTypesTestCase
         $this->assertSame([], $registry->getCategoryTypes());
         $this->assertSame([], $registry->getGroupedCategoryTypes());
         $this->assertSame([], $registry->toArray());
+        $this->assertSame([], $registry->getGroups());
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1683633304209);

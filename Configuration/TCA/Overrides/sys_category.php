@@ -29,6 +29,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
         ];
         $typeIconClasses[$categoryType->getIdentifier()] = $categoryType->getIconIdentifier();
     }
+    // A group nobody declared gets no label and is headed with its key. FormEngine leaves
+    // out a group without items, so a declared group no type uses shows no heading.
+    $itemGroups = [];
+    foreach ($categoryTypeRegistry->getGroups() as $group) {
+        if ($group->getTitle() !== '') {
+            $itemGroups[$group->getIdentifier()] = $group->getTitle();
+        }
+    }
 
     $sysCategoryTca = [
         'ctrl' => [
@@ -44,6 +52,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
                     'type' => 'select',
                     'renderType' => 'selectSingle',
                     'items' => $items,
+                    'itemGroups' => $itemGroups,
                 ],
             ],
         ],

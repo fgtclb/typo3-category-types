@@ -58,6 +58,9 @@ class ServiceProvider extends AbstractServiceProvider
      * rendered as an image.
      *
      * A bitmap has no such option in either case and always keeps what core detected.
+     *
+     * A group declared with an icon in the `groups:` section is registered the same way,
+     * under `category_types.group.<identifier>`.
      */
     public static function addIcons(ContainerInterface $container): \Closure
     {
@@ -78,6 +81,25 @@ class ServiceProvider extends AbstractServiceProvider
                     $iconProviderClassName,
                     [
                         'source' => $categoryType->getIcon(),
+                    ]
+                );
+            }
+
+            // A declared group icon follows the same rule, under `category_types.group.<identifier>`.
+            foreach ($categoryTypeRegistry->getGroups() as $group) {
+                if ($group->getIcon() === '') {
+                    continue;
+                }
+                $iconProviderClassName = $iconRegistry->detectIconProvider($group->getIcon());
+                if ($group->isInlineIcon() && $iconProviderClassName === SvgIconProvider::class) {
+                    $iconProviderClassName = CurrentColorSvgIconProvider::class;
+                }
+
+                $iconRegistry->registerIcon(
+                    $group->getIconIdentifier(),
+                    $iconProviderClassName,
+                    [
+                        'source' => $group->getIcon(),
                     ]
                 );
             }

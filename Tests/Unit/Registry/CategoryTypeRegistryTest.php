@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\CategoryTypes\Tests\Unit\Registry;
 
 use FGTCLB\CategoryTypes\Domain\Model\CategoryType;
+use FGTCLB\CategoryTypes\Domain\Model\CategoryTypeGroup;
 use FGTCLB\CategoryTypes\Exception\CategoryTypeExistException;
 use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
 use PHPUnit\Framework\Attributes\Test;
@@ -327,5 +328,59 @@ final class CategoryTypeRegistryTest extends UnitTestCase
         $subject->attach($first, $second);
 
         $this->assertSame(['registry' => [$first, $second]], $subject->jsonSerialize());
+    }
+
+    #[Test]
+    public function freshRegistryReportsNoGroups(): void
+    {
+        $subject = new CategoryTypeRegistry();
+
+        $this->assertSame([], $subject->getGroups());
+        $this->assertNull($subject->getGroup('programs'));
+    }
+
+    #[Test]
+    public function attachedGroupsAreKeyedByIdentifierInAttachOrder(): void
+    {
+        $programs = new CategoryTypeGroup('programs', title: 'Study programs');
+        $partners = new CategoryTypeGroup('partners', title: 'Partners');
+
+        $subject = new CategoryTypeRegistry();
+        $subject->attachGroups($programs, $partners);
+
+        $this->assertSame(['programs' => $programs, 'partners' => $partners], $subject->getGroups());
+        $this->assertSame($partners, $subject->getGroup('partners'));
+    }
+
+    #[Test]
+    public function groupAttachedAgainReplacesTheEarlierOneInItsPlace(): void
+    {
+        $programs = new CategoryTypeGroup('programs', title: 'Study programs');
+        $partners = new CategoryTypeGroup('partners', title: 'Partners');
+        $relabelled = new CategoryTypeGroup('programs', title: 'Programmes');
+
+        $subject = new CategoryTypeRegistry();
+        $subject->attachGroups($programs, $partners);
+        $subject->attachGroups($relabelled);
+
+        $this->assertSame(['programs' => $relabelled, 'partners' => $partners], $subject->getGroups());
+    }
+
+    /**
+     * Groups and types are independent: a type may use a group nobody declared, and a
+     * declared group need not have a type.
+     */
+    #[Test]
+    public function groupsDoNotChangeTheTypes(): void
+    {
+        $degree = $this->categoryType('degree', group: 'programs');
+
+        $subject = new CategoryTypeRegistry();
+        $subject->attach($degree);
+        $subject->attachGroups(new CategoryTypeGroup('news', title: 'News'));
+
+        $this->assertSame([$degree], $subject->getCategoryTypes());
+        $this->assertSame(['programs'], array_keys($subject->getGroupedCategoryTypes()));
+        $this->assertNull($subject->getGroup('programs'));
     }
 }

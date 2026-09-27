@@ -1,0 +1,12 @@
+groups:
+  - identifier: late
+    title: 'Declared late'
+types:
+  - identifier: testing_news
+    title: 'Testing news'
+    group: news
+    icon: 'EXT:core/Resources/Public/Icons/T3Icons/svgs/apps/apps-pagetree-folder-contains-category.svg'
+  - identifier: testing_late
+    title: 'Testing late'
+    group: late
+    icon: 'EXT:core/Resources/Public/Icons/T3Icons/svgs/apps/apps-pagetree-folder-contains-category.svg'

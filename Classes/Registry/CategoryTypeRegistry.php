@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\CategoryTypes\Registry;
 
 use FGTCLB\CategoryTypes\Domain\Model\CategoryType;
+use FGTCLB\CategoryTypes\Domain\Model\CategoryTypeGroup;
 use FGTCLB\CategoryTypes\Exception\CategoryTypeExistException;
 
 /**
@@ -21,6 +22,11 @@ class CategoryTypeRegistry implements \JsonSerializable
      * @var array<string, CategoryType[]>
      */
     protected array $groupedRegistry = [];
+
+    /**
+     * @var array<string, CategoryTypeGroup>
+     */
+    protected array $groups = [];
 
     /**
      * Attaches the types and orders every group by priority, highest first. Types of equal
@@ -78,6 +84,32 @@ class CategoryTypeRegistry implements \JsonSerializable
             }
         }
         $this->registry = $registry;
+    }
+
+    /**
+     * Attaches declared groups. Groups are independent of the types: a group may be
+     * declared without a type, and a type may use a group nobody declared. A group
+     * attached again under the same identifier replaces the earlier one in its place.
+     */
+    public function attachGroups(CategoryTypeGroup ...$groups): void
+    {
+        foreach ($groups as $group) {
+            $this->groups[$group->getIdentifier()] = $group;
+        }
+    }
+
+    /**
+     * @return array<string, CategoryTypeGroup> The declared groups, keyed by identifier,
+     *                                          in the order they were first declared.
+     */
+    public function getGroups(): array
+    {
+        return $this->groups;
+    }
+
+    public function getGroup(string $identifier): ?CategoryTypeGroup
+    {
+        return $this->groups[$identifier] ?? null;
     }
 
     /**

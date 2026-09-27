@@ -22,10 +22,10 @@ identifiers from it.
         group: example
         icon: 'EXT:example/Resources/Public/Icons/CategoryTypes/Topic.svg'
 
-Only the :yaml:`types` list is read; any other top-level key is ignored. That
-includes a :yaml:`groups` list with a title and an icon per group: it is not
-read, and the type select of a category shows the group key as it is. An empty
-file is allowed and declares nothing.
+The :yaml:`types` list declares the types. An optional :yaml:`groups` list
+gives the groups they use a title and an icon, see :ref:`Naming a group
+<developers-category-types-groups>`. Any other top-level key is ignored. An
+empty file is allowed and declares nothing.
 
 ..  _developers-category-types-keys:
 
@@ -201,12 +201,75 @@ is installed.
 Records that already carry a removed type keep their value in the database;
 the type is only no longer offered and no longer resolved.
 
+..  _developers-category-types-groups:
+
+Naming a group
+--------------
+
+The type select of a category shows a heading above the types of each group.
+Without a declaration, the heading is the bare group key, here
+:yaml:`example`. The :yaml:`groups` list gives a group a title:
+
+..  code-block:: yaml
+    :caption: EXT:example/Configuration/CategoryTypes.yaml
+
+    groups:
+      - identifier: example
+        title: 'LLL:EXT:example/Resources/Private/Language/locallang.xlf:sys_category.example.group'
+        icon: 'EXT:example/Resources/Public/Icons/CategoryGroups/Example.svg'
+        inlineIcon: true
+    types:
+      - identifier: degree
+        title: 'LLL:EXT:example/Resources/Private/Language/locallang.xlf:sys_category.example.degree'
+        group: example
+        icon: 'EXT:example/Resources/Public/Icons/CategoryTypes/Degree.svg'
+
+:yaml:`identifier`
+    Required, a non-empty string: the key the types name in :yaml:`group`. A
+    group without it stops the loading with a
+    :php:`\FGTCLB\CategoryTypes\Exception\CategoryTypeException`, code
+    :php:`1790592001`.
+
+:yaml:`title`
+    The heading of the group in the type select, usually an :php:`LLL:`
+    reference, translated into the backend language of the editor.
+
+:yaml:`icon`
+    An icon file, registered as :php:`category_types.group.<identifier>`, see
+    :ref:`Group icons <developers-icons-groups>`. The type select shows no
+    group icon: the option groups of a select carry a label only.
+
+:yaml:`inlineIcon`
+    Optional boolean, :yaml:`false` by default. As for a type, see
+    :ref:`Which provider the icon gets <developers-icons-provider>`.
+
+:yaml:`priority`
+    Optional integer, :yaml:`0` by default. It is read and kept on the group,
+    but has no effect yet: groups keep the order in which they were first
+    declared, which is the load order of their packages.
+
+A group does not have to be declared for its types to work, and a declared
+group does not need a type. The type select leaves out a group without types.
+
+More than one package can declare the same group. A later package replaces
+the title, the icon, :yaml:`inlineIcon` and :yaml:`priority` it declares and
+keeps what it leaves out, and the group keeps its position. A site package
+that requires :php:`EXT:academic_programs` relabels its group like this:
+
+..  code-block:: yaml
+    :caption: EXT:site_package/Configuration/CategoryTypes.yaml
+
+    groups:
+      - identifier: programs
+        title: 'LLL:EXT:site_package/Resources/Private/Language/locallang_be.xlf:sys_category.programs.group'
+
 ..  _developers-category-types-cache:
 
 Caching
 -------
 
-The declarations of all packages are read once and kept in the core cache.
+The declarations of all packages are read once and kept in the core cache,
+the types and the groups in an entry each.
 Flush the caches after changing a :file:`Configuration/CategoryTypes.yaml`, for
 example with :bash:`vendor/bin/typo3 cache:flush`.
 
@@ -254,8 +317,20 @@ every declared type. Inject it rather than instantiating it:
     extension declared a type for throws an :php:`\InvalidArgumentException`,
     code :php:`1683633304209`.
 
+:php:`getGroups()`
+    Every declared group as a
+    :php:`\FGTCLB\CategoryTypes\Domain\Model\CategoryTypeGroup`, keyed by
+    identifier, in the order the groups were first declared. A group only
+    types use, and nobody declared, is not in the list.
+
+:php:`getGroup()`
+    One declared group by identifier, or :php:`null`.
+
 A :php:`\FGTCLB\CategoryTypes\Domain\Model\CategoryType` exposes the declared
 values through :php:`getIdentifier()`, :php:`getGroup()`, :php:`getTitle()`,
 :php:`getIcon()`, :php:`isInlineIcon()` and :php:`getPriority()`, plus
 :php:`getExtensionKey()` for the extension that declared the type or changed it
-last, and :php:`getIconIdentifier()` for the registered icon.
+last, and :php:`getIconIdentifier()` for the registered icon. A
+:php:`CategoryTypeGroup` exposes :php:`getIdentifier()`, :php:`getTitle()`,
+:php:`getIcon()`, :php:`isInlineIcon()`, :php:`getPriority()` and
+:php:`getIconIdentifier()` the same way.

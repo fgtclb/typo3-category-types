@@ -1,7 +1,13 @@
 groups:
   - identifier: testicons
     title: 'Testing icons'
+    icon: 'EXT:test_category_types_icons/Resources/Public/Icons/Plain.svg'
+  - identifier: testiconsinline
+    title: 'Testing icons, opted in'
     icon: 'EXT:test_category_types_icons/Resources/Public/Icons/Vector.svg'
+    inlineIcon: true
+  - identifier: testiconsnone
+    title: 'Testing icons, without an icon'
 types:
   - identifier: vector
     title: 'Vector icon, opted in'

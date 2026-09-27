@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\CategoryTypes\Tests\Unit\Loader;
 
 use FGTCLB\CategoryTypes\Domain\Model\CategoryType;
+use FGTCLB\CategoryTypes\Exception\CategoryTypeException;
 use FGTCLB\CategoryTypes\Exception\CategoryTypeExistException;
 use FGTCLB\CategoryTypes\Loader\CategoryTypeLoader;
 use PHPUnit\Framework\Attributes\Test;
@@ -426,5 +427,111 @@ final class CategoryTypeLoaderTest extends UnitTestCase
         $this->expectExceptionMessage('Category type group has to be defined as a non-empty string.');
 
         $this->subject('no_group')->loadUncached();
+    }
+
+    /**
+     * A group is keyed by its identifier without surrounding spaces, the way a type is,
+     * and groups keep the order in which they were first declared.
+     */
+    #[Test]
+    public function groupsAreKeyedByTheirIdentifierInTheOrderTheyAreDeclared(): void
+    {
+        $this->assertSame(['programs', 'partners'], array_keys($this->subject('grouped_types')->loadGroupsUncached()));
+    }
+
+    #[Test]
+    public function everyDeclaredGroupValueIsCarriedOver(): void
+    {
+        $groups = $this->subject('grouped_types')->loadGroupsUncached();
+
+        $this->assertSame(
+            [
+                'identifier' => 'programs',
+                'group' => '',
+                'priority' => 10,
+                'title' => 'Study programs',
+                'icon' => 'EXT:grouped_types/Resources/Public/Icons/programs.svg',
+                'inlineIcon' => true,
+            ],
+            $groups['programs']->toArray(),
+        );
+    }
+
+    #[Test]
+    public function omittedGroupValuesDefaultToEmpty(): void
+    {
+        $groups = $this->subject('grouped_types')->loadGroupsUncached();
+
+        $this->assertSame(
+            [
+                'identifier' => 'partners',
+                'group' => '',
+                'priority' => 0,
+                'title' => 'Partners',
+                'icon' => '',
+                'inlineIcon' => false,
+            ],
+            $groups['partners']->toArray(),
+        );
+    }
+
+    #[Test]
+    public function packageWithoutAGroupsSectionDeclaresNoGroup(): void
+    {
+        $this->assertSame([], $this->subject('base_types', 'no_configuration', 'empty_file')->loadGroupsUncached());
+    }
+
+    /**
+     * A later package replaces what it declares and keeps the rest, so a project can
+     * relabel a shipped group without restating its icon. The group keeps its position.
+     */
+    #[Test]
+    public function laterDeclarationReplacesTheTitleAndKeepsTheIcon(): void
+    {
+        $groups = $this->subject('grouped_types', 'relabelling_extension')->loadGroupsUncached();
+
+        $this->assertSame(['programs', 'partners', 'news'], array_keys($groups));
+        $this->assertSame('Programmes', $groups['programs']->getTitle());
+        $this->assertSame('EXT:grouped_types/Resources/Public/Icons/programs.svg', $groups['programs']->getIcon());
+        $this->assertTrue($groups['programs']->isInlineIcon());
+        $this->assertSame(10, $groups['programs']->getPriority());
+    }
+
+    #[Test]
+    public function laterDeclarationReplacesTheIconAndKeepsTheTitle(): void
+    {
+        $groups = $this->subject('grouped_types', 'group_icon_override')->loadGroupsUncached();
+
+        $this->assertSame('Study programs', $groups['programs']->getTitle());
+        $this->assertSame('EXT:group_icon_override/Resources/Public/Icons/programs.png', $groups['programs']->getIcon());
+        $this->assertFalse($groups['programs']->isInlineIcon());
+    }
+
+    #[Test]
+    public function groupWithoutAnIdentifierIsRejected(): void
+    {
+        $this->expectException(CategoryTypeException::class);
+        $this->expectExceptionCode(1790592001);
+        $this->expectExceptionMessage('Category type group identifier has to be defined as a non-empty string.');
+
+        $this->subject('nameless_group')->loadGroupsUncached();
+    }
+
+    /**
+     * Reading the groups changes nothing about the types of the same file.
+     */
+    #[Test]
+    public function typesOfAPackageDeclaringGroupsAreRead(): void
+    {
+        $this->assertSame(['programs.degree'], array_keys($this->subject('grouped_types')->loadUncached()));
+    }
+
+    #[Test]
+    public function loadedRegistryCarriesTheDeclaredGroups(): void
+    {
+        $registry = $this->subject('grouped_types', 'relabelling_extension')->load();
+
+        $this->assertSame(['programs', 'partners', 'news'], array_keys($registry->getGroups()));
+        $this->assertSame('Programmes', $registry->getGroup('programs')?->getTitle());
     }
 }

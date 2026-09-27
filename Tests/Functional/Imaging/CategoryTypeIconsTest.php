@@ -39,6 +39,9 @@ final class CategoryTypeIconsTest extends AbstractCategoryTypesTestCase
     private const IDENTIFIER_PLAIN = 'category_types.testicons.plain';
     private const IDENTIFIER_BITMAP = 'category_types.testicons.bitmap';
     private const IDENTIFIER_MISSING = 'category_types.testicons.missing';
+    private const IDENTIFIER_GROUP_PLAIN = 'category_types.group.testicons';
+    private const IDENTIFIER_GROUP_INLINE = 'category_types.group.testiconsinline';
+    private const IDENTIFIER_GROUP_WITHOUT_ICON = 'category_types.group.testiconsnone';
 
     protected function setUp(): void
     {
@@ -126,5 +129,37 @@ final class CategoryTypeIconsTest extends AbstractCategoryTypesTestCase
         $this->assertSame('', $icon->getMarkup());
         $this->assertSame('', $icon->getAlternativeMarkup(AbstractSvgIconProvider::MARKUP_IDENTIFIER_INLINE));
         $this->assertStringNotContainsString('default-not-found', $icon->render());
+    }
+
+    /**
+     * A declared group icon follows the rule of the type icons: the core provider unless
+     * the group asks for inlining.
+     */
+    #[Test]
+    public function groupIconWithoutOptInKeepsTheCoreProvider(): void
+    {
+        $iconRegistry = $this->get(IconRegistry::class);
+
+        $this->assertTrue($iconRegistry->isRegistered(self::IDENTIFIER_GROUP_PLAIN));
+        $this->assertSame(
+            SvgIconProvider::class,
+            $iconRegistry->getIconConfigurationByIdentifier(self::IDENTIFIER_GROUP_PLAIN)['provider'] ?? null,
+        );
+        $this->assertStringEndsWith(
+            'Icons/Plain.svg',
+            $iconRegistry->getIconConfigurationByIdentifier(self::IDENTIFIER_GROUP_PLAIN)['options']['source'] ?? '',
+        );
+    }
+
+    #[Test]
+    public function optedInGroupIconIsRegisteredWithTheColourSchemeAwareProvider(): void
+    {
+        $this->assertIconIsRegisteredWithCurrentColorProvider(self::IDENTIFIER_GROUP_INLINE);
+    }
+
+    #[Test]
+    public function groupWithoutAnIconRegistersNone(): void
+    {
+        $this->assertFalse($this->get(IconRegistry::class)->isRegistered(self::IDENTIFIER_GROUP_WITHOUT_ICON));
     }
 }

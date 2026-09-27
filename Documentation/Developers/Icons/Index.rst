@@ -34,6 +34,27 @@ the identifier a template addresses:
 
     <core:icon identifier="category_types.example.degree" />
 
+..  _developers-icons-groups:
+
+Group icons
+-----------
+
+A group declared in the :ref:`groups list <developers-category-types-groups>`
+with an :yaml:`icon` is registered the same way, with the same choice of
+provider, under
+
+..  code-block:: text
+
+    category_types.group.<group>
+
+For a group :yaml:`example` that is :php:`category_types.group.example`. The
+type select of a category shows no group icon, because the option groups of a
+select carry a label only; the identifier is there for templates and other
+views. Type icons and group icons share the :php:`category_types.` prefix, so
+a group must not be named :yaml:`group`: the icon of its type :yaml:`example`
+would be :php:`category_types.group.example`, the icon of the group
+:yaml:`example`.
+
 ..  _developers-icons-provider:
 
 Which provider the icon gets

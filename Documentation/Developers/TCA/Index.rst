@@ -13,6 +13,12 @@ This extension changes the :sql:`sys_category` TCA itself, in its
     :php:`default`, followed by one item per declared type, with the title as
     label, the identifier as value, the icon identifier as icon and the group as
     item group.
+*   :php:`itemGroups` maps every :ref:`declared group
+    <developers-category-types-groups>` with a title to that title, so the type
+    select heads the types of a group with it. A group without a title keeps
+    its key as the heading. FormEngine lists the groups of :php:`itemGroups`
+    first, in the order they were declared, and then the groups it only finds
+    in the items.
 *   :php:`ctrl.typeicon_classes` maps every identifier to its icon identifier,
     so the record icon follows the type.
 *   The :sql:`type` field is shown before :sql:`title` in every record type.

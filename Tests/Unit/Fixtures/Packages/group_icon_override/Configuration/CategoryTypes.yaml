@@ -1,0 +1,4 @@
+groups:
+  - identifier: programs
+    icon: 'EXT:group_icon_override/Resources/Public/Icons/programs.png'
+    inlineIcon: false

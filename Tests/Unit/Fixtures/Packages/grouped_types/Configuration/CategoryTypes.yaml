@@ -1,0 +1,13 @@
+groups:
+  - identifier: programs
+    title: 'Study programs'
+    icon: 'EXT:grouped_types/Resources/Public/Icons/programs.svg'
+    inlineIcon: true
+    priority: 10
+  - identifier: ' partners '
+    title: 'Partners'
+types:
+  - identifier: degree
+    title: 'Degree'
+    group: programs
+    icon: 'EXT:grouped_types/Resources/Public/Icons/degree.svg'

@@ -1,0 +1,5 @@
+groups:
+  - identifier: programs
+    title: 'Programmes'
+  - identifier: news
+    title: 'News'
