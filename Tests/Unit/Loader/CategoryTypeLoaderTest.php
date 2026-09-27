@@ -21,8 +21,9 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
  * plain directories rather than installable extensions, and a test can put them in any
  * order. Order matters: `remove` and `useExisting` act on what earlier packages defined.
  *
- * `load()` and the cache round trip are covered by the functional counterpart, which has
- * a real cache backend.
+ * `load()` is called here only for the order of the registry it builds, with a stubbed
+ * cache. The cache round trip itself is covered by the functional counterpart, which
+ * has a real cache backend.
  */
 final class CategoryTypeLoaderTest extends UnitTestCase
 {
@@ -200,6 +201,53 @@ final class CategoryTypeLoaderTest extends UnitTestCase
             ],
             $categoryTypes['programs.research_field']->toArray(),
         );
+    }
+
+    /**
+     * How a project reorders the types an extension ships: an override that sets nothing
+     * but the priority. The loader keeps the type where it was declared, the registry puts
+     * it in front of `research_field`, whose priority is 10.
+     */
+    #[Test]
+    public function priorityOfAnOverrideMovesTheTypeToTheFront(): void
+    {
+        $loader = $this->subject('base_types', 'priority_override');
+
+        $this->assertSame(['programs.research_field', 'programs.degree'], array_keys($loader->loadUncached()));
+
+        $registry = $loader->load();
+        $this->assertSame(['degree', 'research_field'], $registry->getCategoryTypeIdentifierByGroup('programs'));
+        $this->assertSame(
+            [
+                'identifier' => 'degree',
+                'extensionKey' => 'priority_override',
+                'title' => 'Degree',
+                'group' => 'programs',
+                'icon' => 'EXT:base_types/Resources/Public/Icons/degree.svg',
+                'priority' => 100,
+            ],
+            $registry->getCategoryType('programs', 'degree')?->toArray(),
+        );
+    }
+
+    /**
+     * The cache holds the flat list the loader wrote, and the registry sorts again when the
+     * types are attached from it. The order therefore does not depend on the order of a
+     * cache entry, not even of one written before the types were sorted.
+     */
+    #[Test]
+    public function typesRestoredFromTheCacheAreOrderedByPriority(): void
+    {
+        $categoryTypes = $this->subject('base_types', 'priority_override')->loadUncached();
+        $cache = $this->createMock(PhpFrontend::class);
+        $cache->method('require')->willReturn($categoryTypes);
+        $cache->expects($this->never())->method('set');
+        $packageManager = $this->createMock(PackageManager::class);
+        $packageManager->expects($this->never())->method('getActivePackages');
+
+        $registry = (new CategoryTypeLoader($cache, $packageManager))->load();
+
+        $this->assertSame(['degree', 'research_field'], $registry->getCategoryTypeIdentifierByGroup('programs'));
     }
 
     /**
