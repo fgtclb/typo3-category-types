@@ -34,8 +34,8 @@ The keys of a type
 
 :yaml:`identifier`
     Required, a non-empty string. The value stored in the :sql:`type` column of
-    a category record. It is stored without the group, so keep it unique across
-    all groups, see :ref:`Keep identifiers unique across groups
+    a category record. It is stored without the group, so it has to be unique
+    across all groups, see :ref:`Identifiers are unique across groups
     <developers-tca-unique>`.
 
 :yaml:`group`
@@ -70,7 +70,8 @@ The keys of a type
     <developers-category-types-remove>`.
 
 A type without :yaml:`identifier` or without :yaml:`group` stops the loading
-with an exception, code :php:`1678979375330`.
+with an exception, code :php:`1678979375330`. So does an identifier that more
+than one group declares, with code :php:`1790505412`.
 
 ..  _developers-category-types-order:
 

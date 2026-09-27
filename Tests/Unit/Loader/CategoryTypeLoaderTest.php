@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\CategoryTypes\Tests\Unit\Loader;
 
 use FGTCLB\CategoryTypes\Domain\Model\CategoryType;
+use FGTCLB\CategoryTypes\Exception\CategoryTypeExistException;
 use FGTCLB\CategoryTypes\Loader\CategoryTypeLoader;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Cache\Frontend\PhpFrontend;
@@ -333,6 +334,78 @@ final class CategoryTypeLoaderTest extends UnitTestCase
         $this->expectExceptionMessage('Category type does not exist for override.');
 
         $this->subject('orphan_override')->loadUncached();
+    }
+
+    /**
+     * A category stores the identifier without its group, so two groups declaring the same
+     * identifier would offer two type items with one value (ACE-64).
+     */
+    #[Test]
+    public function identifierDeclaredInTwoGroupsIsRejected(): void
+    {
+        $this->expectException(CategoryTypeExistException::class);
+        $this->expectExceptionCode(1790505412);
+        $this->expectExceptionMessage(
+            'The category type identifier "degree" is declared in more than one group:'
+            . ' "programs" by base_types, "projects" by colliding_extension.'
+        );
+
+        $this->subject('base_types', 'colliding_extension')->loadUncached();
+    }
+
+    #[Test]
+    public function everyGroupDeclaringTheIdentifierIsNamed(): void
+    {
+        $this->expectException(CategoryTypeExistException::class);
+        $this->expectExceptionCode(1790505412);
+        $this->expectExceptionMessage(
+            '"programs" by base_types, "projects" by colliding_extension, "partners" by second_colliding_extension.'
+        );
+
+        $this->subject('base_types', 'colliding_extension', 'second_colliding_extension')->loadUncached();
+    }
+
+    /**
+     * MySQL and MariaDB compare `sys_category.type` case-insensitively, so `Degree ` would
+     * still match the categories of `degree` there.
+     */
+    #[Test]
+    public function identifiersDifferingOnlyInCaseAndSpacesCollide(): void
+    {
+        $this->expectException(CategoryTypeExistException::class);
+        $this->expectExceptionCode(1790505412);
+        $this->expectExceptionMessage(
+            'The category type identifier "degree" is declared in more than one group:'
+            . ' "programs" by base_types, "projects" by case_colliding_extension.'
+        );
+
+        $this->subject('base_types', 'case_colliding_extension')->loadUncached();
+    }
+
+    /**
+     * The extension named is the one the type records, which after an override is the
+     * overriding one - the package an integrator has to change.
+     */
+    #[Test]
+    public function collisionNamesTheExtensionThatOverrodeTheType(): void
+    {
+        $this->expectException(CategoryTypeExistException::class);
+        $this->expectExceptionCode(1790505412);
+        $this->expectExceptionMessage('"programs" by priority_override, "projects" by colliding_extension.');
+
+        $this->subject('base_types', 'priority_override', 'colliding_extension')->loadUncached();
+    }
+
+    /**
+     * The check runs once every package is read, so a later package can resolve a collision
+     * by removing one of the two types.
+     */
+    #[Test]
+    public function collisionResolvedByALaterRemovalIsAccepted(): void
+    {
+        $categoryTypes = $this->subject('base_types', 'colliding_extension', 'removing_extension')->loadUncached();
+
+        $this->assertSame(['programs.research_field', 'projects.degree'], array_keys($categoryTypes));
     }
 
     #[Test]

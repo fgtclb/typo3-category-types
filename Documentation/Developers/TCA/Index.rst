@@ -25,13 +25,27 @@ a whole when this extension builds it.
 
 ..  _developers-tca-unique:
 
-Keep identifiers unique across groups
--------------------------------------
+Identifiers are unique across groups
+------------------------------------
 
 The :sql:`type` column stores the identifier only, not the group. Two groups
-declaring the same identifier produce two items with the same value, and a
-record carrying that value cannot tell which of the two it is. Keep type
-identifiers unique across all groups of all installed extensions.
+declaring the same identifier would produce two items with the same value, and
+a record carrying that value could not tell which of the two it is. Loading the
+category types therefore fails when an identifier is declared in more than one
+group, with a :php:`\FGTCLB\CategoryTypes\Exception\CategoryTypeExistException`,
+code :php:`1790505412`. Identifiers that differ only in case or in surrounding
+whitespace count as the same: MySQL and MariaDB compare the :sql:`type` column
+case-insensitively. The message names the identifier, the groups and, per
+group, the extension that declared the type last.
+
+The check runs once the :file:`Configuration/CategoryTypes.yaml` of every
+package is read, so a package loaded later can resolve a collision by removing
+one of the two types, see :ref:`Removing a type
+<developers-category-types-remove>`. Declaring a type again within its own
+group, or changing it with :yaml:`useExisting`, is no collision.
+
+Until 3.0, `academic_programs` and `academic_projects` both declared
+`department`. Since 3.0 the projects type is `project_department`.
 
 ..  _developers-tca-type-select:
 

@@ -1,0 +1,5 @@
+types:
+  - identifier: 'Degree '
+    title: 'Degree'
+    group: projects
+    icon: 'EXT:case_colliding_extension/Resources/Public/Icons/degree.svg'

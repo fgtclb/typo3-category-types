@@ -1,0 +1,5 @@
+types:
+  - identifier: degree
+    title: 'Degree'
+    group: partners
+    icon: 'EXT:second_colliding_extension/Resources/Public/Icons/degree.svg'
