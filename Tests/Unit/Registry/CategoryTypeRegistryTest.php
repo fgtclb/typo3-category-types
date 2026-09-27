@@ -81,6 +81,89 @@ final class CategoryTypeRegistryTest extends UnitTestCase
         $this->assertSame([$first, $second], $subject->getCategoryTypes());
     }
 
+    /**
+     * The order every consumer of a group follows: the facts of a program, the filter
+     * selects of a list, the page module summary and the type select of a category.
+     */
+    #[Test]
+    public function typesOfAGroupAreOrderedByPriorityHighestFirst(): void
+    {
+        $low = $this->categoryType('low', group: 'programs');
+        $high = $this->categoryType('high', group: 'programs', priority: 10);
+        $middle = $this->categoryType('middle', group: 'programs', priority: 5);
+
+        $subject = new CategoryTypeRegistry();
+        $subject->attach($low, $high, $middle);
+
+        $this->assertSame(['high' => $high, 'middle' => $middle, 'low' => $low], $subject->getCategoryTypesByGroup('programs'));
+        $this->assertSame(['high', 'middle', 'low'], $subject->getCategoryTypeIdentifierByGroup('programs'));
+        $this->assertSame(['programs' => ['high' => $high, 'middle' => $middle, 'low' => $low]], $subject->getGroupedCategoryTypes());
+        $this->assertSame([$high, $middle, $low], $subject->getCategoryTypes());
+        $this->assertSame(['registry' => [$high, $middle, $low]], $subject->jsonSerialize());
+        $this->assertSame(
+            ['high', 'middle', 'low'],
+            array_column($subject->toArray()['programs'], 'identifier'),
+        );
+    }
+
+    #[Test]
+    public function typesOfEqualPriorityKeepTheirAttachmentOrder(): void
+    {
+        $unprioritised = $this->categoryType('unprioritised', group: 'programs');
+        $first = $this->categoryType('first', group: 'programs', priority: 10);
+        $second = $this->categoryType('second', group: 'programs', priority: 10);
+
+        $subject = new CategoryTypeRegistry();
+        $subject->attach($unprioritised, $first, $second);
+
+        $this->assertSame(['first', 'second', 'unprioritised'], $subject->getCategoryTypeIdentifierByGroup('programs'));
+    }
+
+    #[Test]
+    public function negativePriorityMovesATypeBehindTheOthers(): void
+    {
+        $subject = new CategoryTypeRegistry();
+        $subject->attach(
+            $this->categoryType('first', group: 'programs'),
+            $this->categoryType('last', group: 'programs', priority: -10),
+            $this->categoryType('second', group: 'programs'),
+        );
+
+        $this->assertSame(['first', 'second', 'last'], $subject->getCategoryTypeIdentifierByGroup('programs'));
+    }
+
+    /**
+     * `attach()` may be called more than once, so a type attached later still takes the
+     * place its priority gives it.
+     */
+    #[Test]
+    public function typeAttachedLaterIsSortedIntoItsGroup(): void
+    {
+        $subject = new CategoryTypeRegistry();
+        $subject->attach($this->categoryType('early', group: 'programs'));
+        $subject->attach($this->categoryType('late', group: 'programs', priority: 10));
+
+        $this->assertSame(['late', 'early'], $subject->getCategoryTypeIdentifierByGroup('programs'));
+    }
+
+    /**
+     * The flat list is the groups one after the other, in the order each group was first
+     * attached, and each group in its own order. The priority of `country` is higher
+     * than any of `programs`, which a sort across all types would put first.
+     */
+    #[Test]
+    public function flatListFollowsTheOrderOfTheGroups(): void
+    {
+        $degree = $this->categoryType('degree', group: 'programs');
+        $country = $this->categoryType('country', group: 'partners', priority: 5);
+        $location = $this->categoryType('location', group: 'programs');
+
+        $subject = new CategoryTypeRegistry();
+        $subject->attach($degree, $country, $location);
+
+        $this->assertSame([$degree, $location, $country], $subject->getCategoryTypes());
+    }
+
     #[Test]
     public function typesAreGroupedByTheirGroupAndKeyedByIdentifier(): void
     {
@@ -124,6 +207,29 @@ final class CategoryTypeRegistryTest extends UnitTestCase
         $this->expectExceptionCode(1678979375329);
 
         $subject->attach($this->categoryType('duplicate'));
+    }
+
+    /**
+     * The types before the duplicate stay attached, in the flat list as much as in their
+     * group, so the two never disagree.
+     */
+    #[Test]
+    public function typesBeforeARejectedDuplicateStayAttached(): void
+    {
+        $existing = $this->categoryType('duplicate');
+        $before = $this->categoryType('before', priority: 10);
+
+        $subject = new CategoryTypeRegistry();
+        $subject->attach($existing);
+        try {
+            $subject->attach($before, $this->categoryType('duplicate'));
+            $this->fail('The duplicate was not rejected.');
+        } catch (CategoryTypeExistException) {
+        }
+
+        $this->assertSame([$before, $existing], $subject->getCategoryTypes());
+        $this->assertSame(['before', 'duplicate'], $subject->getCategoryTypeIdentifierByGroup('testing'));
+        $this->assertTrue($subject->exists($before));
     }
 
     #[Test]

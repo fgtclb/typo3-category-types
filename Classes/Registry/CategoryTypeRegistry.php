@@ -23,6 +23,10 @@ class CategoryTypeRegistry implements \JsonSerializable
     protected array $groupedRegistry = [];
 
     /**
+     * Attaches the types and orders every group by priority, highest first. Types of equal
+     * priority keep the order they were attached in, which is the load order of their
+     * packages and their position in the file.
+     *
      * @param CategoryType ...$categoryTypes
      */
     public function attach(CategoryType ...$categoryTypes): void
@@ -30,23 +34,50 @@ class CategoryTypeRegistry implements \JsonSerializable
         if ($categoryTypes === []) {
             return;
         }
-        foreach ($categoryTypes as $categoryType) {
-            $typeIdentifier = (string)$categoryType->getIdentifier();
-            $groupIdentifier = $categoryType->getGroup() ? (string)$categoryType->getGroup() : 'default';
-            if (!isset($this->groupedRegistry[$groupIdentifier])) {
-                $this->groupedRegistry[$groupIdentifier] = [];
-            } else {
-                if (array_key_exists($categoryType->getIdentifier(), $this->groupedRegistry[$groupIdentifier])) {
-                    throw new CategoryTypeExistException(
-                        'Category type already defined in registry.',
-                        1678979375329
-                    );
+        try {
+            foreach ($categoryTypes as $categoryType) {
+                $typeIdentifier = (string)$categoryType->getIdentifier();
+                $groupIdentifier = $categoryType->getGroup() ? (string)$categoryType->getGroup() : 'default';
+                if (!isset($this->groupedRegistry[$groupIdentifier])) {
+                    $this->groupedRegistry[$groupIdentifier] = [];
+                } else {
+                    if (array_key_exists($categoryType->getIdentifier(), $this->groupedRegistry[$groupIdentifier])) {
+                        throw new CategoryTypeExistException(
+                            'Category type already defined in registry.',
+                            1678979375329
+                        );
+                    }
                 }
-            }
 
-            $this->registry[] = $categoryType;
-            $this->groupedRegistry[$groupIdentifier][$typeIdentifier] = $categoryType;
+                $this->groupedRegistry[$groupIdentifier][$typeIdentifier] = $categoryType;
+            }
+        } finally {
+            // A rejected duplicate leaves the types attached before it, as it always
+            // did, so the flat list has to include them as well.
+            $this->sortByPriority();
         }
+    }
+
+    /**
+     * Sorting here rather than in the loader covers every way in: the YAML files, the
+     * cache entry and a direct `attach()`. `uasort()` is stable, so equal priorities need
+     * no tiebreaker. The flat list is rebuilt from the groups, in the order each group was
+     * first attached.
+     */
+    private function sortByPriority(): void
+    {
+        $registry = [];
+        foreach ($this->groupedRegistry as $groupIdentifier => $categoryTypes) {
+            uasort(
+                $categoryTypes,
+                static fn(CategoryType $a, CategoryType $b): int => $b->getPriority() <=> $a->getPriority(),
+            );
+            $this->groupedRegistry[$groupIdentifier] = $categoryTypes;
+            foreach ($categoryTypes as $categoryType) {
+                $registry[] = $categoryType;
+            }
+        }
+        $this->registry = $registry;
     }
 
     /**

@@ -55,9 +55,9 @@ The keys of a type
     <developers-icons-provider>`.
 
 :yaml:`priority`
-    Optional integer, :yaml:`0` by default. It is stored with the type and
-    returned by :php:`CategoryType::getPriority()`, but nothing in this
-    extension sorts by it.
+    Optional integer, :yaml:`0` by default. Orders the types of a group, the
+    highest first, see :ref:`The order of the types
+    <developers-category-types-order>`.
 
 :yaml:`useExisting`
     Optional, :yaml:`false` by default. Changes a type an earlier loaded
@@ -72,8 +72,39 @@ The keys of a type
 A type without :yaml:`identifier` or without :yaml:`group` stops the loading
 with an exception, code :php:`1678979375330`.
 
-The types keep the order in which they were declared: in the order the packages
-are loaded, and within one file in the order they are listed.
+..  _developers-category-types-order:
+
+The order of the types
+----------------------
+
+The types of a group are ordered by :yaml:`priority`, the highest first. Types
+with the same priority keep the order in which they were declared: in the order
+the packages are loaded, and within one file in the order they are listed. A
+type that declares no priority has :yaml:`0`, so as long as no type declares
+one, the declaration order is the order.
+
+Every list of the types of a group follows that order: the type select of a
+category, the :ref:`select of the types of one group
+<developers-tca-type-select>`, the :ref:`page module category summary
+<developers-page-module-summary>` and the outputs of the extensions that use
+the group, such as the facts and the list filters of the programs.
+
+To move a type another extension declares, give it a priority with
+:yaml:`useExisting`, see :ref:`Changing a type another extension declares
+<developers-category-types-override>`:
+
+..  code-block:: yaml
+    :caption: EXT:site_package/Configuration/CategoryTypes.yaml
+
+    types:
+      - identifier: topic
+        group: example
+        priority: 10
+        useExisting: true
+
+:yaml:`topic` is then the first type of the group :yaml:`example`, ahead of every
+type without a priority. A negative priority moves a type behind them. Several
+types are ordered by giving each its own priority.
 
 ..  _developers-category-types-override:
 
@@ -110,10 +141,12 @@ loading with the exception "Category type does not exist for override.", code
 the declaring extension is loaded after the overriding one, or when an
 extension loaded before the overriding one removed the type.
 
-Redeclared or changed with :yaml:`useExisting`, the type keeps its position
-among the declared types and in the type select, and
+Redeclared or changed with :yaml:`useExisting`, the type keeps its place in the
+declaration order, which decides among types of the same priority, and
 :php:`CategoryType::getExtensionKey()` returns the extension that changed it,
-not the declaring one.
+not the declaring one. A :yaml:`priority` the override sets moves it, see
+:ref:`The order of the types <developers-category-types-order>`; a
+redeclaration without :yaml:`useExisting` falls back to :yaml:`priority: 0`.
 
 ..  _developers-category-types-override-icon:
 
@@ -212,12 +245,13 @@ every declared type. Inject it rather than instantiating it:
     One type by group and identifier, or :php:`null`.
 
 :php:`getCategoryTypes()`
-    All types, in declaration order.
+    All types, group by group in the order the groups were first declared,
+    and each group in :ref:`its order <developers-category-types-order>`.
 
 :php:`getCategoryTypesByGroup()`
-    The types of one group, keyed by identifier. A group no extension declared a
-    type for throws an :php:`\InvalidArgumentException`, code
-    :php:`1683633304209`.
+    The types of one group in their order, keyed by identifier. A group no
+    extension declared a type for throws an :php:`\InvalidArgumentException`,
+    code :php:`1683633304209`.
 
 A :php:`\FGTCLB\CategoryTypes\Domain\Model\CategoryType` exposes the declared
 values through :php:`getIdentifier()`, :php:`getGroup()`, :php:`getTitle()`,

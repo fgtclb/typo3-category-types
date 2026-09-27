@@ -99,8 +99,9 @@ What the template is given
     :name: page-module-summary-rows
     :type: array
 
-    One entry per registered category type of the group, in registry order, and
-    including the types the page carries no category of.
+    One entry per registered category type of the group, in :ref:`the order of
+    the types <developers-category-types-order>`, and including the types the
+    page carries no category of.
 
     Each entry has :php:`title`, the resolved title of the type;
     :php:`iconIdentifier`, its icon identifier; :php:`categories`, the
