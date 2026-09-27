@@ -34,6 +34,9 @@ the identifier a template addresses:
 
     <core:icon identifier="category_types.example.degree" />
 
+To give a type another extension declares a different icon, see
+:ref:`Changing only the icon <developers-category-types-override-icon>`.
+
 ..  _developers-icons-provider:
 
 Which provider the icon gets
