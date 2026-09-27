@@ -1,0 +1,6 @@
+types:
+  - identifier: research_field
+    group: programs
+    icon: 'EXT:icon_override/Resources/Public/Icons/research_field.svg'
+    inlineIcon: false
+    useExisting: true

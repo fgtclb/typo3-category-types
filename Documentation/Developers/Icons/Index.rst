@@ -68,6 +68,10 @@ default markup as well as in the `inline` alternative - so an icon drawn in
 A **bitmap** file cannot be inlined and keeps what core detected for it, with or
 without the flag.
 
+To give a type another extension declares a different icon, or to change its
+:yaml:`inlineIcon`, see :ref:`Changing only the icon
+<developers-category-types-override-icon>`.
+
 ..  _developers-icons-opt-in:
 
 Why inlining is opt in

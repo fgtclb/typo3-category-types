@@ -197,6 +197,85 @@ final class CategoryTypeLoaderTest extends UnitTestCase
         );
     }
 
+    /**
+     * The override a project needs most: another icon, nothing else. A file that cannot
+     * be inlined has to withdraw the opt in explicitly, because an override that leaves
+     * `inlineIcon` out keeps it (see above).
+     */
+    #[Test]
+    public function laterPackageCanOverrideOnlyTheIconOfAnEarlierType(): void
+    {
+        $categoryTypes = $this->subject('base_types', 'icon_override')->loadUncached();
+
+        // The override changes the type in place, it does not move it to the end.
+        $this->assertSame(['programs.research_field', 'programs.degree'], array_keys($categoryTypes));
+        $this->assertSame(
+            [
+                'identifier' => 'research_field',
+                'extensionKey' => 'icon_override',
+                'title' => 'Research field',
+                'group' => 'programs',
+                'icon' => 'EXT:icon_override/Resources/Public/Icons/research_field.svg',
+                'priority' => 10,
+                'inlineIcon' => false,
+            ],
+            $categoryTypes['programs.research_field']->toArray(),
+        );
+    }
+
+    /**
+     * Without `useExisting` a later declaration of the same type replaces it as a
+     * whole: what it leaves out falls back to the default rather than to the earlier
+     * value. The type keeps its position, because the key already exists.
+     */
+    #[Test]
+    public function redeclaringATypeReplacesItAsAWhole(): void
+    {
+        $categoryTypes = $this->subject('base_types', 'redeclaring_extension')->loadUncached();
+
+        $this->assertSame(['programs.research_field', 'programs.degree'], array_keys($categoryTypes));
+        $this->assertSame(
+            [
+                'identifier' => 'research_field',
+                'extensionKey' => 'redeclaring_extension',
+                'title' => 'Subject area',
+                'group' => 'programs',
+                'icon' => '',
+                'priority' => 0,
+                'inlineIcon' => false,
+            ],
+            $categoryTypes['programs.research_field']->toArray(),
+        );
+    }
+
+    /**
+     * Order decides here too: an override loaded before the package that declares the
+     * type fails exactly like one of a type nobody declares.
+     */
+    #[Test]
+    public function overrideBeforeTheDefinitionIsRejected(): void
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(1678979375330);
+        $this->expectExceptionMessage('Category type does not exist for override.');
+
+        $this->subject('overriding_extension', 'base_types')->loadUncached();
+    }
+
+    /**
+     * A removal takes the type away for every package loaded after it, an override
+     * included.
+     */
+    #[Test]
+    public function overrideOfARemovedTypeIsRejected(): void
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(1678979375330);
+        $this->expectExceptionMessage('Category type does not exist for override.');
+
+        $this->subject('base_types', 'removing_extension', 'removed_type_override')->loadUncached();
+    }
+
     #[Test]
     public function overridingATypeThatWasNeverDefinedIsRejected(): void
     {
