@@ -1,0 +1,20 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","slug","title"
+,1,0,1,0,0,0,0,"/","Site Root"
+"sys_category",
+,"uid","pid","deleted","hidden","parent","type","title","sys_language_uid","l10n_parent"
+,1,1,0,0,0,"testing_first","Bachelor",0,0
+,2,1,0,0,0,"testing_first","Master",0,0
+,3,1,0,0,6,"testing_first","Bachelor of Science with Honours",0,0
+,4,1,0,1,1,"testing_first","Hidden Bachelor Degree",0,0
+,5,1,0,0,4,"testing_first","Child Of Hidden Bachelor Degree",0,0
+,6,1,0,0,1,"testing_first","Bachelor of Science",0,0
+,7,1,0,0,1,"testing_second","Bachelor of Engineering",0,0
+,8,1,1,0,1,"testing_first","Deleted Bachelor Degree",0,0
+,9,1,0,0,1,"testing_first","Bachelor of Science (translated)",1,6
+,10,1,0,0,1,"foreign","Bachelor Degree Of A Foreign Type",0,0
+,11,1,0,0,10,"testing_first","Child Of Foreign Type",0,0
+,12,1,0,0,2,"testing_first","Master of Science",0,0
+,13,1,0,0,14,"testing_first","Cycle First",0,0
+,14,1,0,0,13,"testing_first","Cycle Second",0,0
+,15,1,0,0,2,"testing_first","Bachelor of Science with Honours (translated, below Master)",1,3

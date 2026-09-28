@@ -103,6 +103,60 @@ class CategoryRepository
      */
     public function findAllApplicable(string $group, GetCategoryCollectionInterface ...$entities): CategoryCollection
     {
+        return $this->findApplicable($group, $entities)[0];
+    }
+
+    /**
+     * Like {@see findAllApplicable()}, but a category also counts as applicable when an entity
+     * carries one of its subcategories, at any depth. A list that matches a selected category
+     * by its whole subtree uses it, so a parent no record carries itself is still offered.
+     *
+     * The tree is read from the default-language parents of the categories the query
+     * returns, every visible category of the group. A hidden category and one of a type
+     * outside the group are not among them, so they end the walk exactly where
+     * {@see findDescendantUids()} ends it.
+     *
+     * @param string $group
+     * @param GetCategoryCollectionInterface ...$entities
+     */
+    public function findAllApplicableWithSubcategories(string $group, GetCategoryCollectionInterface ...$entities): CategoryCollection
+    {
+        [$categoryCollection, $parentUids] = $this->findApplicable($group, $entities);
+
+        $categoriesByUid = [];
+        foreach ($categoryCollection as $category) {
+            $categoriesByUid[$category->getUid()] = $category;
+        }
+        foreach ($categoriesByUid as $uid => $category) {
+            if ($category->isDisabled()) {
+                continue;
+            }
+            // A category that names one of its own descendants as parent would otherwise be
+            // walked forever.
+            $seen = [$uid => true];
+            $parentUid = $parentUids[$uid] ?? 0;
+            while (isset($categoriesByUid[$parentUid]) && !isset($seen[$parentUid])) {
+                $seen[$parentUid] = true;
+                $categoriesByUid[$parentUid]->setDisabled(false);
+                $parentUid = $parentUids[$parentUid] ?? 0;
+            }
+        }
+
+        return $categoryCollection;
+    }
+
+    /**
+     * Every visible category of the group, the ones no entity carries disabled, and the parent
+     * of each category as the default language stores it. The parent of a category object is
+     * the one of its translation in a translated frontend, and an editor can give a
+     * translation another parent. The tree of a list filter is the one of the default
+     * language, as {@see findDescendantUids()} reads it.
+     *
+     * @param GetCategoryCollectionInterface[] $entities
+     * @return array{0: CategoryCollection, 1: array<int, int>}
+     */
+    private function findApplicable(string $group, array $entities): array
+    {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_category');
         $result = $queryBuilder
             ->select('sys_category.*')
@@ -131,8 +185,10 @@ class CategoryRepository
             }
         }
         $applicableCategories = array_unique($applicableCategories);
+        $parentUids = [];
         // Disable all categories which are not assigned to any of the given entities
         while ($row = $result->fetchAssociative()) {
+            $parentUids[(int)$row['uid']] = (int)$row['parent'];
             $category = $this->buildCategoryObjectFromArray($group, $row);
             if (!in_array($category->getUid(), $applicableCategories, true)) {
                 $category->setDisabled(true);
@@ -140,7 +196,82 @@ class CategoryRepository
             $categoryCollection->attach($category);
         }
 
-        return $categoryCollection;
+        return [$categoryCollection, $parentUids];
+    }
+
+    /**
+     * Returns the uids of the subcategories of each given category, at any depth, ordered by
+     * uid and keyed by the given uid. Only visible categories of the types of the group in the
+     * default language take part, so a hidden category or one of another type ends the walk
+     * below it. A category without subcategories, an unknown uid and a uid of 0 or less map
+     * to an empty list. The given categories themselves are not checked: callers hand over
+     * categories they already resolved for the frontend.
+     *
+     * The tree is read one level per statement, however many categories are given. A uid
+     * that was reached before is not read again, which ends a loop in the tree.
+     *
+     * @return array<int, list<int>>
+     */
+    public function findDescendantUids(string $group, int ...$uids): array
+    {
+        $typeIdentifiers = $this->categoryTypeRegistry->getCategoryTypeIdentifierByGroup($group);
+
+        $childrenByParent = [];
+        // A uid of 0 or less is not a category. Walked, 0 would find every root category of the
+        // group as its children.
+        $seen = array_fill_keys(array_filter($uids, static fn(int $uid): bool => $uid > 0), true);
+        $level = array_keys($seen);
+        while ($level !== []) {
+            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_category');
+            $result = $queryBuilder
+                ->select('uid', 'parent')
+                ->from('sys_category')
+                ->where(
+                    $queryBuilder->expr()->in(
+                        'parent',
+                        $queryBuilder->quoteArrayBasedValueListToIntegerList($level),
+                    ),
+                    $queryBuilder->expr()->in(
+                        'type',
+                        $queryBuilder->quoteArrayBasedValueListToStringList($typeIdentifiers),
+                    ),
+                    $queryBuilder->expr()->in(
+                        'sys_language_uid',
+                        $queryBuilder->quoteArrayBasedValueListToIntegerList([0, -1]),
+                    ),
+                )
+                ->orderBy('uid', 'ASC')
+                ->executeQuery();
+
+            $level = [];
+            while ($row = $result->fetchAssociative()) {
+                $uid = (int)$row['uid'];
+                $childrenByParent[(int)$row['parent']][] = $uid;
+                if (!isset($seen[$uid])) {
+                    $seen[$uid] = true;
+                    $level[] = $uid;
+                }
+            }
+        }
+
+        $descendants = [];
+        foreach ($uids as $uid) {
+            $collected = [];
+            $pending = $childrenByParent[$uid] ?? [];
+            while ($pending !== []) {
+                $child = array_pop($pending);
+                if ($child === $uid || isset($collected[$child])) {
+                    continue;
+                }
+                $collected[$child] = true;
+                array_push($pending, ...($childrenByParent[$child] ?? []));
+            }
+            $collected = array_keys($collected);
+            sort($collected);
+            $descendants[$uid] = $collected;
+        }
+
+        return $descendants;
     }
 
     /**
