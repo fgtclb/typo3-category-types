@@ -8,9 +8,9 @@
                project-home="https://extensions.typo3.org/extension/category_types/"
                project-repository="https://github.com/fgtclb/typo3-category-types"
                project-issues="https://github.com/fgtclb/academic-extensions/issues"
-               edit-on-github-branch="main"
+               edit-on-github-branch="2"
                edit-on-github="fgtclb/academic-extensions"
-               edit-on-github-directory="packages/fgtclb/academic-base/Documentation"
+               edit-on-github-directory="packages/fgtclb/typo3-category-types/Documentation"
                typo3-core-preferred="stable"/>
     <project title="FGTCLB Category Types" release="2.4.0" copyright="2023"/>
     <inventory id="t3tsref" url="http://docs.typo3.org/typo3cms/TyposcriptReference/"/>
