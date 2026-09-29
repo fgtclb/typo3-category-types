@@ -36,7 +36,7 @@ final class CategoryCollectionTest extends UnitTestCase
      * a matching registry is queued for exactly that call — see `CategoryTest` for why
      * this is `addInstance()` rather than a singleton.
      */
-    private function typedCategory(int $uid, string $typeIdentifier, string $group = 'testing'): Category
+    private function typedCategory(int $uid, string $typeIdentifier, string $group = 'testing', int $parentId = 0): Category
     {
         $registry = new CategoryTypeRegistry();
         $registry->attach(new CategoryType(
@@ -51,7 +51,7 @@ final class CategoryCollectionTest extends UnitTestCase
 
         return new Category(
             uid: $uid,
-            parentId: 0,
+            parentId: $parentId,
             title: 'Category ' . $uid,
             type: $typeIdentifier,
             typeGroup: $group,
@@ -253,6 +253,149 @@ final class CategoryCollectionTest extends UnitTestCase
         $subject->attach($this->typedCategory(1, 'country'));
 
         $this->assertSame(['research_field' => []], $subject->getAllCategoriesByType());
+    }
+
+    #[Test]
+    public function mostSpecificCategoriesLeaveOutAnAttachedParent(): void
+    {
+        $bachelor = $this->typedCategory(1, 'degree');
+        $bachelorOfScience = $this->typedCategory(2, 'degree', parentId: 1);
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['degree']);
+        $subject->attach($bachelor);
+        $subject->attach($bachelorOfScience);
+
+        $this->assertSame(['degree' => [2 => $bachelorOfScience]], $subject->getMostSpecificCategoriesByType());
+        // The full view is left as it is.
+        $this->assertSame(['degree' => [1 => $bachelor, 2 => $bachelorOfScience]], $subject->getAllCategoriesByType());
+    }
+
+    #[Test]
+    public function mostSpecificCategoriesKeepUnrelatedCategoriesOfOneType(): void
+    {
+        $bachelor = $this->typedCategory(1, 'degree');
+        $bachelorOfScience = $this->typedCategory(2, 'degree', parentId: 1);
+        $master = $this->typedCategory(3, 'degree');
+        $campusA = $this->typedCategory(4, 'location');
+        $campusB = $this->typedCategory(5, 'location');
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['degree', 'location']);
+        foreach ([$bachelor, $bachelorOfScience, $master, $campusA, $campusB] as $category) {
+            $subject->attach($category);
+        }
+
+        $this->assertSame(
+            [
+                'degree' => [2 => $bachelorOfScience, 3 => $master],
+                'location' => [4 => $campusA, 5 => $campusB],
+            ],
+            $subject->getMostSpecificCategoriesByType(),
+        );
+    }
+
+    #[Test]
+    public function mostSpecificCategoriesKeepTheLeafOfAChainOfThree(): void
+    {
+        $leaf = $this->typedCategory(3, 'degree', parentId: 2);
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['degree']);
+        // The leaf comes first, so the walk passes parents that are attached after it.
+        $subject->attach($leaf);
+        $subject->attach($this->typedCategory(1, 'degree'));
+        $subject->attach($this->typedCategory(2, 'degree', parentId: 1));
+
+        $this->assertSame(['degree' => [3 => $leaf]], $subject->getMostSpecificCategoriesByType());
+    }
+
+    /**
+     * A parent of another type stands for a fact of its own, so it stays. An ancestor of
+     * the same type above it is still found: the walk passes the parent of the other type.
+     */
+    #[Test]
+    public function mostSpecificCategoriesKeepAParentOfAnotherType(): void
+    {
+        $faculty = $this->typedCategory(1, 'faculty');
+        $department = $this->typedCategory(2, 'department', parentId: 1);
+        $group = $this->typedCategory(3, 'faculty', parentId: 2);
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['faculty', 'department']);
+        $subject->attach($faculty);
+        $subject->attach($department);
+        $subject->attach($group);
+
+        $this->assertSame(
+            ['faculty' => [3 => $group], 'department' => [2 => $department]],
+            $subject->getMostSpecificCategoriesByType(),
+        );
+    }
+
+    /**
+     * Only attached categories are known. With the level between them missing, the
+     * category and its grandchild are not seen as related.
+     */
+    #[Test]
+    public function mostSpecificCategoriesDoNotBridgeAParentThatIsNotAttached(): void
+    {
+        $bachelor = $this->typedCategory(1, 'degree');
+        $grandchild = $this->typedCategory(3, 'degree', parentId: 2);
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['degree']);
+        $subject->attach($bachelor);
+        $subject->attach($grandchild);
+
+        $this->assertSame(['degree' => [1 => $bachelor, 3 => $grandchild]], $subject->getMostSpecificCategoriesByType());
+    }
+
+    /**
+     * A parent chain that leads back to where it started would make every category of it
+     * the ancestor of every other one, and so leave the fact empty. A cycle hides nothing
+     * of its own, and the walk ends.
+     */
+    #[Test]
+    public function mostSpecificCategoriesKeepTheCategoriesOfACyclicParentChain(): void
+    {
+        $first = $this->typedCategory(1, 'degree', parentId: 3);
+        $second = $this->typedCategory(2, 'degree', parentId: 1);
+        $third = $this->typedCategory(3, 'degree', parentId: 2);
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['degree']);
+        $subject->attach($first);
+        $subject->attach($second);
+        $subject->attach($third);
+
+        $this->assertSame(['degree' => [1 => $first, 2 => $second, 3 => $third]], $subject->getMostSpecificCategoriesByType());
+    }
+
+    /**
+     * A category below a cycle is the descendant of every category in it.
+     */
+    #[Test]
+    public function mostSpecificCategoriesLeaveOutACycleAboveAnAttachedCategory(): void
+    {
+        $leaf = $this->typedCategory(4, 'degree', parentId: 1);
+
+        $subject = new CategoryCollection();
+        $subject->setTypeIdentifiers(['degree']);
+        $subject->attach($this->typedCategory(1, 'degree', parentId: 2));
+        $subject->attach($this->typedCategory(2, 'degree', parentId: 1));
+        $subject->attach($leaf);
+
+        $this->assertSame(['degree' => [4 => $leaf]], $subject->getMostSpecificCategoriesByType());
+    }
+
+    #[Test]
+    public function mostSpecificCategoriesAreEmptyWhileNoTypeIdentifiersAreKnown(): void
+    {
+        $subject = new CategoryCollection();
+        $subject->attach($this->typedCategory(1, 'degree'));
+
+        $this->assertSame([], $subject->getMostSpecificCategoriesByType());
     }
 
     #[Test]

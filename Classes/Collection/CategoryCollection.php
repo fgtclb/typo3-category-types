@@ -85,6 +85,50 @@ class CategoryCollection implements \Countable, \Iterator, \ArrayAccess, \String
     }
 
     /**
+     * {@see getAllCategoriesByType()} without every category that is an ancestor of another
+     * category of the same type in this collection: with "Bachelor" and its child
+     * "Bachelor of Science" attached, only the latter is returned.
+     *
+     * The ancestors are found through the parents of the attached categories alone, without
+     * a query. The walk up from a category passes attached categories of any type, and stops
+     * at a parent that is not attached, at the root and at a parent it has already passed. A
+     * parent that is not attached therefore breaks the chain: with a category and its
+     * grandchild attached but not the child between them, both are returned. A cyclic parent
+     * chain hides none of its own categories, while a category below it still hides them.
+     *
+     * @return array<string, Category[]>
+     */
+    public function getMostSpecificCategoriesByType(): array
+    {
+        $ancestorUids = [];
+        foreach ($this->collection as $uid => $category) {
+            $typeIdentifier = (string)$category->getType();
+            $passed = [$uid => true];
+            $ancestorsOfType = [];
+            $parentUid = $category->getParentId();
+            while ($parentUid > 0 && isset($this->collection[$parentUid]) && !isset($passed[$parentUid])) {
+                $passed[$parentUid] = true;
+                if ((string)$this->collection[$parentUid]->getType() === $typeIdentifier) {
+                    $ancestorsOfType[$parentUid] = true;
+                }
+                $parentUid = $this->collection[$parentUid]->getParentId();
+            }
+            // A category whose parents lead back to itself is part of a cycle, in which
+            // each category is the ancestor of every other one. Hiding them for that would
+            // leave the whole fact empty, so a cycle hides nothing of its own.
+            if ($parentUid !== $uid) {
+                $ancestorUids += $ancestorsOfType;
+            }
+        }
+
+        $typeSortedCollection = $this->getAllCategoriesByType();
+        foreach ($typeSortedCollection as $typeIdentifier => $categories) {
+            $typeSortedCollection[$typeIdentifier] = array_diff_key($categories, $ancestorUids);
+        }
+        return $typeSortedCollection;
+    }
+
+    /**
      * @param string $typeIdentifier
      * @return Category[]
      */
