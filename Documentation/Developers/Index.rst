@@ -18,3 +18,4 @@ academic_base <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Develope
     Icons/Index
     PageModuleSummary/Index
     CategoryTree/Index
+    Routing/Index

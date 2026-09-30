@@ -1,0 +1,20 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","slug","title"
+,1,0,1,0,0,0,0,"/","Site Root"
+"sys_category",
+,"uid","pid","deleted","hidden","parent","type","title","sys_language_uid","l10n_parent"
+,12,1,0,0,0,"testing_first","Europe",0,0
+,14,1,0,0,0,"testing_first","Berlin",0,0
+,15,1,0,0,0,"testing_second","Berlin",0,0
+,16,1,0,0,0,"testing_first","?!",0,0
+,17,1,0,1,0,"testing_first","Hidden",0,0
+,18,1,1,0,0,"testing_first","Deleted",0,0
+,19,1,0,0,0,"testing_late","Elsewhere",0,0
+,20,1,0,0,0,"","Without type",0,0
+,21,1,0,0,0,"testing_first","Research / Teaching",0,0
+,22,1,0,0,0,"testing_second","Asia",-1,0
+,31,1,0,0,0,"testing_second","University",0,0
+,112,1,0,0,0,"testing_first","Europa",1,12
+,113,1,0,1,0,"testing_second","Hochschule",1,31
+,114,1,0,0,0,"testing_first","Berlin (DE)",1,14
+,212,1,0,0,0,"testing_first","Europa (CH)",2,12
