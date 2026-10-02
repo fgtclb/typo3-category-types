@@ -55,8 +55,11 @@ class CategoryFilterNormalizer
      * The list is in ascending uid order, so one selection has exactly one URL whichever
      * order its categories were selected in. The category type is left out for the reason
      * {@see toUidList()} ignores it. An empty string means that nothing is filtered.
+     *
+     * `$withoutCategory` leaves the category of that uid out, which is the argument of a
+     * link that removes one category from the selection and keeps the others.
      */
-    public function toFilterArgument(?FilterCollection $filterCollection): string
+    public function toFilterArgument(?FilterCollection $filterCollection, ?int $withoutCategory = null): string
     {
         if ($filterCollection === null) {
             return '';
@@ -64,7 +67,9 @@ class CategoryFilterNormalizer
 
         $uids = [];
         foreach ($filterCollection->getFilterCategories() as $category) {
-            $uids[] = $category->getUid();
+            if ($category->getUid() !== $withoutCategory) {
+                $uids[] = $category->getUid();
+            }
         }
         sort($uids, SORT_NUMERIC);
 

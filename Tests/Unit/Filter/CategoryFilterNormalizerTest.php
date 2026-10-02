@@ -165,6 +165,21 @@ final class CategoryFilterNormalizerTest extends UnitTestCase
         $this->assertSame([5, 12, 31], $this->subject()->toUidList(['categories' => $filterArgument]));
     }
 
+    /**
+     * The argument of a link that removes one category and keeps the others.
+     */
+    #[Test]
+    public function aCategoryToLeaveOutIsNotPartOfTheList(): void
+    {
+        $this->assertSame('5,31', $this->subject()->toFilterArgument($this->filterCollection(31, 5, 12), 12));
+    }
+
+    #[Test]
+    public function leavingOutTheOnlyCategoryMeansNothingIsFiltered(): void
+    {
+        $this->assertSame('', $this->subject()->toFilterArgument($this->filterCollection(12), 12));
+    }
+
     private function filterCollection(int ...$uids): FilterCollection
     {
         $categoryCollection = new CategoryCollection();
