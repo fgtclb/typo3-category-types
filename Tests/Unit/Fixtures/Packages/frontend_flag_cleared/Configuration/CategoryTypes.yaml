@@ -1,0 +1,10 @@
+groups:
+  # The frontend flag cleared, so the frontend follows inlineIcon again.
+  - identifier: partners
+    frontendInlineIcon: ~
+types:
+  # The frontend flag cleared, so the frontend follows inlineIcon again.
+  - identifier: format
+    group: programs
+    frontendInlineIcon: ~
+    useExisting: true

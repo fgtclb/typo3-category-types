@@ -1,0 +1,3 @@
+groups:
+  - identifier: programs
+    frontendIcon: 'EXT:group_frontend_icon_override/Resources/Public/Icons/programs.svg'

@@ -25,8 +25,10 @@ It is read now:
 
 *   The :yaml:`title` heads the types of the group in the type select, in the
     backend language of the editor.
-*   The :yaml:`icon` is registered as :php:`category_types.group.<identifier>`,
-    with the same choice of provider as a type icon, :yaml:`inlineIcon`
+*   The :yaml:`icon` is registered as :php:`category_types_group.<identifier>`,
+    in the icon registry of the backend and in the frontend icon registry of
+    :php:`EXT:academic_base`, with the same choice of provider as a type icon,
+    :yaml:`inlineIcon`, :yaml:`frontendIcon` and :yaml:`frontendInlineIcon`
     included. The type select itself shows no group icon.
 *   A :yaml:`priority` is read and kept, and has no effect yet.
 *   A later package can declare the same group again to change its title or
@@ -52,8 +54,9 @@ The groups are cached in an entry of their own, so a types entry written
 before the update does not hide them. Flush the caches after the update, as
 after every extension update, so the TCA picks up the titles.
 
-A group must not be named :yaml:`group`: the icons of its types would then
-share their identifiers with the group icons.
+A group icon identifier starts with :php:`category_types_group.`, a type icon
+identifier with :php:`category_types.`, so the two never share an identifier,
+whatever the groups are named.
 
 See the :guilabel:`For Developers` chapter, section :guilabel:`Naming a group`.
 

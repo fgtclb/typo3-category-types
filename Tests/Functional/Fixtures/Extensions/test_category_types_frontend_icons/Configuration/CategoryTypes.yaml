@@ -1,0 +1,58 @@
+groups:
+  - identifier: frontend
+    title: 'Frontend icons'
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Plain.svg'
+    frontendIcon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Frontend.svg'
+    frontendInlineIcon: true
+  - identifier: group
+    title: 'A group named group'
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Vector.svg'
+  - identifier: collision
+    title: 'A group named like a type of the group named group'
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Plain.svg'
+types:
+  - identifier: same
+    title: 'One file, no flag'
+    group: frontend
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Plain.svg'
+  - identifier: inlined
+    title: 'One file, inlined everywhere'
+    group: frontend
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Vector.svg'
+    inlineIcon: true
+  - identifier: dedicated
+    title: 'A frontend file without its own flag'
+    group: frontend
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Vector.svg'
+    inlineIcon: true
+    frontendIcon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Frontend.svg'
+  - identifier: dedicatedinline
+    title: 'A frontend file with its own flag'
+    group: frontend
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Plain.svg'
+    frontendIcon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Frontend.svg'
+    frontendInlineIcon: true
+  - identifier: backendinline
+    title: 'The same file, inlined only in the backend'
+    group: frontend
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Vector.svg'
+    inlineIcon: true
+    frontendInlineIcon: false
+  - identifier: bitmap
+    title: 'A bitmap frontend file asking for inlining'
+    group: frontend
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Vector.svg'
+    frontendIcon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Bitmap.png'
+    frontendInlineIcon: true
+  - identifier: replaced
+    title: 'Replaced by the site package file'
+    group: frontend
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Vector.svg'
+    inlineIcon: true
+  - identifier: none
+    title: 'Without any icon file'
+    group: frontend
+  - identifier: collision
+    title: 'A type of the group named group'
+    group: group
+    icon: 'EXT:test_category_types_frontend_icons/Resources/Public/Icons/Frontend.svg'

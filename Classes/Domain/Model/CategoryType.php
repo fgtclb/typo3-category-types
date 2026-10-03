@@ -17,6 +17,8 @@ class CategoryType implements \JsonSerializable, \Stringable
         protected readonly string $icon,
         protected readonly int $priority,
         protected readonly bool $inlineIcon = false,
+        protected readonly string $frontendIcon = '',
+        protected readonly ?bool $frontendInlineIcon = null,
     ) {}
 
     /**
@@ -28,6 +30,8 @@ class CategoryType implements \JsonSerializable, \Stringable
      *     icon?: string,
      *     priority?: int,
      *     inlineIcon?: bool,
+     *     frontendIcon?: string,
+     *     frontendInlineIcon?: bool|null,
      * } $array
      * @return CategoryType
      */
@@ -41,6 +45,8 @@ class CategoryType implements \JsonSerializable, \Stringable
             icon: (string)($array['icon'] ?? ''),
             priority: (int)($array['priority'] ?? 0),
             inlineIcon: (bool)($array['inlineIcon'] ?? false),
+            frontendIcon: (string)($array['frontendIcon'] ?? ''),
+            frontendInlineIcon: isset($array['frontendInlineIcon']) ? (bool)$array['frontendInlineIcon'] : null,
         );
     }
 
@@ -58,6 +64,8 @@ class CategoryType implements \JsonSerializable, \Stringable
      *     icon?: string,
      *     priority?: int,
      *     inlineIcon?: bool,
+     *     frontendIcon?: string,
+     *     frontendInlineIcon?: bool|null,
      * }|array<string, mixed> $array
      * @return CategoryType
      */
@@ -71,6 +79,8 @@ class CategoryType implements \JsonSerializable, \Stringable
             icon: (string)($array['icon'] ?? ''),
             priority: (int)($array['priority'] ?? 0),
             inlineIcon: (bool)($array['inlineIcon'] ?? false),
+            frontendIcon: (string)($array['frontendIcon'] ?? ''),
+            frontendInlineIcon: isset($array['frontendInlineIcon']) ? (bool)$array['frontendInlineIcon'] : null,
         );
     }
 
@@ -88,6 +98,8 @@ class CategoryType implements \JsonSerializable, \Stringable
      *     icon: string,
      *     priority: int,
      *     inlineIcon: bool,
+     *     frontendIcon: string,
+     *     frontendInlineIcon: bool|null,
      * }
      */
     public function toArray(): array
@@ -100,6 +112,8 @@ class CategoryType implements \JsonSerializable, \Stringable
             'icon' => $this->icon,
             'priority' => $this->priority,
             'inlineIcon' => $this->inlineIcon,
+            'frontendIcon' => $this->frontendIcon,
+            'frontendInlineIcon' => $this->frontendInlineIcon,
         ];
     }
 
@@ -159,6 +173,32 @@ class CategoryType implements \JsonSerializable, \Stringable
         return $this->inlineIcon;
     }
 
+    /**
+     * The file the frontend shows: `frontendIcon` when the type declares one, `icon`
+     * otherwise. The backend always shows {@see CategoryType::getIcon()}.
+     *
+     * {@see \FGTCLB\CategoryTypes\EventListener\AddCategoryTypeFrontendIcons} reads this.
+     */
+    public function getFrontendIcon(): string
+    {
+        return $this->frontendIcon !== '' ? $this->frontendIcon : $this->icon;
+    }
+
+    /**
+     * Whether the frontend inlines {@see CategoryType::getFrontendIcon()}. A declared
+     * `frontendInlineIcon` decides. Without one, the frontend follows `inlineIcon` only
+     * while it shows the `icon` file, because that flag was set for that file: a
+     * `frontendIcon` nobody opted in for is shown as an image, for the reasons given at
+     * {@see CategoryType::isInlineIcon()}.
+     */
+    public function isFrontendInlineIcon(): bool
+    {
+        if ($this->frontendInlineIcon !== null) {
+            return $this->frontendInlineIcon;
+        }
+        return $this->frontendIcon === '' && $this->inlineIcon;
+    }
+
     public function __toString(): string
     {
         return $this->identifier;
@@ -173,6 +213,8 @@ class CategoryType implements \JsonSerializable, \Stringable
      *     icon: string,
      *     priority: int,
      *     inlineIcon: bool,
+     *     frontendIcon: string,
+     *     frontendInlineIcon: bool|null,
      * }
      */
     public function jsonSerialize(): array
@@ -185,6 +227,8 @@ class CategoryType implements \JsonSerializable, \Stringable
             'icon' => $this->icon,
             'priority' => $this->priority,
             'inlineIcon' => $this->inlineIcon,
+            'frontendIcon' => $this->frontendIcon,
+            'frontendInlineIcon' => $this->frontendInlineIcon,
         ];
     }
 }

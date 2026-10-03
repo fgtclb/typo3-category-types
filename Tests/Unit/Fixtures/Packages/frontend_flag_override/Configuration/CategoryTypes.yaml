@@ -1,0 +1,11 @@
+types:
+  # The frontend flag only, for a type with a frontend file.
+  - identifier: degree
+    group: programs
+    frontendInlineIcon: false
+    useExisting: true
+  # The frontend flag only, for a type without a frontend file.
+  - identifier: subject
+    group: programs
+    frontendInlineIcon: false
+    useExisting: true

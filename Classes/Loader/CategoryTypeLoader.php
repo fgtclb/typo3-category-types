@@ -112,6 +112,12 @@ class CategoryTypeLoader
                                 1678979375330
                             );
                         }
+                        // A new frontend file does not inherit the inline flag the earlier
+                        // declaration set for its own frontend file. A new `icon` keeps the
+                        // earlier `inlineIcon`, the documented rule of the backend pair.
+                        if (array_key_exists('frontendIcon', $categoryType) && !array_key_exists('frontendInlineIcon', $categoryType)) {
+                            $categoryType['frontendInlineIcon'] = null;
+                        }
                         // Combine existing categoryType options with override values.
                         $categoryType = array_merge(
                             $loadedCategoryTypes[$categoryKey]->toArray(),
@@ -130,9 +136,11 @@ class CategoryTypeLoader
 
     /**
      * Reads the `groups:` section of every active package, in package load order. A later
-     * package replaces the title, the icon, `inlineIcon` and the priority it declares and
-     * keeps what it leaves out, so a project can relabel a shipped group without restating
-     * its icon. A redeclared group keeps its position.
+     * package replaces the title, the icon, `inlineIcon`, `frontendIcon`,
+     * `frontendInlineIcon` and the priority it declares and keeps what it leaves out, so a
+     * project can relabel a shipped group without restating its icon. A new `frontendIcon`
+     * without `frontendInlineIcon` drops the earlier frontend flag. A redeclared group keeps
+     * its position.
      *
      * @return array<string, CategoryTypeGroup> Keyed by the identifier without surrounding
      *                                          spaces.
@@ -164,6 +172,17 @@ class CategoryTypeLoader
                 }
                 if (array_key_exists('inlineIcon', $declaration)) {
                     $group->setInlineIcon((bool)$declaration['inlineIcon']);
+                }
+                if (is_string($declaration['frontendIcon'] ?? null) && $declaration['frontendIcon'] !== '') {
+                    $group->setFrontendIcon($declaration['frontendIcon']);
+                    // A new frontend file does not inherit the inline flag of the file it
+                    // replaces, unlike `icon`, which keeps the earlier `inlineIcon`.
+                    $group->setFrontendInlineIcon(null);
+                }
+                if (array_key_exists('frontendInlineIcon', $declaration)) {
+                    $group->setFrontendInlineIcon(
+                        $declaration['frontendInlineIcon'] === null ? null : (bool)$declaration['frontendInlineIcon']
+                    );
                 }
                 if (array_key_exists('priority', $declaration)) {
                     $group->setPriority((int)$declaration['priority']);

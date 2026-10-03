@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\CategoryTypes\Tests\Unit\Domain\Model;
 
 use FGTCLB\CategoryTypes\Domain\Model\CategoryTypeGroup;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
@@ -21,6 +22,8 @@ final class CategoryTypeGroupTest extends UnitTestCase
         $this->assertSame('', $subject->getTitle());
         $this->assertSame('', $subject->getIcon());
         $this->assertFalse($subject->isInlineIcon());
+        $this->assertSame('', $subject->getFrontendIcon());
+        $this->assertFalse($subject->isFrontendInlineIcon());
     }
 
     #[Test]
@@ -42,7 +45,7 @@ final class CategoryTypeGroupTest extends UnitTestCase
         $subject->setPriority(5);
 
         $this->assertSame(
-            ['identifier' => 'partners', 'group' => 'academic', 'priority' => 5, 'title' => '', 'icon' => '', 'inlineIcon' => false],
+            ['identifier' => 'partners', 'group' => 'academic', 'priority' => 5, 'title' => '', 'icon' => '', 'inlineIcon' => false, 'frontendIcon' => '', 'frontendInlineIcon' => null],
             $subject->toArray(),
         );
     }
@@ -53,7 +56,7 @@ final class CategoryTypeGroupTest extends UnitTestCase
         $subject = new CategoryTypeGroup('programs', 'academic', 20);
 
         $this->assertSame(
-            ['identifier' => 'programs', 'group' => 'academic', 'priority' => 20, 'title' => '', 'icon' => '', 'inlineIcon' => false],
+            ['identifier' => 'programs', 'group' => 'academic', 'priority' => 20, 'title' => '', 'icon' => '', 'inlineIcon' => false, 'frontendIcon' => '', 'frontendInlineIcon' => null],
             $subject->toArray(),
         );
     }
@@ -63,7 +66,7 @@ final class CategoryTypeGroupTest extends UnitTestCase
     {
         $built = CategoryTypeGroup::fromArray(['identifier' => 'built', 'group' => 'other', 'priority' => 9]);
 
-        $this->assertSame(['identifier' => 'built', 'group' => 'other', 'priority' => 9, 'title' => '', 'icon' => '', 'inlineIcon' => false], $built->toArray());
+        $this->assertSame(['identifier' => 'built', 'group' => 'other', 'priority' => 9, 'title' => '', 'icon' => '', 'inlineIcon' => false, 'frontendIcon' => '', 'frontendInlineIcon' => null], $built->toArray());
     }
 
     #[Test]
@@ -71,7 +74,7 @@ final class CategoryTypeGroupTest extends UnitTestCase
     {
         $built = CategoryTypeGroup::fromArray(['priority' => '7']);
 
-        $this->assertSame(['identifier' => '', 'group' => '', 'priority' => 7, 'title' => '', 'icon' => '', 'inlineIcon' => false], $built->toArray());
+        $this->assertSame(['identifier' => '', 'group' => '', 'priority' => 7, 'title' => '', 'icon' => '', 'inlineIcon' => false, 'frontendIcon' => '', 'frontendInlineIcon' => null], $built->toArray());
     }
 
     /**
@@ -86,8 +89,8 @@ final class CategoryTypeGroupTest extends UnitTestCase
 
         $built = $subject->fromArray(['identifier' => 'built', 'group' => 'other', 'priority' => 9]);
 
-        $this->assertSame(['identifier' => 'built', 'group' => 'other', 'priority' => 9, 'title' => '', 'icon' => '', 'inlineIcon' => false], $built->toArray());
-        $this->assertSame(['identifier' => 'original', 'group' => 'academic', 'priority' => 1, 'title' => '', 'icon' => '', 'inlineIcon' => false], $subject->toArray());
+        $this->assertSame(['identifier' => 'built', 'group' => 'other', 'priority' => 9, 'title' => '', 'icon' => '', 'inlineIcon' => false, 'frontendIcon' => '', 'frontendInlineIcon' => null], $built->toArray());
+        $this->assertSame(['identifier' => 'original', 'group' => 'academic', 'priority' => 1, 'title' => '', 'icon' => '', 'inlineIcon' => false, 'frontendIcon' => '', 'frontendInlineIcon' => null], $subject->toArray());
     }
 
     #[Test]
@@ -101,13 +104,87 @@ final class CategoryTypeGroupTest extends UnitTestCase
     }
 
     /**
-     * The group identifier makes up the icon identifier after a fixed `group` segment, next
-     * to the `category_types.<group>.<type>` identifiers of the type icons.
+     * The prefix differs from the `category_types.` of the type icons in its fifteenth
+     * character, so a group icon identifier never equals a type icon identifier, not even
+     * for a group named `group`.
      */
     #[Test]
-    public function iconIdentifierIsNamespacedByGroup(): void
+    public function iconIdentifierHasAPrefixOfItsOwn(): void
     {
-        $this->assertSame('category_types.group.programs', (new CategoryTypeGroup('programs'))->getIconIdentifier());
+        $this->assertSame('category_types_group.programs', (new CategoryTypeGroup('programs'))->getIconIdentifier());
+        $this->assertSame('category_types_group.group', (new CategoryTypeGroup('group'))->getIconIdentifier());
+    }
+
+    /**
+     * The rule of the type icons, see `CategoryTypeTest::frontendIconDeclarations()`.
+     *
+     * @return \Generator<string, array{0: array<string, mixed>, 1: string, 2: bool}>
+     */
+    public static function frontendIconDeclarations(): \Generator
+    {
+        yield 'one file, inlined everywhere' => [
+            ['icon' => 'Programs.svg', 'inlineIcon' => true],
+            'Programs.svg',
+            true,
+        ];
+        yield 'a frontend file without its own flag' => [
+            ['icon' => 'Programs.svg', 'inlineIcon' => true, 'frontendIcon' => 'ProgramsFrontend.svg'],
+            'ProgramsFrontend.svg',
+            false,
+        ];
+        yield 'a frontend file with its own flag' => [
+            ['icon' => 'Programs.svg', 'frontendIcon' => 'ProgramsFrontend.svg', 'frontendInlineIcon' => true],
+            'ProgramsFrontend.svg',
+            true,
+        ];
+        yield 'the same file, inlined only in the backend' => [
+            ['icon' => 'Programs.svg', 'inlineIcon' => true, 'frontendInlineIcon' => false],
+            'Programs.svg',
+            false,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $declaration
+     */
+    #[DataProvider('frontendIconDeclarations')]
+    #[Test]
+    public function frontendShowsItsOwnFileAndInlinesItOnlyWhenAskedFor(array $declaration, string $expectedFile, bool $expectedInline): void
+    {
+        $subject = CategoryTypeGroup::fromArray(['identifier' => 'programs'] + $declaration);
+
+        $this->assertSame($expectedFile, $subject->getFrontendIcon());
+        $this->assertSame($expectedInline, $subject->isFrontendInlineIcon());
+        $this->assertSame($declaration['icon'], $subject->getIcon());
+        $this->assertSame($declaration['inlineIcon'] ?? false, $subject->isInlineIcon());
+    }
+
+    #[Test]
+    public function frontendPairCanBeReplacedByItsSetters(): void
+    {
+        $subject = new CategoryTypeGroup('programs', icon: 'Programs.svg', inlineIcon: true);
+        $subject->setFrontendIcon('ProgramsFrontend.svg');
+        $subject->setFrontendInlineIcon(true);
+
+        $this->assertSame('ProgramsFrontend.svg', $subject->getFrontendIcon());
+        $this->assertTrue($subject->isFrontendInlineIcon());
+
+        $subject->setFrontendInlineIcon(null);
+
+        $this->assertFalse($subject->isFrontendInlineIcon());
+        $this->assertNull($subject->toArray()['frontendInlineIcon']);
+    }
+
+    /**
+     * A cache entry written before the frontend pair existed restores the frontend it had.
+     */
+    #[Test]
+    public function cacheEntryWithoutTheFrontendPairRestoresTheEarlierFrontend(): void
+    {
+        $restored = CategoryTypeGroup::__set_state(['identifier' => 'programs', 'icon' => 'Programs.svg', 'inlineIcon' => true]);
+
+        $this->assertSame('Programs.svg', $restored->getFrontendIcon());
+        $this->assertTrue($restored->isFrontendInlineIcon());
     }
 
     #[Test]
@@ -116,7 +193,7 @@ final class CategoryTypeGroupTest extends UnitTestCase
         $built = CategoryTypeGroup::fromArray(['identifier' => 'programs', 'title' => 'Study programs', 'icon' => 'EXT:ext/Icons/Programs.svg', 'inlineIcon' => 1]);
 
         $this->assertSame(
-            ['identifier' => 'programs', 'group' => '', 'priority' => 0, 'title' => 'Study programs', 'icon' => 'EXT:ext/Icons/Programs.svg', 'inlineIcon' => true],
+            ['identifier' => 'programs', 'group' => '', 'priority' => 0, 'title' => 'Study programs', 'icon' => 'EXT:ext/Icons/Programs.svg', 'inlineIcon' => true, 'frontendIcon' => '', 'frontendInlineIcon' => null],
             $built->toArray(),
         );
     }
@@ -129,7 +206,7 @@ final class CategoryTypeGroupTest extends UnitTestCase
     #[Test]
     public function setStateRestoresEveryProperty(): void
     {
-        $subject = new CategoryTypeGroup('programs', 'academic', 20, 'Study programs', 'EXT:ext/Icons/Programs.svg', true);
+        $subject = new CategoryTypeGroup('programs', 'academic', 20, 'Study programs', 'EXT:ext/Icons/Programs.svg', true, 'EXT:ext/Icons/ProgramsFrontend.svg', false);
 
         $this->assertSame($subject->toArray(), CategoryTypeGroup::__set_state($subject->toArray())->toArray());
     }

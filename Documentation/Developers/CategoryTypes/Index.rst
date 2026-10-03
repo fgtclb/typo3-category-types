@@ -57,6 +57,17 @@ The keys of a type
     text colour, see :ref:`Which provider the icon gets
     <developers-icons-provider>`.
 
+:yaml:`frontendIcon`
+    Optional. Another icon file for the frontend, as an :php:`EXT:` path. The
+    frontend shows :yaml:`icon` without it, see :ref:`A file of its own for
+    the frontend <developers-icons-frontend>`.
+
+:yaml:`frontendInlineIcon`
+    Optional boolean. Whether the frontend inlines the file it shows. Without
+    it, the frontend follows :yaml:`inlineIcon` while it shows the
+    :yaml:`icon` file and shows a :yaml:`frontendIcon` as an image, see
+    :ref:`A file of its own for the frontend <developers-icons-frontend>`.
+
 :yaml:`priority`
     Optional integer, :yaml:`0` by default. Orders the types of a group, the
     highest first, see :ref:`The order of the types
@@ -173,10 +184,34 @@ label keys:
 
 An override that leaves out :yaml:`inlineIcon` keeps the value of the
 declaration it changes, so a type that asked for inlining still asks for it
-with the new file. Set :yaml:`inlineIcon: false` for a file that does not meet
-:ref:`the rules for an inlined icon <developers-icons-svg>`, or
-:yaml:`inlineIcon: true` for one that does, see :ref:`Category type icons
-<developers-icons>`.
+with the new file, in the backend and in a frontend that shows :yaml:`icon`.
+Set :yaml:`inlineIcon: false` for a file that does not meet :ref:`the rules
+for an inlined icon <developers-icons-svg>`, or :yaml:`inlineIcon: true` for
+one that does, see :ref:`Category type icons <developers-icons>`. A new
+:yaml:`icon` does not change a :yaml:`frontendIcon` the type declares.
+
+:yaml:`frontendIcon` follows a different rule. An override that names a new
+:yaml:`frontendIcon` without :yaml:`frontendInlineIcon` shows the new file as
+an image, it does not inherit the flag the declaration set for its own
+frontend file. Say :yaml:`frontendInlineIcon: true` again for a file that is
+drawn for inlining:
+
+..  code-block:: yaml
+    :caption: EXT:site_package/Configuration/CategoryTypes.yaml
+
+    types:
+      - identifier: degree
+        group: example
+        frontendIcon: 'EXT:site_package/Resources/Public/Icons/CategoryTypes/DegreeFrontend.svg'
+        frontendInlineIcon: true
+        useExisting: true
+
+An override that names only :yaml:`frontendInlineIcon` applies it to the file
+the frontend already shows. To replace the frontend drawing of a type without
+touching its declaration, register its icon identifier in the
+:file:`Configuration/FrontendIcons.php` of the site package instead, see
+:ref:`Replacing an icon in the frontend only
+<developers-icons-frontend-replace>`.
 
 ..  _developers-category-types-remove:
 
@@ -238,13 +273,17 @@ Without a declaration, the heading is the bare group key, here
     reference, translated into the backend language of the editor.
 
 :yaml:`icon`
-    An icon file, registered as :php:`category_types.group.<identifier>`, see
+    An icon file, registered as :php:`category_types_group.<identifier>`, see
     :ref:`Group icons <developers-icons-groups>`. The type select shows no
     group icon: the option groups of a select carry a label only.
 
 :yaml:`inlineIcon`
     Optional boolean, :yaml:`false` by default. As for a type, see
     :ref:`Which provider the icon gets <developers-icons-provider>`.
+
+:yaml:`frontendIcon`, :yaml:`frontendInlineIcon`
+    Optional. As for a type, see :ref:`A file of its own for the frontend
+    <developers-icons-frontend>`.
 
 :yaml:`priority`
     Optional integer, :yaml:`0` by default. It is read and kept on the group,
@@ -255,8 +294,11 @@ A group does not have to be declared for its types to work, and a declared
 group does not need a type. The type select leaves out a group without types.
 
 More than one package can declare the same group. A later package replaces
-the title, the icon, :yaml:`inlineIcon` and :yaml:`priority` it declares and
-keeps what it leaves out, and the group keeps its position. A site package
+the title, the icon, :yaml:`inlineIcon`, :yaml:`frontendIcon`,
+:yaml:`frontendInlineIcon` and :yaml:`priority` it declares and keeps what it
+leaves out, and the group keeps its position. As for a type, a new
+:yaml:`frontendIcon` without :yaml:`frontendInlineIcon` is shown as an image,
+while a new :yaml:`icon` keeps the earlier :yaml:`inlineIcon`. A site package
 that requires :php:`EXT:academic_programs` relabels its group like this:
 
 ..  code-block:: yaml
@@ -386,7 +428,10 @@ A :php:`\FGTCLB\CategoryTypes\Domain\Model\CategoryType` exposes the declared
 values through :php:`getIdentifier()`, :php:`getGroup()`, :php:`getTitle()`,
 :php:`getIcon()`, :php:`isInlineIcon()` and :php:`getPriority()`, plus
 :php:`getExtensionKey()` for the extension that declared the type or changed it
-last, and :php:`getIconIdentifier()` for the registered icon. A
-:php:`CategoryTypeGroup` exposes :php:`getIdentifier()`, :php:`getTitle()`,
-:php:`getIcon()`, :php:`isInlineIcon()`, :php:`getPriority()` and
-:php:`getIconIdentifier()` the same way.
+last, and :php:`getIconIdentifier()` for the registered icon.
+:php:`getFrontendIcon()` and :php:`isFrontendInlineIcon()` answer what the
+frontend shows, with the fallback to :yaml:`icon` and :yaml:`inlineIcon`
+already applied. A :php:`CategoryTypeGroup` exposes :php:`getIdentifier()`,
+:php:`getTitle()`, :php:`getIcon()`, :php:`isInlineIcon()`,
+:php:`getFrontendIcon()`, :php:`isFrontendInlineIcon()`, :php:`getPriority()`
+and :php:`getIconIdentifier()` the same way.

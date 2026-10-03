@@ -202,6 +202,8 @@ class CategoryTypeRegistry implements \JsonSerializable
      *      icon: string,
      *      priority: int,
      *      inlineIcon: bool,
+     *      frontendIcon: string,
+     *      frontendInlineIcon: bool|null,
      *  }>>
      */
     public function toArray(): array

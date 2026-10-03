@@ -7,7 +7,8 @@ namespace FGTCLB\CategoryTypes\Domain\Model;
 /**
  * A group declared in the `groups:` section of a `Configuration/CategoryTypes.yaml`. Its
  * title heads the types of the group in the type select of a category, and its icon is
- * registered as `category_types.group.<identifier>`.
+ * registered as `category_types_group.<identifier>`, in the icon registry of the backend
+ * and in the frontend icon registry of EXT:academic_base.
  */
 class CategoryTypeGroup
 {
@@ -18,6 +19,8 @@ class CategoryTypeGroup
         protected string $title = '',
         protected string $icon = '',
         protected bool $inlineIcon = false,
+        protected string $frontendIcon = '',
+        protected ?bool $frontendInlineIcon = null,
     ) {}
 
     public function setIdentifier(string $identifier): void
@@ -70,9 +73,14 @@ class CategoryTypeGroup
         return $this->icon;
     }
 
+    /**
+     * Every type icon identifier starts with `category_types.`, every group icon identifier
+     * with `category_types_group.`. The two differ in their fifteenth character, so no
+     * group or type name can make a group icon identifier equal a type icon identifier.
+     */
     public function getIconIdentifier(): string
     {
-        return 'category_types.group.' . $this->identifier;
+        return 'category_types_group.' . $this->identifier;
     }
 
     public function setInlineIcon(bool $inlineIcon): void
@@ -86,6 +94,45 @@ class CategoryTypeGroup
     }
 
     /**
+     * Sets the declared frontend file. The loader resets the declared frontend flag next
+     * to it when a later declaration names a new file without one.
+     */
+    public function setFrontendIcon(string $frontendIcon): void
+    {
+        $this->frontendIcon = $frontendIcon;
+    }
+
+    /**
+     * The file the frontend shows: `frontendIcon` when the group declares one, `icon`
+     * otherwise, the rule of {@see CategoryType::getFrontendIcon()}.
+     */
+    public function getFrontendIcon(): string
+    {
+        return $this->frontendIcon !== '' ? $this->frontendIcon : $this->icon;
+    }
+
+    /**
+     * `null` means not declared, see {@see CategoryTypeGroup::isFrontendInlineIcon()}.
+     */
+    public function setFrontendInlineIcon(?bool $frontendInlineIcon): void
+    {
+        $this->frontendInlineIcon = $frontendInlineIcon;
+    }
+
+    /**
+     * Whether the frontend inlines {@see CategoryTypeGroup::getFrontendIcon()}, the rule of
+     * {@see CategoryType::isFrontendInlineIcon()}: a declared `frontendInlineIcon` decides,
+     * otherwise `inlineIcon` while the frontend shows the `icon` file.
+     */
+    public function isFrontendInlineIcon(): bool
+    {
+        if ($this->frontendInlineIcon !== null) {
+            return $this->frontendInlineIcon;
+        }
+        return $this->frontendIcon === '' && $this->inlineIcon;
+    }
+
+    /**
      * @return array{
      *     identifier: string,
      *     group: string,
@@ -93,6 +140,8 @@ class CategoryTypeGroup
      *     title: string,
      *     icon: string,
      *     inlineIcon: bool,
+     *     frontendIcon: string,
+     *     frontendInlineIcon: bool|null,
      * }
      */
     public function toArray(): array
@@ -104,6 +153,8 @@ class CategoryTypeGroup
             'title' => $this->title,
             'icon' => $this->icon,
             'inlineIcon' => $this->inlineIcon,
+            'frontendIcon' => $this->frontendIcon,
+            'frontendInlineIcon' => $this->frontendInlineIcon,
         ];
     }
 
@@ -115,6 +166,8 @@ class CategoryTypeGroup
      *     title?: string,
      *     icon?: string,
      *     inlineIcon?: bool,
+     *     frontendIcon?: string,
+     *     frontendInlineIcon?: bool|null,
      * }|array<string, mixed> $array
      * @return self
      */
@@ -127,6 +180,8 @@ class CategoryTypeGroup
             title: (string)($array['title'] ?? ''),
             icon: (string)($array['icon'] ?? ''),
             inlineIcon: (bool)($array['inlineIcon'] ?? false),
+            frontendIcon: (string)($array['frontendIcon'] ?? ''),
+            frontendInlineIcon: isset($array['frontendInlineIcon']) ? (bool)$array['frontendInlineIcon'] : null,
         );
     }
 

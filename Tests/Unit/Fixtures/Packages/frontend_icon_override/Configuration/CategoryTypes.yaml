@@ -1,0 +1,27 @@
+types:
+  # A new frontend file only.
+  - identifier: degree
+    group: programs
+    frontendIcon: 'EXT:frontend_icon_override/Resources/Public/Icons/degree.svg'
+    useExisting: true
+  # A new icon only, for a type that inlines it everywhere.
+  - identifier: subject
+    group: programs
+    icon: 'EXT:frontend_icon_override/Resources/Public/Icons/subject.svg'
+    useExisting: true
+  # A new icon only, for a type with a frontend file.
+  - identifier: field
+    group: programs
+    icon: 'EXT:frontend_icon_override/Resources/Public/Icons/field.svg'
+    useExisting: true
+  # The priority only.
+  - identifier: level
+    group: programs
+    priority: 50
+    useExisting: true
+  # A new icon that asks for inlining.
+  - identifier: mode
+    group: programs
+    icon: 'EXT:frontend_icon_override/Resources/Public/Icons/mode.svg'
+    inlineIcon: true
+    useExisting: true

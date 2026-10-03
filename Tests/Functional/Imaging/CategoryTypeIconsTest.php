@@ -39,9 +39,9 @@ final class CategoryTypeIconsTest extends AbstractCategoryTypesTestCase
     private const IDENTIFIER_PLAIN = 'category_types.testicons.plain';
     private const IDENTIFIER_BITMAP = 'category_types.testicons.bitmap';
     private const IDENTIFIER_MISSING = 'category_types.testicons.missing';
-    private const IDENTIFIER_GROUP_PLAIN = 'category_types.group.testicons';
-    private const IDENTIFIER_GROUP_INLINE = 'category_types.group.testiconsinline';
-    private const IDENTIFIER_GROUP_WITHOUT_ICON = 'category_types.group.testiconsnone';
+    private const IDENTIFIER_GROUP_PLAIN = 'category_types_group.testicons';
+    private const IDENTIFIER_GROUP_INLINE = 'category_types_group.testiconsinline';
+    private const IDENTIFIER_GROUP_WITHOUT_ICON = 'category_types_group.testiconsnone';
 
     protected function setUp(): void
     {

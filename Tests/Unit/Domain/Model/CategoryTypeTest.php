@@ -20,6 +20,8 @@ final class CategoryTypeTest extends UnitTestCase
      *     icon: string,
      *     priority: int,
      *     inlineIcon: bool,
+     *     frontendIcon: string,
+     *     frontendInlineIcon: bool|null,
      * }
      */
     private function completeArray(): array
@@ -32,6 +34,8 @@ final class CategoryTypeTest extends UnitTestCase
             'icon' => 'EXT:academic_programs/Resources/Public/Icons/field_of_study.svg',
             'priority' => 30,
             'inlineIcon' => true,
+            'frontendIcon' => 'EXT:academic_programs/Resources/Public/Icons/field_of_study_frontend.svg',
+            'frontendInlineIcon' => false,
         ];
     }
 
@@ -48,6 +52,8 @@ final class CategoryTypeTest extends UnitTestCase
         $this->assertSame($values['icon'], $subject->getIcon());
         $this->assertSame($values['priority'], $subject->getPriority());
         $this->assertSame($values['inlineIcon'], $subject->isInlineIcon());
+        $this->assertSame($values['frontendIcon'], $subject->getFrontendIcon());
+        $this->assertSame($values['frontendInlineIcon'], $subject->isFrontendInlineIcon());
     }
 
     /**
@@ -125,6 +131,8 @@ final class CategoryTypeTest extends UnitTestCase
                 'icon' => '',
                 'priority' => 0,
                 'inlineIcon' => false,
+                'frontendIcon' => '',
+                'frontendInlineIcon' => null,
             ],
             $subject->toArray(),
         );
@@ -160,6 +168,100 @@ final class CategoryTypeTest extends UnitTestCase
         $this->assertFalse($factory(['identifier' => 'silent'])->isInlineIcon());
         $this->assertTrue($factory(['identifier' => 'asking', 'inlineIcon' => true])->isInlineIcon());
         $this->assertFalse($factory(['identifier' => 'declining', 'inlineIcon' => false])->isInlineIcon());
+    }
+
+    /**
+     * Each row of the spec requirement "Inlining follows the file it is declared for".
+     * The bitmap row is a provider decision and is covered where the provider is chosen.
+     *
+     * @return \Generator<string, array{0: array<string, mixed>, 1: string, 2: bool}>
+     */
+    public static function frontendIconDeclarations(): \Generator
+    {
+        yield 'one file, no flag' => [
+            ['icon' => 'Degree.svg'],
+            'Degree.svg',
+            false,
+        ];
+        yield 'one file, inlined everywhere' => [
+            ['icon' => 'Degree.svg', 'inlineIcon' => true],
+            'Degree.svg',
+            true,
+        ];
+        yield 'a frontend file without its own flag' => [
+            ['icon' => 'Degree.svg', 'inlineIcon' => true, 'frontendIcon' => 'DegreeFrontend.svg'],
+            'DegreeFrontend.svg',
+            false,
+        ];
+        yield 'a frontend file with its own flag' => [
+            ['icon' => 'Degree.svg', 'frontendIcon' => 'DegreeFrontend.svg', 'frontendInlineIcon' => true],
+            'DegreeFrontend.svg',
+            true,
+        ];
+        yield 'the same file, inlined only in the backend' => [
+            ['icon' => 'Degree.svg', 'inlineIcon' => true, 'frontendInlineIcon' => false],
+            'Degree.svg',
+            false,
+        ];
+        yield 'the same file, inlined only in the frontend' => [
+            ['icon' => 'Degree.svg', 'frontendInlineIcon' => true],
+            'Degree.svg',
+            true,
+        ];
+        yield 'a frontend file only' => [
+            ['frontendIcon' => 'DegreeFrontend.svg'],
+            'DegreeFrontend.svg',
+            false,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $declaration
+     */
+    #[DataProvider('frontendIconDeclarations')]
+    #[Test]
+    public function frontendShowsItsOwnFileAndInlinesItOnlyWhenAskedFor(array $declaration, string $expectedFile, bool $expectedInline): void
+    {
+        $subject = CategoryType::fromArray(['identifier' => 'degree', 'group' => 'programs'] + $declaration);
+
+        $this->assertSame($expectedFile, $subject->getFrontendIcon());
+        $this->assertSame($expectedInline, $subject->isFrontendInlineIcon());
+    }
+
+    /**
+     * The backend reads `icon` and `inlineIcon` alone, whatever the frontend pair says.
+     */
+    #[Test]
+    public function frontendPairDoesNotChangeTheBackendIcon(): void
+    {
+        $subject = CategoryType::fromArray([
+            'identifier' => 'degree',
+            'icon' => 'Degree.svg',
+            'inlineIcon' => true,
+            'frontendIcon' => 'DegreeFrontend.svg',
+            'frontendInlineIcon' => false,
+        ]);
+
+        $this->assertSame('Degree.svg', $subject->getIcon());
+        $this->assertTrue($subject->isInlineIcon());
+    }
+
+    /**
+     * A cache entry written before the frontend pair existed has neither key. Restored, it
+     * shows the frontend what it showed before: the `icon` file, inlined when `inlineIcon`
+     * says so.
+     */
+    #[Test]
+    public function cacheEntryWithoutTheFrontendPairRestoresTheEarlierFrontend(): void
+    {
+        $inlined = CategoryType::__set_state(['identifier' => 'degree', 'icon' => 'Degree.svg', 'inlineIcon' => true]);
+        $plain = CategoryType::__set_state(['identifier' => 'subject', 'icon' => 'Subject.svg', 'inlineIcon' => false]);
+
+        $this->assertSame('Degree.svg', $inlined->getFrontendIcon());
+        $this->assertTrue($inlined->isFrontendInlineIcon());
+        $this->assertSame('Subject.svg', $plain->getFrontendIcon());
+        $this->assertFalse($plain->isFrontendInlineIcon());
+        $this->assertNull($inlined->toArray()['frontendInlineIcon']);
     }
 
     #[Test]

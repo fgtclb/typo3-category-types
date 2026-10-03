@@ -5,7 +5,9 @@ Category type icons
 
 A category type does not register its icon in :file:`Configuration/Icons.php`.
 It names an icon **file** in :file:`Configuration/CategoryTypes.yaml`, and this
-extension registers it on :php:`BootCompletedEvent`:
+extension registers it twice: in the icon registry of TYPO3 for the backend,
+and in the frontend icon registry of :php:`EXT:academic_base` for the
+frontend.
 
 ..  code-block:: yaml
     :caption: EXT:example/Configuration/CategoryTypes.yaml
@@ -16,9 +18,12 @@ extension registers it on :php:`BootCompletedEvent`:
         group: example
         icon: 'EXT:example/Resources/Public/Icons/CategoryTypes/Degree.svg'
 
-The registration happens in
-:php:`\FGTCLB\CategoryTypes\ServiceProvider::addIcons()`. The icon identifier is
-derived, never written by hand -
+The backend registration happens on :php:`BootCompletedEvent`, in
+:php:`\FGTCLB\CategoryTypes\ServiceProvider::addIcons()`. The frontend
+registration is a listener on the event
+:php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent`, which runs when
+the frontend registry is built and cached with the system caches. The icon
+identifier is the same in both and is derived, never written by hand -
 :php:`\FGTCLB\CategoryTypes\Domain\Model\CategoryType::getIconIdentifier()`
 builds it from the group and the type:
 
@@ -26,13 +31,20 @@ builds it from the group and the type:
 
     category_types.<group>.<type>
 
-For the example above that is :php:`category_types.example.degree`, and that is
-the identifier the :php:`sys_category` :php:`typeicon_classes` entry uses and
-the identifier a template addresses:
+For the example above that is :php:`category_types.example.degree`. It is the
+identifier the :php:`sys_category` :php:`typeicon_classes` entry uses, the
+identifier a backend template addresses with :html:`<core:icon>`, and the
+identifier a frontend template addresses with the icon view helper of
+:php:`EXT:academic_base`:
 
 ..  code-block:: html
 
-    <core:icon identifier="category_types.example.degree" />
+    <html xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"
+          data-namespace-typo3-fluid="true">
+
+    <ab:icon identifier="category_types.example.degree" />
+
+    </html>
 
 ..  _developers-icons-groups:
 
@@ -40,31 +52,31 @@ Group icons
 -----------
 
 A group declared in the :ref:`groups list <developers-category-types-groups>`
-with an :yaml:`icon` is registered the same way, with the same choice of
-provider, under
+with an :yaml:`icon` is registered the same way, in both registries, with the
+same choice of provider, under
 
 ..  code-block:: text
 
-    category_types.group.<group>
+    category_types_group.<group>
 
-For a group :yaml:`example` that is :php:`category_types.group.example`. The
+For a group :yaml:`example` that is :php:`category_types_group.example`. The
 type select of a category shows no group icon, because the option groups of a
-select carry a label only; the identifier is there for templates and other
-views. Type icons and group icons share the :php:`category_types.` prefix, so
-a group must not be named :yaml:`group`: the icon of its type :yaml:`example`
-would be :php:`category_types.group.example`, the icon of the group
-:yaml:`example`.
+select carry a label only. The identifier is there for templates and other
+views. A type icon identifier starts with :php:`category_types.`, a group icon
+identifier with :php:`category_types_group.`, so the two can never be equal,
+whatever the groups and types are named. A group may therefore be named
+:yaml:`group`.
 
 ..  _developers-icons-provider:
 
 Which provider the icon gets
 ----------------------------
 
-By default the one
-:php:`\TYPO3\CMS\Core\Imaging\IconRegistry::detectIconProvider()` answers for
-the file: :php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider` for an
-SVG, :php:`\TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider` for a
-bitmap. The default markup of both is an :html:`<img>` tag, and an image is
+By default the one TYPO3 derives from the file name, in both registries:
+:php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider` for a file
+ending in `svg`,
+:php:`\TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider` for every
+other file. The default markup of both is an :html:`<img>` tag, and an image is
 opaque to CSS: such an icon keeps the colours of its file whatever the backend
 colour scheme or the frontend theme says.
 
@@ -89,9 +101,80 @@ default markup as well as in the `inline` alternative - so an icon drawn in
 A **bitmap** file cannot be inlined and keeps what core detected for it, with or
 without the flag.
 
-To give a type another extension declares a different icon, or to change its
-:yaml:`inlineIcon`, see :ref:`Changing only the icon
-<developers-category-types-override-icon>`.
+The frontend can show another file, or the same file with another flag, see
+:ref:`developers-icons-frontend`. To give a type another extension declares a
+different icon, or to change its :yaml:`inlineIcon`, see :ref:`Changing only
+the icon <developers-category-types-override-icon>`.
+
+..  _developers-icons-frontend:
+
+A file of its own for the frontend
+----------------------------------
+
+A type or group can name a second file for the frontend with
+:yaml:`frontendIcon`, and decide whether the frontend inlines it with
+:yaml:`frontendInlineIcon`. Both are optional. The backend never reads them.
+
+..  code-block:: yaml
+    :caption: EXT:example/Configuration/CategoryTypes.yaml
+
+    types:
+      - identifier: degree
+        title: 'LLL:EXT:example/Resources/Private/Language/locallang.xlf:sys_category.example.degree'
+        group: example
+        icon: 'EXT:example/Resources/Public/Icons/CategoryTypes/Degree.svg'
+        inlineIcon: true
+        frontendIcon: 'EXT:example/Resources/Public/Icons/CategoryTypes/DegreeFrontend.svg'
+        frontendInlineIcon: true
+
+The frontend shows :yaml:`frontendIcon`, or :yaml:`icon` when there is none.
+An inline flag belongs to the file it was set for:
+
+*   A declared :yaml:`frontendInlineIcon` applies to whatever file the frontend
+    shows.
+*   Without it, the frontend follows :yaml:`inlineIcon` while it shows the
+    :yaml:`icon` file.
+*   A :yaml:`frontendIcon` without :yaml:`frontendInlineIcon` is shown as an
+    image, whatever :yaml:`inlineIcon` says, because nobody opted in for that
+    file.
+
+A bitmap is shown as an image in any case. A type or group without any icon
+file gets no frontend entry, and the frontend shows its placeholder for an
+unknown icon in its place.
+
+The registrations of the frontend are cached with the system caches, so a
+change to a :file:`CategoryTypes.yaml` reaches the frontend after the caches
+are flushed, as it does for the backend.
+
+..  _developers-icons-frontend-replace:
+
+Replacing an icon in the frontend only
+--------------------------------------
+
+A site package that wants another drawing for the frontend and keeps the
+backend as it is registers the identifier in its own
+:file:`Configuration/FrontendIcons.php`. Such an entry wins over every
+:file:`CategoryTypes.yaml`, whatever the loading order of the packages:
+
+..  code-block:: php
+    :caption: EXT:my_sitepackage/Configuration/FrontendIcons.php
+
+    return [
+        'category_types.example.degree' => [
+            'provider' => \FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider::class,
+            'source' => 'EXT:my_sitepackage/Resources/Public/Icons/Degree.svg',
+        ],
+    ];
+
+The file and its format are described in the chapter :guilabel:`Configuration`
+of :php:`EXT:academic_base`, section :guilabel:`Frontend icons`. A
+:file:`Configuration/Icons.php` entry does not replace a category type icon in
+either registry: the backend registration runs after core has read every
+:file:`Icons.php`.
+
+A template that still renders a category type icon with :html:`<core:icon>`
+reads the backend registry and does not see a
+:file:`Configuration/FrontendIcons.php` entry.
 
 ..  _developers-icons-opt-in:
 

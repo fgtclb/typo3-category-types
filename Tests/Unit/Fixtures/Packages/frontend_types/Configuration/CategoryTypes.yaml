@@ -1,0 +1,45 @@
+groups:
+  - identifier: programs
+    title: 'Study programs'
+    icon: 'EXT:frontend_types/Resources/Public/Icons/programs.svg'
+    inlineIcon: true
+    frontendIcon: 'EXT:frontend_types/Resources/Public/Icons/programs_frontend.svg'
+    frontendInlineIcon: true
+  - identifier: partners
+    title: 'Partners, inlined only in the backend'
+    icon: 'EXT:frontend_types/Resources/Public/Icons/partners.svg'
+    inlineIcon: true
+    frontendInlineIcon: false
+types:
+  - identifier: degree
+    title: 'A frontend file with its own flag'
+    group: programs
+    icon: 'EXT:frontend_types/Resources/Public/Icons/degree.svg'
+    inlineIcon: true
+    frontendIcon: 'EXT:frontend_types/Resources/Public/Icons/degree_frontend.svg'
+    frontendInlineIcon: true
+  - identifier: subject
+    title: 'One file, inlined everywhere'
+    group: programs
+    icon: 'EXT:frontend_types/Resources/Public/Icons/subject.svg'
+    inlineIcon: true
+  - identifier: field
+    title: 'A frontend file without a flag'
+    group: programs
+    icon: 'EXT:frontend_types/Resources/Public/Icons/field.svg'
+    frontendIcon: 'EXT:frontend_types/Resources/Public/Icons/field_frontend.svg'
+  - identifier: level
+    title: 'One file, inlined everywhere, reordered'
+    group: programs
+    icon: 'EXT:frontend_types/Resources/Public/Icons/level.svg'
+    inlineIcon: true
+  - identifier: mode
+    title: 'One file, not inlined'
+    group: programs
+    icon: 'EXT:frontend_types/Resources/Public/Icons/mode.svg'
+  - identifier: format
+    title: 'One file, inlined only in the backend'
+    group: programs
+    icon: 'EXT:frontend_types/Resources/Public/Icons/format.svg'
+    inlineIcon: true
+    frontendInlineIcon: false

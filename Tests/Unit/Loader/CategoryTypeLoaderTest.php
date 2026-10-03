@@ -109,6 +109,8 @@ final class CategoryTypeLoaderTest extends UnitTestCase
                 'icon' => 'EXT:base_types/Resources/Public/Icons/research_field.svg',
                 'priority' => 10,
                 'inlineIcon' => true,
+                'frontendIcon' => '',
+                'frontendInlineIcon' => null,
             ],
             $categoryTypes['programs.research_field']->toArray(),
         );
@@ -195,6 +197,8 @@ final class CategoryTypeLoaderTest extends UnitTestCase
                 // The same: an override that says nothing about inlining does not
                 // silently withdraw the opt in of the type it overrides.
                 'inlineIcon' => true,
+                'frontendIcon' => '',
+                'frontendInlineIcon' => null,
             ],
             $categoryTypes['programs.research_field']->toArray(),
         );
@@ -221,9 +225,111 @@ final class CategoryTypeLoaderTest extends UnitTestCase
                 'icon' => 'EXT:icon_override/Resources/Public/Icons/research_field.svg',
                 'priority' => 10,
                 'inlineIcon' => false,
+                'frontendIcon' => '',
+                'frontendInlineIcon' => null,
             ],
             $categoryTypes['programs.research_field']->toArray(),
         );
+    }
+
+    /**
+     * Spec "A project replaces the frontend file only": the new frontend file is shown as an
+     * image, it does not inherit the flag the earlier declaration set for its own frontend
+     * file. The backend pair is untouched.
+     */
+    #[Test]
+    public function overrideOfTheFrontendFileDropsTheEarlierFrontendFlag(): void
+    {
+        $degree = $this->subject('frontend_types', 'frontend_icon_override')->loadUncached()['programs.degree'];
+
+        $this->assertSame('EXT:frontend_icon_override/Resources/Public/Icons/degree.svg', $degree->getFrontendIcon());
+        $this->assertFalse($degree->isFrontendInlineIcon());
+        $this->assertNull($degree->toArray()['frontendInlineIcon']);
+        $this->assertSame('EXT:frontend_types/Resources/Public/Icons/degree.svg', $degree->getIcon());
+        $this->assertTrue($degree->isInlineIcon());
+    }
+
+    /**
+     * Spec "A project replaces the icon of an inlined type": the earlier `inlineIcon` stays,
+     * and the frontend, which shows `icon`, follows it.
+     */
+    #[Test]
+    public function overrideOfTheIconKeepsTheInlineFlagInBothPlaces(): void
+    {
+        $subject = $this->subject('frontend_types', 'frontend_icon_override')->loadUncached()['programs.subject'];
+
+        $this->assertSame('EXT:frontend_icon_override/Resources/Public/Icons/subject.svg', $subject->getIcon());
+        $this->assertTrue($subject->isInlineIcon());
+        $this->assertSame('EXT:frontend_icon_override/Resources/Public/Icons/subject.svg', $subject->getFrontendIcon());
+        $this->assertTrue($subject->isFrontendInlineIcon());
+    }
+
+    /**
+     * Spec "A project replaces the icon of a type with a frontend file".
+     */
+    #[Test]
+    public function overrideOfTheIconLeavesADeclaredFrontendFile(): void
+    {
+        $field = $this->subject('frontend_types', 'frontend_icon_override')->loadUncached()['programs.field'];
+
+        $this->assertSame('EXT:frontend_icon_override/Resources/Public/Icons/field.svg', $field->getIcon());
+        $this->assertSame('EXT:frontend_types/Resources/Public/Icons/field_frontend.svg', $field->getFrontendIcon());
+    }
+
+    /**
+     * Spec "A project changes only the priority".
+     */
+    #[Test]
+    public function overrideOfThePriorityKeepsBothFlags(): void
+    {
+        $level = $this->subject('frontend_types', 'frontend_icon_override')->loadUncached()['programs.level'];
+
+        $this->assertSame(50, $level->getPriority());
+        $this->assertTrue($level->isInlineIcon());
+        $this->assertTrue($level->isFrontendInlineIcon());
+    }
+
+    /**
+     * Spec "A project replaces the icon and asks for inlining".
+     */
+    #[Test]
+    public function overrideOfTheIconWithTheFlagInlinesItInBothPlaces(): void
+    {
+        $mode = $this->subject('frontend_types', 'frontend_icon_override')->loadUncached()['programs.mode'];
+
+        $this->assertTrue($mode->isInlineIcon());
+        $this->assertSame('EXT:frontend_icon_override/Resources/Public/Icons/mode.svg', $mode->getFrontendIcon());
+        $this->assertTrue($mode->isFrontendInlineIcon());
+    }
+
+    /**
+     * An override that names a flag without a file applies it to the file already declared.
+     */
+    #[Test]
+    public function overrideOfTheFrontendFlagAppliesToTheDeclaredFile(): void
+    {
+        $categoryTypes = $this->subject('frontend_types', 'frontend_flag_override')->loadUncached();
+
+        $this->assertSame('EXT:frontend_types/Resources/Public/Icons/degree_frontend.svg', $categoryTypes['programs.degree']->getFrontendIcon());
+        $this->assertFalse($categoryTypes['programs.degree']->isFrontendInlineIcon());
+        // A type without a frontend file: the backend keeps inlining the file the
+        // frontend now shows as an image.
+        $this->assertSame('EXT:frontend_types/Resources/Public/Icons/subject.svg', $categoryTypes['programs.subject']->getFrontendIcon());
+        $this->assertFalse($categoryTypes['programs.subject']->isFrontendInlineIcon());
+        $this->assertTrue($categoryTypes['programs.subject']->isInlineIcon());
+    }
+
+    /**
+     * A YAML `~` is no flag: an override that clears `frontendInlineIcon` leaves the
+     * frontend following `inlineIcon` again, rather than turning it into `false`.
+     */
+    #[Test]
+    public function overrideThatClearsTheFrontendFlagFollowsTheInlineFlagAgain(): void
+    {
+        $format = $this->subject('frontend_types', 'frontend_flag_cleared')->loadUncached()['programs.format'];
+
+        $this->assertNull($format->toArray()['frontendInlineIcon']);
+        $this->assertTrue($format->isFrontendInlineIcon());
     }
 
     /**
@@ -249,6 +355,8 @@ final class CategoryTypeLoaderTest extends UnitTestCase
                 'icon' => 'EXT:base_types/Resources/Public/Icons/degree.svg',
                 'priority' => 100,
                 'inlineIcon' => false,
+                'frontendIcon' => '',
+                'frontendInlineIcon' => null,
             ],
             $registry->getCategoryType('programs', 'degree')?->toArray(),
         );
@@ -294,6 +402,8 @@ final class CategoryTypeLoaderTest extends UnitTestCase
                 'icon' => '',
                 'priority' => 0,
                 'inlineIcon' => false,
+                'frontendIcon' => '',
+                'frontendInlineIcon' => null,
             ],
             $categoryTypes['programs.research_field']->toArray(),
         );
@@ -452,6 +562,8 @@ final class CategoryTypeLoaderTest extends UnitTestCase
                 'title' => 'Study programs',
                 'icon' => 'EXT:grouped_types/Resources/Public/Icons/programs.svg',
                 'inlineIcon' => true,
+                'frontendIcon' => '',
+                'frontendInlineIcon' => null,
             ],
             $groups['programs']->toArray(),
         );
@@ -470,6 +582,8 @@ final class CategoryTypeLoaderTest extends UnitTestCase
                 'title' => 'Partners',
                 'icon' => '',
                 'inlineIcon' => false,
+                'frontendIcon' => '',
+                'frontendInlineIcon' => null,
             ],
             $groups['partners']->toArray(),
         );
@@ -505,6 +619,47 @@ final class CategoryTypeLoaderTest extends UnitTestCase
         $this->assertSame('Study programs', $groups['programs']->getTitle());
         $this->assertSame('EXT:group_icon_override/Resources/Public/Icons/programs.png', $groups['programs']->getIcon());
         $this->assertFalse($groups['programs']->isInlineIcon());
+    }
+
+    /**
+     * Spec "Project replaces the frontend icon of an inlined group": the later declaration
+     * names a new frontend file only, which is then shown as an image. The backend pair and
+     * the title stay.
+     */
+    #[Test]
+    public function laterDeclarationOfTheFrontendFileDropsTheEarlierFrontendFlag(): void
+    {
+        $programs = $this->subject('frontend_types', 'group_frontend_icon_override')->loadGroupsUncached()['programs'];
+
+        $this->assertSame('EXT:group_frontend_icon_override/Resources/Public/Icons/programs.svg', $programs->getFrontendIcon());
+        $this->assertFalse($programs->isFrontendInlineIcon());
+        $this->assertSame('EXT:frontend_types/Resources/Public/Icons/programs.svg', $programs->getIcon());
+        $this->assertTrue($programs->isInlineIcon());
+        $this->assertSame('Study programs', $programs->getTitle());
+    }
+
+    /**
+     * A later declaration that says nothing about the frontend keeps both declared values.
+     */
+    #[Test]
+    public function laterDeclarationWithoutAFrontendFileKeepsTheFrontendPair(): void
+    {
+        $programs = $this->subject('frontend_types', 'relabelling_extension')->loadGroupsUncached()['programs'];
+
+        $this->assertSame('EXT:frontend_types/Resources/Public/Icons/programs_frontend.svg', $programs->getFrontendIcon());
+        $this->assertTrue($programs->isFrontendInlineIcon());
+    }
+
+    /**
+     * The group counterpart of the cleared flag above.
+     */
+    #[Test]
+    public function laterDeclarationThatClearsTheFrontendFlagFollowsTheInlineFlagAgain(): void
+    {
+        $partners = $this->subject('frontend_types', 'frontend_flag_cleared')->loadGroupsUncached()['partners'];
+
+        $this->assertNull($partners->toArray()['frontendInlineIcon']);
+        $this->assertTrue($partners->isFrontendInlineIcon());
     }
 
     #[Test]

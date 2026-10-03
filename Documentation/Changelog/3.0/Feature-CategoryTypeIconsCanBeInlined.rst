@@ -58,4 +58,9 @@ A bitmap icon cannot be inlined and keeps the provider core detects for it, with
 or without the flag. An icon file that does not exist renders empty markup
 rather than raising an exception.
 
+In the frontend icon registry the flag applies to the :yaml:`icon` file. A type
+that names another file for the frontend with :yaml:`frontendIcon` decides
+about that file with :yaml:`frontendInlineIcon`, see
+:ref:`feature-1791067923`.
+
 .. index:: Backend, Frontend, PHP-API, ext:category_types

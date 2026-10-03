@@ -311,6 +311,8 @@ final class CategoryTypeRegistryTest extends UnitTestCase
                         'icon' => 'EXT:test_extension/Resources/Public/Icons/field_of_study.svg',
                         'priority' => 10,
                         'inlineIcon' => false,
+                        'frontendIcon' => '',
+                        'frontendInlineIcon' => null,
                     ],
                 ],
             ],
