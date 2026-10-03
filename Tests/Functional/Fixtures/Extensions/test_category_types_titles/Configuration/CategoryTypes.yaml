@@ -1,0 +1,12 @@
+# Two types of a group no extension ships, the way a project adds types of its own: one
+# with a literal title, which `f:translate` cannot resolve, and one whose title is a label
+# reference with a German translation.
+types:
+  - identifier: funding
+    title: 'Funding & grants'
+    group: titles
+    icon: 'EXT:core/Resources/Public/Icons/T3Icons/svgs/apps/apps-pagetree-folder-contains-category.svg'
+  - identifier: teaching_form
+    title: 'LLL:EXT:test_category_types_titles/Resources/Private/Language/locallang.xlf:teaching_form'
+    group: titles
+    icon: 'EXT:core/Resources/Public/Icons/T3Icons/svgs/apps/apps-pagetree-folder-contains-category.svg'

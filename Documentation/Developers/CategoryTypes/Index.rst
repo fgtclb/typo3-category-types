@@ -44,7 +44,10 @@ The keys of a type
     identifier, see :ref:`Category type icons <developers-icons>`.
 
 :yaml:`title`
-    The label of the type in the backend, usually an :php:`LLL:` reference.
+    The label of the type in the backend, usually an :php:`LLL:` reference. A
+    literal title is shown as written. The frontend shows it for a type the
+    extension of the group has no label for, see :ref:`Naming a type in a
+    template <developers-category-types-title>`.
 
 :yaml:`icon`
     The icon file, as an :php:`EXT:` path.
@@ -262,6 +265,59 @@ that requires :php:`EXT:academic_programs` relabels its group like this:
     groups:
       - identifier: programs
         title: 'LLL:EXT:site_package/Resources/Private/Language/locallang_be.xlf:sys_category.programs.group'
+
+..  _developers-category-types-title:
+
+Naming a type in a template
+---------------------------
+
+The templates of `EXT:academic_programs`, `EXT:academic_partners` and
+`EXT:academic_projects` name a type by the label
+:xml:`sys_category.<group>.<identifier>` of their language file. That file only
+knows the types the extension ships. For any other type, the view helper
+:html:`ct:categoryTypeTitle` returns the registered :yaml:`title` in the
+language of the page: the translation of an :php:`LLL:` reference, a literal
+title as written. It returns an empty string for a type that is not registered
+in the group.
+
+The templates hand it the label as its content. It renders the content when the
+content is not empty, so a label of the extension or one a site sets through
+:typoscript:`_LOCAL_LANG` still wins, and the title otherwise:
+
+..  code-block:: html
+    :caption: EXT:site_package/Resources/Private/Partials/Program/DemandCategories.html
+
+    <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+          xmlns:ct="http://typo3.org/ns/FGTCLB/CategoryTypes/ViewHelpers"
+          data-namespace-typo3-fluid="true">
+
+    {f:translate(key: 'sys_category.programs.{categoryKey}', extensionName: 'AcademicPrograms')
+        -> ct:categoryTypeTitle(group: 'programs', identifier: categoryKey)}
+
+Both arguments are required:
+
+:html:`group`
+    The group of the type, for example `programs`.
+
+:html:`identifier`
+    The identifier of the type.
+
+Do not pass the title as the :html:`default` of :html:`f:translate` instead.
+Fluid evaluates an argument before the view helper runs, and the language
+service caches a resolved label for the whole request by locale and reference,
+without the overrides of the site. On TYPO3 v13 that reference is the one
+:html:`f:translate` reads, and the title of a shipped type of
+`EXT:academic_partners` and `EXT:academic_projects` is that very reference, so
+resolving the title first hides a :typoscript:`_LOCAL_LANG` label of the site.
+
+An empty label counts as none, so a label a site blanks falls back to the
+title. On TYPO3 v13 a shipped type of `EXT:academic_partners` and
+`EXT:academic_projects` stays unlabelled instead, because its title is the
+blanked label itself.
+
+The view helper is meant for frontend rendering. It reads the language from the
+site language of the request it renders for. Without one, in a command for
+example, it resolves the title in the default language.
 
 ..  _developers-category-types-cache:
 
