@@ -63,10 +63,11 @@ Nothing changes for an installation that declares neither new key: the
 frontend registry carries the same file and the same provider as the backend
 registry, apart from a type without an icon file, which has no frontend
 entry. The templates of :php:`EXT:academic_programs`,
-:php:`EXT:academic_partners` and :php:`EXT:academic_projects` still render the
-category type icons with :html:`<core:icon>`, from the backend registry, so a
+:php:`EXT:academic_partners` and :php:`EXT:academic_projects` render the
+category type icons with the icon view helper of :php:`EXT:academic_base`, so a
 :yaml:`frontendIcon` or a :file:`Configuration/FrontendIcons.php` entry reaches
-them only once they switch to the new view helper.
+them. A template override that still renders them with :html:`<core:icon>`
+reads the backend registry and does not see either.
 
 An integrator who wants another frontend drawing for a shipped type registers
 its identifier in :file:`Configuration/FrontendIcons.php` of the site package,
