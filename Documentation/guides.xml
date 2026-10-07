@@ -5,6 +5,7 @@
         links-are-relative="true"
         default-code-language="php">
     <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+               interlink-shortcode="fgtclb/category-types"
                project-home="https://extensions.typo3.org/extension/category_types/"
                project-repository="https://github.com/fgtclb/typo3-category-types"
                project-issues="https://github.com/fgtclb/academic-extensions/issues"
