@@ -17,10 +17,10 @@ use PHPUnit\Framework\Attributes\Test;
  * `Tests/Functional/Domain/Model/CategoryTest`.
  *
  * `getCategoryRootline()` has no caller in this repository: the only one,
- * `EXT:academic_programs` `Backend\Tca\Labels::category()`, is commented out. It is public
- * API nonetheless, and the recursion is the part worth pinning down - the more so because
- * the method returns raw database rows rather than `Category` objects, unlike every other
- * method of the class.
+ * `EXT:academic_programs` `Backend\Tca\Labels::category()`, was commented out and the
+ * class is removed in 3.0. It is public API nonetheless, and the recursion is the part
+ * worth pinning down - the more so because the method returns raw database rows rather
+ * than `Category` objects, unlike every other method of the class.
  *
  * `EXT:category_types` registers no category group of its own, so the group and the two
  * types come from the `test_category_types_group` fixture extension.

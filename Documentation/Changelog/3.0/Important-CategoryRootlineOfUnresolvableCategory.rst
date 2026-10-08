@@ -57,9 +57,10 @@ Affected Installations
 ======================
 
 Installations calling `CategoryRepository::getCategoryRootline()` from own code.
-The only call site inside these extensions,
+These extensions do not call it: the only former call site,
 `EXT:academic_programs` `FGTCLB\\AcademicPrograms\\Backend\\Tca\\Labels::category()`,
-is not active, so no shipped feature changes behaviour.
+was never active and is removed in 3.0, see the Breaking entry of
+`EXT:academic_programs`. No shipped feature changes behaviour.
 
 Migration
 =========
