@@ -16,3 +16,12 @@ services:
     factory:
       - '@FGTCLB\CategoryTypes\Loader\CategoryTypeLoader'
       - 'load'
+
+  # Registered by tag rather than with an attribute: TYPO3 v12 has no
+  # AsEventListener attribute of its own, and Symfony's would silently
+  # never fire.
+  FGTCLB\CategoryTypes\EventListener\ResolveCategoryTypeGroupMarker:
+    tags:
+      - name: event.listener
+        identifier: 'category-types/resolve-category-type-group-marker'
+        event: TYPO3\CMS\Core\Configuration\Event\AfterFlexFormDataStructureParsedEvent

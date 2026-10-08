@@ -1,0 +1,12 @@
+"sys_category",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","parent","sorting","type","title"
+,1,0,0,0,0,0,0,1,"testing_first","First"
+,2,0,0,1,0,0,0,2,"testing_second","Second, hidden"
+,3,0,0,0,0,0,0,3,"default","Plain parent"
+,4,0,0,0,0,0,3,4,"default","Plain category between"
+,5,0,0,0,0,0,4,5,"testing_first","First, two levels down"
+,6,0,0,0,0,0,3,6,"other","Other group below the plain parent"
+,7,0,0,0,0,0,8,7,"default","Plain category in a parent loop"
+,8,0,0,0,0,0,7,8,"testing_second","Second, in a parent loop"
+,9,0,1,0,0,0,0,9,"testing_first","First, deleted"
+,10,0,0,0,1,1,0,10,"testing_first","First, translation"
