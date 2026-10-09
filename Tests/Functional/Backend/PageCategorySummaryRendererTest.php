@@ -108,6 +108,29 @@ final class PageCategorySummaryRendererTest extends AbstractCategoryTypesTestCas
     }
 
     /**
+     * The summary is backend markup, rendered into the page module, so it carries the
+     * table classes of the backend styles rather than the classes of the frontend
+     * templates: without them the backend renders a bare table without borders or
+     * stripes. The wrapper class is the one an override test asserts the absence of,
+     * so it has to be present in the shipped template for that test to mean anything.
+     */
+    #[Test]
+    public function theSummaryIsATableOfTheBackendStyles(): void
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML(
+            '<?xml encoding="utf-8"?>' . $this->renderSummaryOf(self::SUMMARISED_PAGE),
+            LIBXML_NOERROR,
+        );
+        $tables = (new \DOMXPath($document))->query(
+            '//div[@class="category-types-page-summary"]/table[@class="table table-striped"]',
+        );
+
+        $this->assertInstanceOf(\DOMNodeList::class, $tables);
+        $this->assertSame(1, $tables->count());
+    }
+
+    /**
      * The guard the three listeners rely on. The fixture page carries two categories of the
      * group, so an empty answer here is the page type being rejected and not an empty result
      * set.
