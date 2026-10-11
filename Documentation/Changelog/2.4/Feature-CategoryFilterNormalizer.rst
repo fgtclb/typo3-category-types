@@ -23,9 +23,9 @@ to be survivable. The shapes that carry a selection:
 *   a value assembled by a template may be a comma separated list.
 
 Anything that cannot be read is treated as **no filter** rather than as an
-error — a crafted request must not be able to take a list plugin down. That
-covers a filter that is not an array at all, a value nested deeper than one
-level, an object, a boolean and `null`.
+error, so a crafted request cannot take a list plugin down. That covers a
+filter that is not an array at all, a value nested deeper than one level, an
+object that cannot be cast to a string, a boolean and `null`.
 
 Two more properties worth knowing:
 
@@ -59,9 +59,9 @@ splitting the request value itself.
 References
 ==========
 
-*   :ref:`feature-1785706700` — the `multiple` argument of the category filter
+*   :ref:`feature-1785706700`: the `multiple` argument of the category filter
     select, whose submitted shape this class exists to read.
-*   :ref:`important-1785790800` — the empty uid list
+*   :ref:`important-1785790800`: the empty uid list
     `findByGroupAndUidList()` accepts, which is what makes dropping the empty
     values safe.
 

@@ -15,7 +15,7 @@ builder:
 
     $queryBuilder->expr()->in('uid', $idList)
 
-An empty array is not a valid value list there. TYPO3 v13 and v14 raise an
+An empty array is not a valid value list there. TYPO3 v13 raises an
 `\InvalidArgumentException` (1701857902), *ExpressionBuilder::in() can not be
 used with an empty array value*. That validation was added for TYPO3 v13 only
 and never backported, so on TYPO3 v12 the same call produces `uid IN ()` and the
@@ -34,7 +34,7 @@ the API TYPO3 provides for exactly this case:
     )
 
 The helper returns the string `NULL` for an empty array, so the query becomes
-`uid IN (NULL)` — valid on every supported DBMS and matching no row. It is the
+`uid IN (NULL)`, valid on every supported DBMS and matching no row. It is the
 same API the neighbouring condition on `sys_category.type` already used through
 `quoteArrayBasedValueListToStringList()`.
 
@@ -48,7 +48,7 @@ result of every other selection, so a template iterating the types keeps its
 shape.
 
 The uid list is a positive selection, so "nothing selected" means "no
-categories" — it is deliberately not read as "no restriction", which would
+categories". It is deliberately not read as "no restriction", which would
 return the whole group.
 
 An unknown group is still rejected with an `\InvalidArgumentException`
@@ -56,10 +56,12 @@ An unknown group is still rejected with an `\InvalidArgumentException`
 
 The frontend filters shipped by `EXT:academic_partners`,
 `EXT:academic_programs` and `EXT:academic_projects` were not affected: their
-`Factory\\DemandFactory` builds the list with
+`Factory\\DemandFactory` built the list with
 `TYPO3\\CMS\\Core\\Utility\\GeneralUtility::intExplode()`, which returns `[0]`
 for an empty value, so a submitted but unselected filter never produced an empty
 list. Only a `filterCollection` that is an empty array reached the failing call.
+They now read the filter through the category filter normalizer, see
+:ref:`feature-1785709700`, which can hand over an empty list.
 
 Affected Installations
 ======================
@@ -85,13 +87,13 @@ References
 ==========
 
 *   TYPO3 issue `#96434 <https://forge.typo3.org/issues/96434>`__,
-    *Provide quoted array to string-list implode support* — the change adding
+    *Provide quoted array to string-list implode support*, the change adding
     `quoteArrayBasedValueListToIntegerList()` and
     `quoteArrayBasedValueListToStringList()` to the query builder, released for
     TYPO3 v11.5 and later
     (`commit 4ec4b7e2f9 <https://github.com/TYPO3/typo3/commit/4ec4b7e2f9>`__).
 *   TYPO3 issue `#102612 <https://forge.typo3.org/issues/102612>`__,
-    *Validate arguments for ExpressionBuilder::in and notIn* — the change adding
+    *Validate arguments for ExpressionBuilder::in and notIn*, the change adding
     the validation, released for TYPO3 v13 only
     (`commit 7c6b5cc7ac <https://github.com/TYPO3/typo3/commit/7c6b5cc7ac>`__).
 *   `QueryBuilder <https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/Database/QueryBuilder/Index.html>`__

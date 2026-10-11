@@ -7,9 +7,9 @@ Important: Category lists follow the backend sorting order
 Description
 ===========
 
-The four list queries of :php:`CategoryRepository` —
+The four list queries of :php:`CategoryRepository`,
 :php:`findByGroupAndPageId()`, :php:`findAllApplicable()`,
-:php:`findByGroupAndUidList()` and :php:`getByDatabaseFields()` — executed
+:php:`findByGroupAndUidList()` and :php:`getByDatabaseFields()`, executed
 without an ordering, so the order of every category filter and category list
 built from them was whatever the database happened to yield. On PostgreSQL
 that is not the same list twice. They now order by the manual backend
@@ -20,7 +20,7 @@ Impact
 ======
 
 Category filters and lists now follow the backend :sql:`sorting` of the
-categories — the order siblings have in the category tree; categories of
+categories, the order siblings have in the category tree. Categories of
 different parents interleave by that value. That order was never delivered
 before, and it differs from the previous one even where nobody reordered
 anything: the database returned categories oldest first (:sql:`uid` order),
@@ -33,7 +33,7 @@ Affected Installations
 ======================
 
 Every installation of this extension, and the extensions building their
-category filters on it: :php:`academic_partners`, :php:`academic_programs`
-and :php:`academic_projects`.
+category filters on it: `EXT:academic_partners`, `EXT:academic_programs`
+and `EXT:academic_projects`.
 
 .. index:: Frontend, PHP-API, ext:category_types

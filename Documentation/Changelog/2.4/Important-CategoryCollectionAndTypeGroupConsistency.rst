@@ -9,7 +9,7 @@ Description
 
 Three leftovers of the original category type handling are corrected. All three
 were unreachable through the callers this extension ships, so nothing an
-installation does changes; they matter to code that uses these classes directly.
+installation does changes. They matter to code that uses these classes directly.
 
 `CategoryCollection::getAllCategoriesByType()` builds the grouped view on every
 call. It used to keep the result in a `$typeSortedCollection` property whose
@@ -24,8 +24,8 @@ entry, and `getCategoriesByTypeName()` then read a missing key and returned
     TypeError: …::getCategoriesByTypeName(): Return value must be of type array,
     null returned
 
-The property is gone. Nothing was cached by it — the loop over the categories
-re-ran on every call regardless.
+The property is gone. Nothing was cached by it, because the loop over the
+categories re-ran on every call regardless.
 
 `CategoryCollection::exist()` answers on the uid now:
 
@@ -52,12 +52,13 @@ in the collection, even when the object differs in any other property. It
 returned :php:`false` in that case before, and :php:`true` only for an object all
 of whose properties were equal.
 
-Calling `CategoryTypeGroup::fromArray()` on an instance keeps working — PHP
-permits an arrow call to a static method — so no call site has to change. Only a
+Calling `CategoryTypeGroup::fromArray()` on an instance keeps working, since PHP
+permits an arrow call to a static method, so no call site has to change. Only a
 subclass overriding the method non-statically is a fatal error and has to follow.
 
-The removed `$typeSortedCollection` property was :php:`protected`; a subclass
-reading it has to build the grouping itself.
+The removed `$typeSortedCollection` property was :php:`protected`. A subclass
+reading it has to build the grouping itself, or call
+`getAllCategoriesByType()`.
 
 Affected Installations
 ======================

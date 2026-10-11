@@ -13,10 +13,7 @@ categories of their page type in the page module, and none of the three
 renders: all of them are registered as an override of a partial of
 :php:`EXT:backend` that no core template renders, on TYPO3 v12 and v13 alike.
 
-Only :php:`EXT:academic_programs` ever showed the table. It began as a full
-override of core's page module template and a rename turned it into the
-unrendered partial in March 2023; the other two were created later, from that
-already broken shape, and have never shown it at all.
+None of the three has shown the table in any 2.x release.
 
 The summary is implemented here now, once, and the three extensions ask for it
 with a four line event listener each.
@@ -39,8 +36,8 @@ group no active extension registers.
 The table lists every registered type of the group, in registry order, with the
 title the type was registered with. Types the page carries no category of are
 listed with a `Not set` note, and assigned categories that are switched off are
-listed with the core hidden overlay - which is the one thing the page properties
-would not show an editor either.
+listed with the core hidden overlay, which the page properties do not show an
+editor.
 
 Impact
 ======
@@ -62,7 +59,7 @@ Impact
     :file:`Templates/PageCategorySummary.html`.
 
 *   :php:`\FGTCLB\CategoryTypes\ViewHelpers\Be\CategoryViewHelper` is
-    unchanged and stays public API. The summary does not use it; it reads the
+    unchanged and stays public API. The summary does not use it. It reads the
     categories through
     :php:`\FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository`
     directly.

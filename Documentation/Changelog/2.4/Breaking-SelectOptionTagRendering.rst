@@ -11,8 +11,8 @@ Description
 methods writing an `<option>` element: `renderOptionTag()` for the entry
 `prependOptionLabel` adds, and `renderOptionTags()` for the generated ones. Both
 built the markup themselves, and every subclass that needed one more attribute
-copied the whole loop - `FilterSelectViewHelper` for the level class and the
-disabled state, the three `SortingSelectViewHelper` implementations of
+copied the whole loop: `FilterSelectViewHelper` for the level class and the
+disabled state, and the three `SortingSelectViewHelper` implementations of
 `EXT:academic_partners`, `EXT:academic_programs` and `EXT:academic_projects`
 without changing anything at all.
 
@@ -46,14 +46,14 @@ attributes keyed by name:
 
 An option carries those attributes in an `attributes` key.
 `FilterSelectViewHelper::getOptions()` fills it with the level class and, where
-applicable, `disabled`; its `renderOptionTags()` override and the three of the
+applicable, `disabled`. Its `renderOptionTags()` override and the three of the
 sorting selects were removed.
 
 Impact
 ======
 
 *   A subclass overriding `renderOptionTag()` with the previous three-parameter
-    signature is a fatal error - PHP rejects an override with fewer parameters
+    signature is a fatal error. PHP rejects an override with fewer parameters
     than the parent declares.
 *   A subclass overriding `FilterSelectViewHelper::getOptions()` without adding
     an `attributes` key renders its options without the level class and without
@@ -96,18 +96,18 @@ Add the attributes to an overridden `getOptions()`:
     ];
 
 An override of `renderOptionTags()` that writes its own markup keeps working,
-but it escapes nothing unless it does so itself - see
+but it escapes nothing unless it does so itself, see
 :ref:`important-1785882100`.
 
 References
 ==========
 
-*   :ref:`important-1785882100` - the escaping this change makes possible in one
+*   :ref:`important-1785882100`: the escaping this change makes possible in one
     place.
-*   :ref:`breaking-1785706800` - the `value` key of an option, which this builds
+*   :ref:`breaking-1785706800`: the `value` key of an option, which this builds
     on.
 *   `SelectViewHelper
-    <https://docs.typo3.org/permalink/t3viewhelper:typo3-fluid-form-select>`__ -
+    <https://docs.typo3.org/permalink/t3viewhelper:typo3-fluid-form-select>`__:
     the core view helper whose structure the base class now follows.
 
 .. index:: Fluid, Frontend, PHP-API, NotScanned

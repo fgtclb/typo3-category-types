@@ -18,7 +18,7 @@ label of a generated option and concatenated its value unchanged:
 
 `FilterSelectViewHelper` did the same, and additionally wrote the
 `groupLevelClassPrefix` argument into the `class` attribute unchanged. The entry
-`prependOptionLabel` adds was never affected - it goes through
+`prependOptionLabel` adds was never affected. It goes through
 `renderOptionTag()`, which escaped both from the start.
 
 A value that contains a quotation mark ended the attribute and everything after
@@ -40,8 +40,8 @@ partials of `EXT:academic_partners`, `EXT:academic_programs` and
 `EXT:academic_projects` pass `optionValueField="uid"`, and the sorting selects
 of those extensions render their own constants.
 
-It matters for a template that points `optionValueField` at a text property -
-supported since :ref:`feature-1785706700` - because a category title is free
+It matters for a template that points `optionValueField` at a text property,
+supported since :ref:`feature-1785706700`, because a category title is free
 text entered in the backend. A title carrying a quotation mark used to reach the
 `value` attribute unchanged.
 
@@ -52,8 +52,8 @@ not covered by this. Let it render through `renderOptionTag()` instead, see
 References
 ==========
 
-*   :ref:`breaking-1785882000` - the single option writer this relies on.
-*   :ref:`feature-1785706700` - `optionValueField`, which decides what the value
+*   :ref:`breaking-1785882000`: the single option writer this relies on.
+*   :ref:`feature-1785706700`: `optionValueField`, which decides what the value
     of an option is.
 *   `htmlspecialchars <https://www.php.net/manual/en/function.htmlspecialchars.php>`__
 

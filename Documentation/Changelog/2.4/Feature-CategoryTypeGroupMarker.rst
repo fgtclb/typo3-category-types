@@ -27,6 +27,8 @@ Impact
 
 The list plugins of :composer:`fgtclb/academic-partners`,
 :composer:`fgtclb/academic-programs` and :composer:`fgtclb/academic-projects`
-use the marker for their category field.
+use the marker for their category field, so an editor is offered the categories
+of the plugin's group and their parents instead of every category with a type.
+Each of these extensions describes the change in its own changelog.
 
 ..  index:: Backend, FlexForm, ext:category_types

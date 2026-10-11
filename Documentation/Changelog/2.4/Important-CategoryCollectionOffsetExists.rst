@@ -11,7 +11,7 @@ Description
 from `$typeSortedCollection`, the grouped view the collection builds lazily. That
 array stays empty until `getAllCategoriesByType()` has been called once on the
 instance, so a category type was reported as absent although the collection
-accepted it — while `offsetGet()`, which resolves through
+accepted it, while `offsetGet()`, which resolves through
 `getCategoriesByTypeName()`, answered from the start:
 
 ..  code-block:: php
@@ -24,8 +24,8 @@ accepted it — while `offsetGet()`, which resolves through
 
 This reached the frontend. Fluid resolves a path segment on an `ArrayAccess`
 subject through `offsetExists()` and only reads the offset once that returned
-`true`, so `{categories.researchField}` produced nothing — no exception, no log
-entry — until something else had computed the grouping first.
+`true`, so `{categories.researchField}` produced nothing, with no exception and
+no log entry, until something else had computed the grouping first.
 
 `offsetExists()` now answers from the registered type identifiers, the same
 source the lookup it guards resolves against. `FilterCollection::offsetExists()`
@@ -44,7 +44,7 @@ first:
     </f:for>
 
 Previously that rendered nothing unless the template had accessed
-`{categories.allCategoriesByType}` — or anything else computing the grouping —
+`{categories.allCategoriesByType}`, or anything else computing the grouping,
 beforehand.
 
 The Fluid files shipped by `EXT:academic_partners`, `EXT:academic_programs` and

@@ -10,7 +10,7 @@ Description
 `FGTCLB\\CategoryTypes\\Registry\\CategoryTypeRegistry` kept its grouped
 registry in a typed property that was never initialised, and
 `CategoryTypeRegistry::attach()` returns early when it is called without a
-category type — which is what `CategoryTypeLoader::load()` does when no
+category type, which is what `CategoryTypeLoader::load()` does when no
 installed extension ships a `Configuration/CategoryTypes.yaml`.
 
 On such an installation the registry was left in a state where four of its
@@ -50,9 +50,9 @@ Affected Installations
 ======================
 
 Installations using `EXT:category_types` without any extension shipping
-`Configuration/CategoryTypes.yaml`. Among the extensions of this repository
-those are `EXT:academic_partners`, `EXT:academic_programs` and
-`EXT:academic_projects`.
+`Configuration/CategoryTypes.yaml`. Of the academic extensions,
+`EXT:academic_partners`, `EXT:academic_programs` and `EXT:academic_projects`
+ship such a file, so an installation with one of them is not affected.
 
 Migration
 =========
