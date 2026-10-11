@@ -65,4 +65,4 @@ References
     `findByGroupAndUidList()` accepts, which is what makes dropping the empty
     values safe.
 
-.. index:: Frontend, PHP-API, NotScanned
+.. index:: Frontend, PHP-API, NotScanned, ext:category_types

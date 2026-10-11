@@ -89,4 +89,4 @@ References
 *   `Categories <https://docs.typo3.org/permalink/t3coreapi:categories>`__ in
     the TYPO3 Explained manual: `sys_category` and its `parent` field.
 
-.. index:: Database, PHP-API, NotScanned
+.. index:: Database, PHP-API, NotScanned, ext:category_types

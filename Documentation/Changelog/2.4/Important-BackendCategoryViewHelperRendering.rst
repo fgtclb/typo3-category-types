@@ -56,4 +56,4 @@ None for templates. The view helper is used the same way. A project view helper
 inheriting from this one and overriding `renderStatic()` has to be migrated to
 `render()` as described in the TYPO3 changelog entry above.
 
-.. index:: Backend, Fluid, PHP-API, NotScanned
+.. index:: Backend, Fluid, PHP-API, NotScanned, ext:category_types

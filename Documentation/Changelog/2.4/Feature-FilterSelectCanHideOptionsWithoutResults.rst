@@ -52,4 +52,4 @@ of its own option loop.
 The prepended "all" option is not one of the options and always stays, so a
 filter whose options are all without results still shows it.
 
-.. index:: Fluid, Frontend, NotScanned
+.. index:: Fluid, Frontend, NotScanned, ext:category_types

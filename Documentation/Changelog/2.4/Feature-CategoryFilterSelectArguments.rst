@@ -81,4 +81,4 @@ References
     <https://docs.typo3.org/permalink/t3coreapi:extbase>`__: the property path
     resolution used for the two option fields.
 
-.. index:: Fluid, Frontend, NotScanned
+.. index:: Fluid, Frontend, NotScanned, ext:category_types

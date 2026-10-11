@@ -66,4 +66,4 @@ No configuration change is required. Workarounds that accessed
 `{categories.allCategoriesByType}` only to make a later expression resolve can be
 removed.
 
-.. index:: Fluid, Frontend, PHP-API, NotScanned
+.. index:: Fluid, Frontend, PHP-API, NotScanned, ext:category_types

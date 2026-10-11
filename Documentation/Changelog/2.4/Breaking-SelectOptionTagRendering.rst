@@ -110,4 +110,4 @@ References
     <https://docs.typo3.org/permalink/t3viewhelper:typo3-fluid-form-select>`__:
     the core view helper whose structure the base class now follows.
 
-.. index:: Fluid, Frontend, PHP-API, NotScanned
+.. index:: Fluid, Frontend, PHP-API, NotScanned, ext:category_types

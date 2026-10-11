@@ -57,4 +57,4 @@ References
     of an option is.
 *   `htmlspecialchars <https://www.php.net/manual/en/function.htmlspecialchars.php>`__
 
-.. index:: Fluid, Frontend, PHP-API, NotScanned
+.. index:: Fluid, Frontend, PHP-API, NotScanned, ext:category_types

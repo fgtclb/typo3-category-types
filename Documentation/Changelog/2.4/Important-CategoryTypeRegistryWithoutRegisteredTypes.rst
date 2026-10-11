@@ -59,4 +59,4 @@ Migration
 
 No configuration change is required.
 
-.. index:: PHP-API, NotScanned
+.. index:: PHP-API, NotScanned, ext:category_types

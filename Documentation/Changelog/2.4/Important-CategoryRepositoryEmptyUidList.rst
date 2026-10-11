@@ -16,7 +16,7 @@ builder:
     $queryBuilder->expr()->in('uid', $idList)
 
 An empty array is not a valid value list there. TYPO3 v13 raises an
-`\InvalidArgumentException` (1701857902), *ExpressionBuilder::in() can not be
+`\\InvalidArgumentException` (1701857902), *ExpressionBuilder::in() can not be
 used with an empty array value*. That validation was added for TYPO3 v13 only
 and never backported, so on TYPO3 v12 the same call produces `uid IN ()` and the
 outcome depends on the database: MariaDB, MySQL and PostgreSQL reject the
@@ -51,7 +51,7 @@ The uid list is a positive selection, so "nothing selected" means "no
 categories". It is deliberately not read as "no restriction", which would
 return the whole group.
 
-An unknown group is still rejected with an `\InvalidArgumentException`
+An unknown group is still rejected with an `\\InvalidArgumentException`
 (1683633304209).
 
 The frontend filters shipped by `EXT:academic_partners`,
@@ -99,4 +99,4 @@ References
 *   `QueryBuilder <https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/Database/QueryBuilder/Index.html>`__
     in the TYPO3 Explained manual.
 
-.. index:: Database, PHP-API, NotScanned
+.. index:: Database, PHP-API, NotScanned, ext:category_types

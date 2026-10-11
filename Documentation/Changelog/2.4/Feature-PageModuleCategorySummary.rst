@@ -7,11 +7,11 @@ Feature: The page module can summarise a page's categories
 Description
 ===========
 
-:php:`EXT:academic_programs`, :php:`EXT:academic_projects` and
-:php:`EXT:academic_partners` each carried a Fluid partial meant to show the
+EXT:academic_programs, EXT:academic_projects and
+EXT:academic_partners each carried a Fluid partial meant to show the
 categories of their page type in the page module, and none of the three
 renders: all of them are registered as an override of a partial of
-:php:`EXT:backend` that no core template renders, on TYPO3 v12 and v13 alike.
+EXT:backend that no core template renders, on TYPO3 v12 and v13 alike.
 
 None of the three has shown the table in any 2.x release.
 
@@ -43,7 +43,7 @@ Impact
 ======
 
 *   An extension that registers a page type of its own can show a category
-    summary in the page module without copying a template of :php:`EXT:backend`
+    summary in the page module without copying a template of EXT:backend
     and without a partial of its own.
 *   The labels come from the :file:`Configuration/CategoryTypes.yaml` of the
     extension that registered the type, so a type an integrator adds is
@@ -77,4 +77,4 @@ References
     :guilabel:`The page module category summary`, describes the listener, the
     override key and the variables the template is given.
 
-.. index:: Backend, PHP-API, TSConfig, NotScanned
+.. index:: Backend, PHP-API, TSConfig, NotScanned, ext:category_types
