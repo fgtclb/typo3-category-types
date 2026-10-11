@@ -1,4 +1,4 @@
-.. _important-1785700800:
+.. _important-1785700800-3-0:
 
 =============================================================
 Important: Category type registry without any registered type

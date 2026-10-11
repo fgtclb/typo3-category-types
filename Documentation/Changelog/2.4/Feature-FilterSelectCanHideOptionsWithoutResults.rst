@@ -42,12 +42,14 @@ Impact
 
 Nothing changes until a template sets the argument. The `DemandCategories.html`
 partials of `EXT:academic_partners`, `EXT:academic_projects` and
-`EXT:academic_programs`, and from 3.0 on the program finder, pass it from the
-setting `plugin.tx_academic<group>.filter.hideDisabledOptions`, which is off by
-default. A project that overrides them can pass it in place of its own option
-loop.
+`EXT:academic_programs` pass it from the TypoScript constant and site setting
+`plugin.tx_academicpartners.filter.hideDisabledOptions`,
+`plugin.tx_academicprojects.filter.hideDisabledOptions` and
+`plugin.tx_academicprograms.filter.hideDisabledOptions`, which are off by
+default. A project that overrides these partials can pass the argument in place
+of its own option loop.
 
 The prepended "all" option is not one of the options and always stays, so a
 filter whose options are all without results still shows it.
 
-.. index:: Fluid, Frontend, NotScanned
+.. index:: Fluid, Frontend, NotScanned, ext:category_types

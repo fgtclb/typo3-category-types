@@ -1,4 +1,4 @@
-..  _feature-category-type-group-marker:
+..  _feature-category-type-group-marker-3-0:
 
 ===============================================================
 Feature: A category field can offer the categories of one group

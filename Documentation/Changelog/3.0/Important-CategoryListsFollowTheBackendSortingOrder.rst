@@ -1,4 +1,4 @@
-.. _important-category-lists-follow-the-backend-sorting-order:
+.. _important-category-lists-follow-the-backend-sorting-order-3-0:
 
 ==========================================================
 Important: Category lists follow the backend sorting order

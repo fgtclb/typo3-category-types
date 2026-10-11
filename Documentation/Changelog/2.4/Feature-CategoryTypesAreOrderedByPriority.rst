@@ -11,8 +11,7 @@ Every category type of a :file:`Configuration/CategoryTypes.yaml` could declare
 a :yaml:`priority`, and nothing read it. The types of a group came in the order
 the packages were loaded and the files listed them. A :yaml:`useExisting`
 override kept a type where it was, so a project could not reorder the types an
-extension ships, and several projects fixed the order in their own template
-overrides instead.
+extension ships.
 
 The types of a group are now ordered by :yaml:`priority`, the highest first.
 Types with the same priority keep the order in which they were declared. A type
@@ -38,7 +37,7 @@ Impact
 
 Every list of the types of a group follows the order, without a change of its
 own: the type select of a category, the page module category summary and the
-outputs of the extensions that use the group - among them the categories of a
+outputs of the extensions that use the group, among them the categories of a
 program, partner or project page and the filter selects of the program,
 partner and project lists.
 

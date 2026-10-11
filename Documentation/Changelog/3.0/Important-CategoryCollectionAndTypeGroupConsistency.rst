@@ -1,4 +1,4 @@
-.. _important-1785968400:
+.. _important-1785968400-3-0:
 
 ============================================================
 Important: Collection and type group answer consistently now

@@ -1,4 +1,4 @@
-.. _feature-1785706700:
+.. _feature-1785706700-3-0:
 
 =================================================================
 Feature: Category filter select accepts the core select arguments

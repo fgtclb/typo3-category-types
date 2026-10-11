@@ -1,4 +1,4 @@
-.. _important-1785704400:
+.. _important-1785704400-3-0:
 
 ===========================================================
 Important: Category types resolve in templates on first use
