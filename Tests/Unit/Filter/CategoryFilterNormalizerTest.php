@@ -180,6 +180,92 @@ final class CategoryFilterNormalizerTest extends UnitTestCase
         $this->assertSame('', $this->subject()->toFilterArgument($this->filterCollection(12), 12));
     }
 
+    /**
+     * @return \Generator<string, array{0: mixed, 1: bool, 2: bool}>
+     */
+    public static function presetParticipationDataProvider(): \Generator
+    {
+        yield 'a form filter keyed by type' => [['region' => '2'], false, true];
+        yield 'a form filter with "all" selected' => [['region' => ''], false, true];
+        yield 'the filter of a list URL' => [['categories' => '2'], false, false];
+        yield 'no filter' => [null, false, false];
+        yield 'a filter that is no array' => ['2', false, false];
+        yield 'a hidden filter with the filter of a list URL' => [['categories' => '2'], true, true];
+        yield 'a hidden filter without a filter' => [null, true, true];
+    }
+
+    #[DataProvider('presetParticipationDataProvider')]
+    #[Test]
+    public function presetsTakePartInAFormFilterAndAHiddenFilter(mixed $filter, bool $filterHidden, bool $expected): void
+    {
+        $this->assertSame($expected, $this->subject()->keepsPresets($filter, $filterHidden));
+    }
+
+    /**
+     * A form names the types it offers, an empty value for "all" included. The presets of
+     * the other types stay.
+     */
+    #[Test]
+    public function aFormFilterReplacesThePresetsOfTheTypesItNames(): void
+    {
+        $this->assertSame(
+            [6, 3],
+            $this->subject()->toUidListKeepingPresets(
+                ['partner_type' => '3', 'research_field' => ''],
+                $this->presetsByType(),
+                false,
+            ),
+        );
+    }
+
+    #[Test]
+    public function theFilterOfAListUrlIsTheWholeSelection(): void
+    {
+        $this->assertSame(
+            [3],
+            $this->subject()->toUidListKeepingPresets(['categories' => '3'], $this->presetsByType(), false),
+        );
+    }
+
+    /**
+     * Where the content element hides the filter, every preset stays, whatever the filter
+     * names, and the submitted categories are added.
+     */
+    #[Test]
+    public function aHiddenFilterKeepsEveryPresetAndAddsTheSubmittedCategories(): void
+    {
+        $this->assertSame(
+            [6, 7, 2],
+            $this->subject()->toUidListKeepingPresets(['region' => '2', 'research_field' => '7'], $this->presetsByType(), true),
+        );
+        $this->assertSame([6, 7], $this->subject()->toUidListKeepingPresets(null, $this->presetsByType(), true));
+    }
+
+    /**
+     * Without presets, the submitted categories are the selection, as {@see toUidList()}
+     * reads them.
+     */
+    #[Test]
+    public function withoutPresetsTheSubmittedCategoriesAreTheSelection(): void
+    {
+        $this->assertSame([2], $this->subject()->toUidListKeepingPresets(['region' => '2'], [], true));
+        $this->assertSame([2], $this->subject()->toUidListKeepingPresets(['region' => '2'], [], false));
+    }
+
+    /**
+     * The presets Europe (6), a region, and Physics (7), a research field.
+     *
+     * @return array<string, array<int, Category>>
+     */
+    private function presetsByType(): array
+    {
+        return [
+            'region' => [6 => new Category(uid: 6, parentId: 0, title: 'Europe')],
+            'partner_type' => [],
+            'research_field' => [7 => new Category(uid: 7, parentId: 0, title: 'Physics')],
+        ];
+    }
+
     private function filterCollection(int ...$uids): FilterCollection
     {
         $categoryCollection = new CategoryCollection();
