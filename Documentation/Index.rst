@@ -55,6 +55,11 @@ consistently across the academic extensions.
         Install and configure :guilabel:`category_types` for your
         installation.
 
+    ..  card:: :ref:`Upgrade <upgrade>`
+
+        The steps to upgrade :guilabel:`category_types` to a newer
+        version, in the order to take them.
+
     ..  card:: :ref:`Developers <developers>`
 
         Reference for developers: declaring category types, TCA integration
@@ -72,6 +77,7 @@ consistently across the academic extensions.
 
     Introduction/Index
     Administration/Index
+    Upgrade/Index
     Developers/Index
     Changelog/Changelog-2
 
