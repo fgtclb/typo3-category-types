@@ -31,7 +31,7 @@ download and install it using one of the following methods.
 
             ..  code-block:: bash
 
-                composer require 'fgtclb/category-types':'~2.3.1@dev'
+                composer require 'fgtclb/category-types':'~2.4.0@dev'
 
     ..  group-tab:: Extension Manager
 
