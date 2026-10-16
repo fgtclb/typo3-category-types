@@ -6,11 +6,11 @@
 
 # TYPO3 extension `category_types` (READ-ONLY)
 
-|                  | URL                                                        |
-|------------------|------------------------------------------------------------|
-| **Repository:**  | https://github.com/fgtclb/typo3-category-types             |
-| **Read online:** | https://docs.typo3.org/p/fgtclb/category-types/main/en-us/ |
-| **TER:**         | https://extensions.typo3.org/extension/category_types/     |
+|                  | URL                                                       |
+|------------------|-----------------------------------------------------------|
+| **Repository:**  | https://github.com/fgtclb/typo3-category-types            |
+| **Read online:** | https://docs.typo3.org/p/fgtclb/category-types/2.4/en-us/ |
+| **TER:**         | https://extensions.typo3.org/extension/category_types/    |
 
 ## Description
 
