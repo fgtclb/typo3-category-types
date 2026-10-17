@@ -139,8 +139,8 @@ instead:
 
     vendor/bin/typo3 academic:upgrade:check category_types --override-path=<folder>
 
-See the `upgrade check
-<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/UpgradeCheck/Index.html>`__
+See the :ref:`upgrade check
+<fgtclb/academic-base:upgrade-check>`
 of :guilabel:`academic_base`.
 
 ..  _upgrade-from-2-3-to-3-0-unique-identifiers:

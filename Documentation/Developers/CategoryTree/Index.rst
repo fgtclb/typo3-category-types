@@ -13,8 +13,8 @@ has a method for each.
 
 ..  note::
 
-    The repository is not listed on the `extension points page of
-    academic_base <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Developers/ExtensionPoints/Index.html>`__,
+    The repository is not listed on the :ref:`extension points page of
+    academic_base <fgtclb/academic-base:developers-extension-points>`,
     so these methods are not public API. They serve the list plugins of the
     academic extensions and may change with them.
 
