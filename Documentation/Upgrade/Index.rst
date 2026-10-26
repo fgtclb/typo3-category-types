@@ -42,6 +42,11 @@ Before you start
     deployment, to the same release.
 *   :guilabel:`category_types` requires :guilabel:`academic_base`. Upgrade it
     first, by the upgrade chapter of its own manual.
+*   An installation on TYPO3 v12, on a release older than 2.3, on an
+    unreleased revision or on a development constraint of an earlier version
+    takes the steps of :ref:`Installations outside these paths
+    <fgtclb/academic-base:upgrade-outside-these-paths>` in the manual of
+    :guilabel:`academic_base` first.
 
 ..  toctree::
     :hidden:
