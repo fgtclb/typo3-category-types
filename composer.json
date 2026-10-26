@@ -11,7 +11,7 @@
   ],
   "require": {
     "php": "^8.2 || ^8.3 || ^8.4",
-    "fgtclb/academic-base": "~3.0.0@dev",
+    "fgtclb/academic-base": "3.0.0@dev",
     "typo3/cms-core": "~13.4.35 || ~14.3.7"
   },
   "require-dev": {
@@ -24,7 +24,7 @@
       "ignore-as-root": false,
       "web-dir": ".Build/Web",
       "app-dir": ".Build",
-      "version": "3.0.0-dev",
+      "version": "3.0.0",
       "Package": {
         "serviceProvider": "FGTCLB\\CategoryTypes\\ServiceProvider",
         "providesPackages": []
