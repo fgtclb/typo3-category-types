@@ -5,7 +5,7 @@ Contribution
 
 Contributions are essential to the success of open source projects, but are by
 no means limited to contributing code. Much more can be done, for example by
-improving `documentation <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/>`__.
+improving `documentation <https://docs.typo3.org/p/fgtclb/category-types/3.0/en-us/>`__.
 
 Contribution workflow
 ---------------------
