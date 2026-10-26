@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'TESTS: Category Types Icons',
     'description' => 'Category types with an SVG and a bitmap icon for tests',
-    'version' => '3.0.1',
+    'version' => '3.1.0',
     'category' => 'misc',
     'state' => 'beta',
     'author' => 'Stefan Bürk',
@@ -13,7 +13,7 @@ $EM_CONF[$_EXTKEY] = [
         'depends' => [
             'typo3' => '13.4.35-14.3.99',
             'core' => '13.4.35-14.3.99',
-            'category_types' => '3.0.1',
+            'category_types' => '3.1.0',
         ],
     ],
 ];
